@@ -1,6 +1,6 @@
 This project is created using play framework 2.5 seeds template.
 
-Running
+<b>For run the project<b> 
 
 You need to download and install sbt for this application to run.
 
