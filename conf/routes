@@ -13,4 +13,7 @@ GET     /addelection                controllers.HomeController.addelection
 GET        /assets/*file        controllers.Assets.at(path="/public", file)
 
 
-GET     /webjars/*file                    controllers.WebJarAssets.at(file)
+GET     /auth/login                 controllers.AuthController.login
+
+POST    /addelection                controllers.ElectionController.create
+
