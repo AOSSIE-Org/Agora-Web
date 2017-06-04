@@ -4,16 +4,18 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-GET     /login                      controllers.HomeController.login
-GET     /vote                       controllers.HomeController.vote
-GET     /addelection                controllers.HomeController.addelection
+GET     /                           @controllers.HomeController.index
+GET     /login                      @controllers.HomeController.login
+GET     /vote                       @controllers.HomeController.vote
+GET     /addelection                @controllers.HomeController.addelection
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file        controllers.Assets.at(path="/public", file)
+GET        /assets/*file        @controllers.Assets.at(path="/public", file)
 
 
-GET     /auth/login                 controllers.AuthController.login
+GET     /auth/login                 @controllers.AuthController.login
 
-POST    /addelection                controllers.ElectionController.create
+POST    /addelection                @controllers.ElectionController.create
 
+
+POST  /creatCustomer             @controllers.HomeController.createCustomer

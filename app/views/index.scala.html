@@ -1,3 +1,18 @@
-@main("Welcome to Play") {
- <h1>Hello<h1>
+@(customerForm:Form[Customer])(implicit messages: Messages)
+
+@import helper._
+
+//Add csrf tag
+
+
+@main("welcome") {
+ <h1>Customer Form</h1>
+    <div class="container">
+ @helper.form(CSRF(routes.HomeController.createCustomer())) {
+  @helper.inputText(customerForm("Credit Limit"))
+  @helper.inputText(customerForm("Customer Name"))
+
+  <input type="submit" value="Submit">
+ }
+    </div>
 }
