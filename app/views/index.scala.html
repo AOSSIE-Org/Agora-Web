@@ -1,17 +1,17 @@
-@(customerForm:Form[Customer])(implicit messages: Messages, requestHeader: RequestHeader)
+@*@(customerForm:Form[Customer])(implicit messages: Messages, requestHeader: RequestHeader)*@
 
-@import helper._
+@*@import helper._*@
 
 
 
-@main("welcome") {
- <h1>Customer Form</h1>
-    <div class="container">
- @helper.form(CSRF(routes.HomeController.createCustomer())) {
-  @helper.inputText(customerForm("Credit Limit"))
-  @helper.inputText(customerForm("Customer Name"))
+@*@main("welcome") {*@
+ @*<h1>Customer Form</h1>*@
+    @*<div class="container">*@
+ @*@helper.form(CSRF(routes.HomeController.createCustomer())) {*@
+  @*@helper.inputText(customerForm("Credit Limit"))*@
+  @*@helper.inputText(customerForm("Customer Name"))*@
 
-  <input type="submit" value="Submit">
- }
-    </div>
-}
+  @*<input type="submit" value="Submit">*@
+ @*}*@
+    @*</div>*@
+@*}*@
