@@ -30,8 +30,8 @@ class ElectionController @Inject() extends Controller {
 
 
   def electionForm = Form(mapping("Name"  -> nonEmptyText, "Description" -> nonEmptyText, "Creator name" -> nonEmptyText,
-    "Creator email" -> email, "Starting Date" -> nonEmptyText, "Ending Date" -> nonEmptyText, "Realtime Result" -> boolean,
-    "Voting Algo" -> nonEmptyText, "Canditates" -> list(text), "Voting Preference" -> nonEmptyText,
+    "Creator email" -> email, "Starting Date" -> date , "Ending Date" -> date, "Realtime Result" -> boolean,
+    "Voting Algo" -> nonEmptyText, "Canditates" -> list(text), "Voting Preference" -> boolean,
     "Invite Voters" -> boolean)(Election.apply)(Election.unapply))
 
   def create = Action { implicit request =>

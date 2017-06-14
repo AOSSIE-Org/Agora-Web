@@ -25,7 +25,7 @@
 
         @b3.select( electionForm("Voting Algo"), options = result, '_label -> "Voting Algo" )
         @b3.text(electionForm("Canditates") , '_label -> "Canditates", 'placeholder -> "Canditates List")
-        @b3.text(electionForm("Voting Preference") , '_label -> "Voting Preference", 'placeholder -> "Voting Preference")
+        @b3.select(electionForm("Voting Preference") , options = result, '_label -> "Voting Algo" )
         @b3.select( electionForm("Invite Voters"), options = result, '_label -> "Invite Voters" )
             <input type="submit" class="btn btn-info" value="Submit Button">
             </div>

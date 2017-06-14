@@ -23,8 +23,10 @@ class HomeController @Inject() extends Controller {
    */
 
 
-  def index = Action { implicit request =>
+  def index = Action { implicit request => {
+//    val test = new countvotes.methods.EVACSMethod
     Ok(views.html.home())
+  }
   }
 
   def login = Action {implicit request =>
