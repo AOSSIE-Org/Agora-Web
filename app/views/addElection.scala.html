@@ -1,36 +1,56 @@
-@(electionForm:Form[Election])(implicit messages: Messages, requestHeader: RequestHeader)
+@(electionForm: Form[Election])(implicit messages: Messages, requestHeader: RequestHeader)
 
 @import helper._
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
-@algo = @{ Seq("False"->"False","True"->"True") }
-@result = @{ Seq("false"->"False","true"->"True") }
+@algo = @{
+    Seq("False" -> "False", "True" -> "True")
+}
+@result = @{
+    Seq("false" -> "False", "true" -> "True")
+}
 
 @main("welcome") {
-  <h1>Election Form</h1>
+
+    <div class="container centered">
+        <h1>Election Form</h1>
+    </div>
     <div class="container">
-
-
 
     @b3.form(CSRF(routes.ElectionController.create())) {
         <div class="row">
-        @b3.text(electionForm("Name") , '_label -> "Creator name", 'placeholder -> "Election name")
-        @b3.text(electionForm("Description") , '_label -> "Creator name", 'placeholder -> "Description")
-        @b3.text(electionForm("Creator name") , '_label -> "Creator name", 'placeholder -> "full name")
-        @b3.email( electionForm("Creator email"), '_label -> "Creator email", 'placeholder -> "example@mail.com" )
-        @b3.date( electionForm("Starting Date"), '_label -> "Starting Date",'value -> "15-11-2014" )
-        @b3.date(electionForm("Ending Date"), '_label -> "Ending Date",'value -> "31-12-2014" )
-        @b3.select( electionForm("Realtime Result"), options = result, '_label -> "Realtime Result" )
+            <div class="row">
+                <div class="col-md-4">
+                    @b3.text(electionForm("Name"), '_label -> "Creator name", 'placeholder -> "Election name")
+                    @b3.email(electionForm("Creator email"), '_label -> "Creator email", 'placeholder -> "example@mail.com")
+                    @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "15-11-2014")
+                    @b3.select(electionForm("Voting Preference"), options = result, '_label -> "Voting Algo")
+                </div>
+                <div class="col-md-4">
+                    @b3.text(electionForm("Description"), '_label -> "Creator name", 'placeholder -> "Description")
+                    @b3.select(electionForm("Realtime Result"), options = result, '_label -> "Realtime Result")
+                    @b3.date(electionForm("Ending Date"), '_label -> "Ending Date", 'value -> "31-12-2014")
+                    @b3.select(electionForm("Invite Voters"), options = result, '_label -> "Invite Voters")
 
-        @b3.select( electionForm("Voting Algo"), options = result, '_label -> "Voting Algo" )
-        @b3.text(electionForm("Canditates") , '_label -> "Canditates", 'placeholder -> "Canditates List")
-        @b3.select(electionForm("Voting Preference") , options = result, '_label -> "Voting Algo" )
-        @b3.select( electionForm("Invite Voters"), options = result, '_label -> "Invite Voters" )
-            <input type="submit" class="btn btn-info" value="Submit Button">
+                </div>
+                <div class="col-md-4">
+                    @b3.text(electionForm("Creator name"), '_label -> "Creator name", 'placeholder -> "full name")
+                    @b3.select(electionForm("Voting Algo"), options = result, '_label -> "Voting Algo")
+                    @b3.text(electionForm("Canditates"), '_label -> "Canditates", 'placeholder -> "Canditates List")
+
+
+                </div>
+
+
             </div>
+            <div class="centered">
+                <br>
+                <input type="submit" class="btn btn-info" value="Submit Button">
+            </div>
+        </div>
         <br>
-    }
+        }
 
     </div>
 }
