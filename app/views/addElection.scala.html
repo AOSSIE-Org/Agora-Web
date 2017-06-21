@@ -1,51 +1,76 @@
-@(electionForm: Form[Election])(implicit messages: Messages, requestHeader: RequestHeader)
+@(user: models.User, electionForm: Form[Election])(implicit request: RequestHeader, messages: Messages)
+
 
 @import helper._
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
 @algo = @{
-    Seq("False" -> "False", "True" -> "True")
+    Seq("EVACS" -> "EVACS", "Simple" -> "Simple" ,"Egalitarian" -> "Egalitarian", "Majority" -> "Majority" ,"Borda" -> "Borda", "Approval" -> "Approval" ,"Nanson" -> "Nanson", "Kemeny-Young" -> "Kemeny-Young" )
 }
 @result = @{
     Seq("false" -> "False", "true" -> "True")
 }
 
-@main("welcome") {
+@main(Messages("home.title"), Some(user)) {
 
     <div class="container centered">
-        <h1>Election Form</h1>
+        <div class="well">
+            <h1>Create a new election</h1>
+        </div>
     </div>
     <div class="container">
 
     @b3.form(CSRF(routes.ElectionController.create())) {
         <div class="row">
             <div class="row">
+            @if(user == null) {
+                    <!--guest view of add Election form -->
                 <div class="col-md-4">
-                    @b3.text(electionForm("Name"), '_label -> "Creator name", 'placeholder -> "Election name")
+                    @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
                     @b3.email(electionForm("Creator email"), '_label -> "Creator email", 'placeholder -> "example@mail.com")
-                    @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "15-11-2014")
+                    @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "2017-06-22")
                     @b3.select(electionForm("Voting Preference"), options = result, '_label -> "Voting Algo")
                 </div>
                 <div class="col-md-4">
-                    @b3.text(electionForm("Description"), '_label -> "Creator name", 'placeholder -> "Description")
+                    @b3.text(electionForm("Description"), '_label -> "Description", 'placeholder -> "Description")
                     @b3.select(electionForm("Realtime Result"), options = result, '_label -> "Realtime Result")
-                    @b3.date(electionForm("Ending Date"), '_label -> "Ending Date", 'value -> "31-12-2014")
+                    @b3.date(electionForm("Ending Date"), '_label -> "Ending Date", 'value -> "2017-06-19")
                     @b3.select(electionForm("Invite Voters"), options = result, '_label -> "Invite Voters")
 
                 </div>
                 <div class="col-md-4">
                     @b3.text(electionForm("Creator name"), '_label -> "Creator name", 'placeholder -> "full name")
-                    @b3.select(electionForm("Voting Algo"), options = result, '_label -> "Voting Algo")
-                    @b3.text(electionForm("Canditates"), '_label -> "Canditates", 'placeholder -> "Canditates List")
-
+                    @b3.select(electionForm("Voting Algo"), options = algo, '_label -> "Voting Algo")
+                    @b3.tagInput(electionForm("canditates"), '_label -> "Canditates")
+                </div>
+            } else {
+                    <!--user view of add election form-->
+                <div class="col-md-4">
+                    @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
+                    @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "15-11-2014")
+                    @b3.select(electionForm("Voting Preference"), options = result, '_label -> "Voting Algo")
+                </div>
+                <div class="col-md-4">
+                    @b3.text(electionForm("Description"), '_label -> "Description", 'placeholder -> "Description")
+                    @b3.select(electionForm("Realtime Result"), options = result, '_label -> "Realtime Result")
+                    @b3.date(electionForm("Ending Date"), '_label -> "Ending Date", 'value -> "31-12-2014")
+                </div>
+                <div class="col-md-4">
+                    @b3.select(electionForm("Voting Algo"), options = algo, '_label -> "Voting Algo")
+                    @b3.select(electionForm("Invite Voters"), options = result, '_label -> "Invite Voters")
+                    @b3.tagInput(electionForm("canditates"), '_label -> "Canditates")
 
                 </div>
+                @b3.hidden("Creator email", user.email, 'fooAttr -> "fooAttrValue")
+                @b3.hidden("Creator name", user.fullName, 'fooAttr -> "fooAttrValue")
+            }
 
 
             </div>
             <div class="centered">
                 <br>
+
                 <input type="submit" class="btn btn-info" value="Submit Button">
             </div>
         </div>
