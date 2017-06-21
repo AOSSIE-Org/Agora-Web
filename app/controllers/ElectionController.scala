@@ -4,12 +4,21 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 
+import utils.auth.DefaultEnv
+
 import models.Election
 import play.api.data._
 import play.api.data.Forms._
+import forms.ElectionForm
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import scala.concurrent.Future
 
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
+import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
+import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
+
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -17,7 +26,7 @@ import play.api.Play.current
   */
 
 @Singleton
-class ElectionController @Inject() extends Controller {
+class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Silhouette[DefaultEnv] ) extends Controller with I18nSupport  {
 
   /**
     * Create an Action to render an HTML page.
@@ -29,26 +38,29 @@ class ElectionController @Inject() extends Controller {
 
 
 
-  def electionForm = Form(mapping("Name"  -> nonEmptyText, "Description" -> nonEmptyText, "Creator name" -> nonEmptyText,
-    "Creator email" -> email, "Starting Date" -> date , "Ending Date" -> date, "Realtime Result" -> boolean,
-    "Voting Algo" -> nonEmptyText, "Canditates" -> list(text), "Voting Preference" -> boolean,
-    "Invite Voters" -> boolean)(Election.apply)(Election.unapply))
 
-  def create = Action { implicit request =>
-    electionForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.addElection(formWithErrors)),
+
+  def create = silhouette.SecuredAction.async { implicit request =>
+    ElectionForm.form.bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(views.html.addElection(request.identity ,formWithErrors))),
       {
 
         election => {
           Election.create(election)
-          Ok(views.html.home())
+          Future.successful(Ok(views.html.home(request.identity)))
         }
       })
   }
 
+  def createGuestView = silhouette.UnsecuredAction.async( implicit request => {
+    Future.successful(Ok(views.html.addElection(null, ElectionForm.form)))
+  })
 
-  def createview = Action { implicit request =>
-    Ok(views.html.addElection(electionForm))
+
+
+
+  def createUserView = silhouette.SecuredAction.async { implicit request =>
+    Future.successful(Ok(views.html.addElection(request.identity,ElectionForm.form)))
   }
 
 
