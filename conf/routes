@@ -4,22 +4,22 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /                      @controllers.HomeController.index
-GET         /vote                  @controllers.HomeController.vote
-GET         /user/createElection        @controllers.ElectionController.createUserView
-GET         /guest/createElection       @controllers.ElectionController.createGuestView
+GET         /                              @controllers.HomeController.index
+GET         /vote                          @controllers.HomeController.vote
+GET         /user/createElection           @controllers.ElectionController.createUserView
+GET         /guest/createElection          @controllers.ElectionController.createGuestView
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file          @controllers.Assets.at(path="/public", file)
-POST        /createElection        @controllers.ElectionController.create
+GET         /assets/*file                  @controllers.Assets.at(path="/public", file)
+POST        /createElection                @controllers.ElectionController.create
 
 
-GET         /signOut                         controllers.ApplicationController.signOut
-GET         /authenticate/:provider          controllers.SocialAuthController.authenticate(provider)
+GET         /signOut                       controllers.HomeController.signOut
+GET         /authenticate/:provider        controllers.SocialAuthController.authenticate(provider)
 
-GET         /signIn                          controllers.SignInController.view
-
-
-GET         /home                                controllers.ApplicationController.index
+GET         /signIn                        controllers.SignInController.view
 
 
-GET         /webjars/*file                   controllers.WebJarAssets.at(file)
+GET         /home                          controllers.HomeController.indexAutherized
+GET         /voteAutherized                controllers.HomeController.voteAutherized
+
+GET         /webjars/*file                 controllers.WebJarAssets.at(file)

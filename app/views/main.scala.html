@@ -1,10 +1,10 @@
 @*
- * This template is called from the `index` template. This template
- * handles the rendering of the page header and body tags. It takes
- * two arguments, a `String` for the title of the page and an `Html`
- * object to insert into the body of the page.
- *@
-@(title: String)(content: Html)
+* This template is called from the `index` template. This template
+* handles the rendering of the page header and body tags. It takes
+* two arguments, a `String` for the title of the page and an `Html`
+* object to insert into the body of the page.
+*@
+@(title: String, user: Option[models.User] = None)(content: Html)(implicit request: RequestHeader, messages: Messages)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +19,9 @@
         <script type='text/javascript' src='@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js")'></script>
         <link href='@routes.Assets.at("lib/font-awesome/css/font-awesome.css")' rel="stylesheet">
         <link href='@routes.Assets.at("/css/main.css")' rel="stylesheet">
+        <link rel="stylesheet" href='@routes.Assets.at("/css/bootstrap-tagsinput.css")'>
+        <script src=@routes.Assets.at("/javascripts/bootstrap-tagsinput.min.js")></script>
+
     </head>
     <body>
       <nav class="navbar navbar-default" role="navigation">
@@ -30,21 +33,84 @@
                  <span class="icon-bar"></span>
                  <span class="icon-bar"></span>
             </button>
+            @user.map { u =>
+        @if(u == null) {
             <a class="navbar-brand" href="/">Agora</a>
+            } else {
+        <a class="navbar-brand" href="/home">Agora</a>
+    }
+    }.getOrElse{
+         <a class="navbar-brand" href="/">Agora</a>
+    }
           </div>
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+             @user.map { u =>
+            @if(u == null) {
               <li><a href="/vote">Vote</a></li>
+} else {
+        <li><a href="/voteAutherized">Vote</a></li>
+    }}.getOrElse{
+         <li><a href="/vote">Vote</a></li>
+    }
             </ul>
+
+
+            @user.map { u =>
+
+        @if(u != null) {
             <ul class="nav navbar-nav">
-              <li><a href="/createElection">Add Election</a></li>
+                <li><a href="/user/createElection">Add Election</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="/login">login</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-      @content
+            <li><a href="@routes.HomeController.indexAutherized
+            ">@u.name</a></li>
+
+        <li><a href="@routes.HomeController.signOut">@Messages("sign.out")</a></li>
+    </ul>
+    } else{
+        <ul class="nav navbar-nav">
+            <li><a href="/guest/createElection">Add Election</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
+        </ul>
+    }
+
+    }.getOrElse {
+        <ul class="nav navbar-nav">
+            <li><a href="/guest/createElection">Add Election</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
+        </ul>
+    }
+
+    </div>
+    </div>
+    </nav>
+        <main class="container">
+            <div class="starter-template row">
+                @request.flash.get("error").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("error")</strong> @msg
+                    </div>
+                }
+                @request.flash.get("info").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("info")</strong> @msg
+                    </div>
+                }
+                @request.flash.get("success").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-success">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("success")</strong> @msg
+                    </div>
+                }
+                @content
+            </div>
+        </main>
     </body>
 </html>
