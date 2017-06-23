@@ -23,3 +23,5 @@ GET         /home                          controllers.HomeController.indexAuthe
 GET         /voteAutherized                controllers.HomeController.voteAutherized
 
 GET         /webjars/*file                 controllers.WebJarAssets.at(file)
+
+GET         /profile                        controllers.HomeController.profile

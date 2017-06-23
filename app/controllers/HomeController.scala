@@ -56,4 +56,8 @@ class HomeController @Inject() (
     Future.successful(Ok(views.html.index(request.identity)))
   }
 
+  def profile = silhouette.SecuredAction.async{implicit request => {
+    Future.successful(Ok(views.html.profile(request.identity)))
+  }
+  }
 }
