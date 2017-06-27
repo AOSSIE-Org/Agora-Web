@@ -19,6 +19,7 @@ import ExecutionContext.Implicits.global
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 
+import models.daos.ElectionDAOImpl
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -35,7 +36,7 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
     * will be called when the application receives a `GET` request with
     * a path of `/`.
     */
-
+    val electionDAOImpl = new ElectionDAOImpl();
 
 
 
@@ -46,7 +47,7 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
       {
 
         election => {
-          Election.create(election)
+          electionDAOImpl.save(election);
           Future.successful(Ok(views.html.home(request.identity)))
         }
       })
