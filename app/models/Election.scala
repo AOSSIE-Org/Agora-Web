@@ -7,7 +7,7 @@ import java.util.Date;
   *
   * @param name The name of the election
   * @param description The short description about the election
-  * @param creater_name The name of the creator of the election
+  * @param createrName The name of the creator of the election
   * @param creatorEmail The email of the creator of the election
   * @param start The start date of the election
   * @param end The end date of the election
@@ -18,9 +18,9 @@ import java.util.Date;
   * @param isInvite Specify Whether the election is invitable or not
   */
 
-case class Election(name:String, description:String , creater_name:String,
+case class Election(name:String, description:String , createrName:String,
                     creatorEmail : String, start : Date , end : Date , realtimeResult : Boolean ,
-                    votingAlgo : String , canditates : List[String] , isPublic : Boolean ,
+                    votingAlgo : String , candidates : String , isPublic : Boolean ,
                     isInvite : Boolean )
 
 
