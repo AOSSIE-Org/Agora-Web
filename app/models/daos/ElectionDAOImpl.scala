@@ -34,7 +34,7 @@ class ElectionDAOImpl extends ElectionDAO {
   val  electionObject : MongoDBObject = MongoDBObject(
       "name" -> election.name,
       "description" -> election.description,
-      "creater_name" -> election.createrName,
+      "createrName" -> election.createrName,
       "creatorEmail" -> election.creatorEmail,
       "start" -> election.start,
       "end" -> election.end ,
