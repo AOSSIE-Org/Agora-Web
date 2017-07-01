@@ -36,7 +36,7 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
     * will be called when the application receives a `GET` request with
     * a path of `/`.
     */
-    val electionDAOImpl = new ElectionDAOImpl();
+  val electionDAOImpl = new ElectionDAOImpl();
 
 
 

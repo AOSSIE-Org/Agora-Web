@@ -18,8 +18,10 @@ import models.MongoDBConnection
 
 
 class ElectionDAOImpl extends ElectionDAO {
-
-
+    val collectionRef;
+    public ElectionDAOImpl(){
+      val collectionRef = MongoDBConnection.getConnection()
+    }
 
 
   /**
@@ -45,10 +47,16 @@ class ElectionDAOImpl extends ElectionDAO {
       "isInvite" -> election.isInvite,
       "createdTime" ->  new java.util.Date
   );
-  val collectionRef = MongoDBConnection.getConnection()
+
   collectionRef.save(electionObject)
   Future.successful(election)
   }
+
+
+  def view() = {
+
+  }
+
 }
 
 /**

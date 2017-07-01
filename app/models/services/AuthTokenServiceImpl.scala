@@ -28,7 +28,7 @@ class AuthTokenServiceImpl @Inject() (authTokenDAO: AuthTokenDAO, clock: Clock) 
    * @param expiry The duration a token expires.
    * @return The saved auth token.
    */
-  def create(userID: UUID, expiry: FiniteDuration = 5 minutes) = {
+  def create(userID: UUID, expiry: FiniteDuration = 1 minutes) = {
     val token = AuthToken(UUID.randomUUID(), userID, clock.now.withZone(DateTimeZone.UTC).plusSeconds(expiry.toSeconds.toInt))
     authTokenDAO.save(token)
   }
