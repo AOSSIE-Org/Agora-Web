@@ -18,10 +18,7 @@ import models.MongoDBConnection
 
 
 class ElectionDAOImpl extends ElectionDAO {
-    val collectionRef;
-    public ElectionDAOImpl(){
-      val collectionRef = MongoDBConnection.getConnection()
-    }
+    val collectionRef = MongoDBConnection.getConnection();
 
 
   /**
@@ -53,8 +50,10 @@ class ElectionDAOImpl extends ElectionDAO {
   }
 
 
-  def view() = {
-
+  def view() : List[com.mongodb.casbah.Imports.DBObject] = {
+		val docs =  collectionRef.find() 
+		val list = docs.toList
+		return list;
   }
 
 }

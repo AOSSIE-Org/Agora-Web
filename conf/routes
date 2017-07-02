@@ -24,4 +24,6 @@ GET         /voteAutherized                controllers.HomeController.voteAuther
 
 GET         /webjars/*file                 controllers.WebJarAssets.at(file)
 
-GET         /profile                        controllers.HomeController.profile
+GET         /profile                       controllers.HomeController.profile
+
+GET         /election                      controllers.ElectionController.viewElection

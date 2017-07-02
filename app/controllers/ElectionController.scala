@@ -64,6 +64,10 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
     Future.successful(Ok(views.html.addElection(request.identity,ElectionForm.form)))
   }
 
+  def viewElection = silhouette.UnsecuredAction.async( implicit request =>{
+      Future.successful(Ok(views.html.election(null,  electionDAOImpl.view() )))
+  })
+
 
 
 }
