@@ -50,10 +50,16 @@ class ElectionDAOImpl extends ElectionDAO {
   }
 
 
-  def view() : List[com.mongodb.casbah.Imports.DBObject] = {
-		val docs =  collectionRef.find() 
-		val list = docs.toList
-		return list;
+  def view(id: ObjectId) : List[com.mongodb.casbah.Imports.DBObject] = {
+
+		
+      val o : DBObject = MongoDBObject("_id" -> id)
+      val u = collectionRef.findOne(o)
+      val      list = u.toList
+      
+    
+    return list;
+
   }
 
 }

@@ -20,6 +20,7 @@ import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 
 import models.daos.ElectionDAOImpl
+import org.bson.types.ObjectId;
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -64,8 +65,10 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
     Future.successful(Ok(views.html.addElection(request.identity,ElectionForm.form)))
   }
 
-  def viewElection = silhouette.UnsecuredAction.async( implicit request =>{
-      Future.successful(Ok(views.html.election(null,  electionDAOImpl.view() )))
+  def viewElection(id: String) = silhouette.UnsecuredAction.async( implicit request =>{
+      val objectId = new ObjectId(id);
+            
+      Future.successful(Ok(views.html.election(null,  electionDAOImpl.view(objectId: ObjectId) )))
   })
 
 

@@ -42,7 +42,7 @@ class HomeController @Inject() (
     Future.successful(Ok(views.html.vote(null)))
   }
 
-  def voteAutherized = silhouette.SecuredAction.async{ implicit request =>
+  def voteAuthorized = silhouette.SecuredAction.async{ implicit request =>
     Future.successful(Ok(views.html.vote(request.identity)))
   }
 
@@ -52,7 +52,7 @@ class HomeController @Inject() (
     silhouette.env.authenticatorService.discard(request.authenticator, result)
   }
 
-  def indexAutherized = silhouette.SecuredAction.async { implicit request =>
+  def indexAuthorized = silhouette.SecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.index(request.identity)))
   }
 
