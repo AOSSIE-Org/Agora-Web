@@ -54,14 +54,18 @@
                                     </thead>
                                     <tbody id="items">
                                       @for((doc,index) <- list.zipWithIndex) {
+
                                         <tr>
-                                            <td><a href=user/election/@doc.get("_id") >@{index+1}</a></td>
-                                            <td>@doc.get("name")</td>
+
+                                            <td>@{index+1}</td>
+                                            <td>  <a href=user/election/@doc.get("_id")>@doc.get("name")</a></td>
                                             <td>@doc.get("isCompleted")</td>
                                             <td>@doc.get("votingAlgo")</td>
                                             <td>@doc.get("end")</td>
                                             <td>Table Cell</td>
+
                                         </tr>
+
                                     	}
                                     </tbody>
                                 </table>
