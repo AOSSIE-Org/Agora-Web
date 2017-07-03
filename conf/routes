@@ -4,12 +4,15 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /                              @controllers.HomeController.index
-GET         /vote                          @controllers.HomeController.vote
-GET         /user/createElection           @controllers.ElectionController.createUserView
-GET         /guest/createElection          @controllers.ElectionController.createGuestView
+GET         /                              controllers.HomeController.index
 
-POST        /createElection                @controllers.ElectionController.create
+GET         /guest/vote                       controllers.HomeController.vote
+GET         /user/vote                        controllers.HomeController.voteAuthorized
+
+GET         /user/createElection           controllers.ElectionController.createUserView
+GET         /guest/createElection          controllers.ElectionController.createGuestView
+
+POST        /createElection                controllers.ElectionController.create
 
 
 GET         /signOut                       controllers.HomeController.signOut
@@ -19,13 +22,15 @@ GET         /signIn                        controllers.SignInController.view
 
 
 GET         /home                          controllers.HomeController.indexAuthorized
-GET         /voteAuthorized                controllers.HomeController.voteAuthorized
 
 GET         /webjars/*file                 controllers.WebJarAssets.at(file)
 
 GET         /profile                       controllers.HomeController.profile
 
-GET         /election/:id                  controllers.ElectionController.viewElection(id)
+GET         /guest/election/:id                  controllers.ElectionController.viewElection(id)
+GET         /user/election/:id                  controllers.ElectionController.viewElectionSecured(id)
+
+
 
 
 # Map static resources from the /public folder to the /assets URL path
