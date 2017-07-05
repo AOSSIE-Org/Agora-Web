@@ -29,13 +29,7 @@ import models.daos.ElectionDAOImpl
 @Singleton
 class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Silhouette[DefaultEnv] ) extends Controller with I18nSupport  {
 
-  /**
-    * Create an Action to render an HTML page.
-    *
-    * The configuration in the `routes` file means that this method
-    * will be called when the application receives a `GET` request with
-    * a path of `/`.
-    */
+
     val electionDAOImpl = new ElectionDAOImpl();
 
 
@@ -56,14 +50,5 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
   def createGuestView = silhouette.UnsecuredAction.async( implicit request => {
     Future.successful(Ok(views.html.addElection(null, ElectionForm.form)))
   })
-
-
-
-
-  def createUserView = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.addElection(request.identity,ElectionForm.form)))
-  }
-
-
 
 }

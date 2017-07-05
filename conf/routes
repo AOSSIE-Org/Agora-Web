@@ -6,10 +6,7 @@
 # An example controller showing a sample home page
 GET         /                              @controllers.HomeController.index
 GET         /vote                          @controllers.HomeController.vote
-GET         /user/createElection           @controllers.ElectionController.createUserView
-GET         /guest/createElection          @controllers.ElectionController.createGuestView
-# Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                  @controllers.Assets.at(path="/public", file)
+
 POST        /createElection                @controllers.ElectionController.create
 
 
@@ -19,9 +16,14 @@ GET         /authenticate/:provider        controllers.SocialAuthController.auth
 GET         /signIn                        controllers.SignInController.view
 
 
-GET         /home                          controllers.HomeController.indexAutherized
-GET         /voteAutherized                controllers.HomeController.voteAutherized
+GET         /home                          controllers.HomeController.indexAuthorized
+GET         /voteAutherized                controllers.HomeController.voteAuthorized
 
-GET         /webjars/*file                 controllers.WebJarAssets.at(file)
+
 
 GET         /profile                        controllers.HomeController.profile
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                  @controllers.Assets.at(path="/public", file)
+GET         /webjars/*file                 controllers.WebJarAssets.at(file)
