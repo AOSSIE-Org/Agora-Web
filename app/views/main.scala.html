@@ -1,10 +1,10 @@
 @*
- * This template is called from the `index` template. This template
- * handles the rendering of the page header and body tags. It takes
- * two arguments, a `String` for the title of the page and an `Html`
- * object to insert into the body of the page.
- *@
-@(title: String)(content: Html)
+* This template is called from the `index` template. This template
+* handles the rendering of the page header and body tags. It takes
+* two arguments, a `String` for the title of the page and an `Html`
+* object to insert into the body of the page.
+*@
+@(title: String, user: Option[models.User] = None)(content: Html)(implicit request: RequestHeader, messages: Messages)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,15 +13,17 @@
         <title>Agora Front End</title>
         <meta charset="utf-8">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src='@routes.Assets.at("/javascripts/jquery-3.2.0.min.js")'></script>
-        <link rel="stylesheet" href='@routes.Assets.at("/css/bootstrap.css")'>
-        <script type='text/javascript' src='@routes.Assets.at("/javascripts/bootstrap.js")'></script>
-        <link rel="stylesheet" href='@routes.Assets.at("/css/datepicker.min.css")' />
-        <link rel="stylesheet" href='@routes.Assets.at("/css/datepicker3.min.css")' />
-        <script type='text/javascript' src='@routes.Assets.at("/javascripts/bootstrap-datepicker.min.js")'></script>
-        <link href='@routes.Assets.at("/css/fontawesome.css")' rel="stylesheet">
+        <script src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
+        <link rel="stylesheet" href='@routes.Assets.at("lib/bootstrap/css/bootstrap.css")'>
+        <script type='text/javascript' src='@routes.Assets.at("lib/bootstrap/js/bootstrap.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js")'></script>
+        <link href='@routes.Assets.at("lib/font-awesome/css/font-awesome.css")' rel="stylesheet">
         <link href='@routes.Assets.at("/css/main.css")' rel="stylesheet">
+        <link rel="stylesheet" href='@routes.Assets.at("/css/bootstrap-tagsinput.css")'>
+        <script src=@routes.Assets.at("/javascripts/bootstrap-tagsinput.min.js")></script>
     </head>
+
+
     <body>
       <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
@@ -32,21 +34,100 @@
                  <span class="icon-bar"></span>
                  <span class="icon-bar"></span>
             </button>
+            @user.map { u =>
+        @if(u == null) {
             <a class="navbar-brand" href="/">Agora</a>
+            } else {
+        <a class="navbar-brand" href="/home">Agora</a>
+    }
+    }.getOrElse{
+         <a class="navbar-brand" href="/">Agora</a>
+    }
           </div>
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+             @user.map { u =>
+            @if(u == null) {
               <li><a href="/vote">Vote</a></li>
+} else {
+        <li><a href="/voteAuthorized">Vote</a></li>
+    }}.getOrElse{
+         <li><a href="/vote">Vote</a></li>
+    }
             </ul>
+
+
+            @user.map { u =>
+
+        @if(u != null) {
             <ul class="nav navbar-nav">
-              <li><a href="/addelection">Add Election</a></li>
+                <li><a href="/user/createElection">Add Election</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="/login">login</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-      @content
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <span class="user-avatar pull-left" style="margin-right:8px; margin-top:-5px;">
+                                        <img src="@u.avatarURL" class="img-responsive img-circle" title="John Doe" alt="John Doe" width="30px" height="30px">
+                                    </span>
+                                    <span class="user-name">
+                                        @u.fullName
+                                    </span>
+                                    <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                            <div class="navbar-content">
+                                                         <li><a href="/profile" class="btn btn-default btn-block"> Profile</a></li>
+                                                         <li><a href="#" class="btn btn-default btn-block"> Settings</a></li>
+                                                         <li><a href="@routes.HomeController.signOut" class="btn btn-default btn-block">Sign Out</a></li>
+                                            </div>
+                                    </ul>
+                                </li>
+
+
+
+
+    </ul>
+    } else{
+        <ul class="nav navbar-nav">
+            <li><a href="/guest/createElection">Add Election</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
+        </ul>
+    }
+
+    }.getOrElse {
+        <ul class="nav navbar-nav">
+            <li><a href="/guest/createElection">Add Election</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
+        </ul>
+    }
+
+    </div>
+    </div>
+    </nav>
+        <main class="container">
+            <div class="starter-template row">
+                @request.flash.get("error").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("error")</strong> @msg
+                    </div>
+                }
+                @request.flash.get("info").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("info")</strong> @msg
+                    </div>
+                }
+                @request.flash.get("success").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-success">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("success")</strong> @msg
+                    </div>
+                }
+                @content
+            </div>
+        </main>
     </body>
 </html>

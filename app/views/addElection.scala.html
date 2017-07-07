@@ -1,109 +1,81 @@
-@main("Welcome to Play") {
+@(user: models.User, electionForm: Form[Election])(implicit request: RequestHeader, messages: Messages)
 
-  <div class="text-center ">
-      <div id="headerwrap">
-      <h1>Create a Election</h1>
+
+@import helper._
+@import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
+
+
+@algo = @{
+    Seq("EVACS" -> "EVACS", "Simple" -> "Simple" ,"Egalitarian" -> "Egalitarian", "Majority" -> "Majority" ,"Borda" -> "Borda", "Approval" -> "Approval" ,"Nanson" -> "Nanson", "Kemeny-Young" -> "Kemeny-Young" )
+}
+@result = @{
+    Seq("false" -> "False", "true" -> "True")
+}
+
+@main(Messages("home.title"), Some(user)) {
+
+    <div class="container centered">
+        <div class="well">
+            <h1>Create a new election</h1>
+        </div>
     </div>
     <div class="container">
-      <button class="btn btn-primary"
-      data-toggle="modal" data-target="#new-activity">
-      Add Election</button>
+
+    @b3.form(CSRF(routes.ElectionController.create())) {
+        <div class="row">
+            <div class="row">
+            @if(user == null) {
+                    <!--guest view of add Election form -->
+                <div class="col-md-4">
+                    @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
+                    @b3.email(electionForm("Creator email"), '_label -> "Creator email", 'placeholder -> "example@mail.com")
+                    @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "2017-06-22")
+                    @b3.select(electionForm("Voting Preference"), options = result, '_label -> "Voting Algo")
+                </div>
+                <div class="col-md-4">
+                    @b3.text(electionForm("Description"), '_label -> "Description", 'placeholder -> "Description")
+                    @b3.select(electionForm("Realtime Result"), options = result, '_label -> "Realtime Result")
+                    @b3.date(electionForm("Ending Date"), '_label -> "Ending Date", 'value -> "2017-06-19")
+                    @b3.select(electionForm("Invite Voters"), options = result, '_label -> "Invite Voters")
+
+                </div>
+                <div class="col-md-4">
+                    @b3.text(electionForm("Creator name"), '_label -> "Creator name", 'placeholder -> "full name")
+                    @b3.select(electionForm("Voting Algo"), options = algo, '_label -> "Voting Algo")
+                    @b3.tagInput(electionForm("Candidates"), '_label -> "Candidates")
+                </div>
+            } else {
+                    <!--user view of add election form-->
+                <div class="col-md-4">
+                    @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
+                    @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "2017-06-19")
+                    @b3.select(electionForm("Voting Preference"), options = result, '_label -> "Voting Algo")
+                </div>
+                <div class="col-md-4">
+                    @b3.text(electionForm("Description"), '_label -> "Description", 'placeholder -> "Description")
+                    @b3.date(electionForm("Ending Date"), '_label -> "Ending Date", 'value -> "2017-06-19")
+                    @b3.select(electionForm("Realtime Result"), options = result, '_label -> "Realtime Result")
+                </div>
+                <div class="col-md-4">
+                    @b3.select(electionForm("Voting Algo"), options = algo, '_label -> "Voting Algo")
+                    @b3.select(electionForm("Invite Voters"), options = result, '_label -> "Invite Voters")
+                    @b3.tagInput(electionForm("Candidates"), '_label -> "Candidates")
+
+                </div>
+                @b3.hidden("Creator email", user.email, 'fooAttr -> "fooAttrValue")
+                @b3.hidden("Creator name", user.fullName, 'fooAttr -> "fooAttrValue")
+            }
+
+
+            </div>
+            <div class="centered">
+                <br>
+
+                <input type="submit" class="btn btn-info" value="Submit Button">
+            </div>
+        </div>
+        <br>
+        }
+
     </div>
-    <div class="modal fade" id="new-activity" role="dialog">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">New Election</h4>
-          </div>
-          <div class="modal-body">
-            <!-- <form action="/v1/posts" method="post"> -->
-            <form class="form-horizontal" action="/v1/posts" method="post">
-              <div class="form-group">
-                <label for="candidates" class="control-label col-sm-2">candidates</label>
-                <div class="col-sm-10">
-                  <input name="candidate" class="form-control" type="text" placeholder="A ; B ; C ; D">
-              </div>
-              </br>
-              </br>
-              </br>
-              <div class="col-sm-11 center-block well">
-                Each separated by a semicolon candidate.The front and rear spaces will be ignored.
-                Of course, a minimum vote requires two candidates.
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="methods" class="control-label col-sm-2">Method</label>
-              <div class="col-sm-10">
-                <select class="form-control" name="method" id="method">
-                  <option value="EVACS">EVACS</option>
-                  <option value="Simple">Simple</option>
-                  <option value="Egalitarian">Egalitarian</option>
-                  <option value="Majority">Majority</option>
-                  <option value="Approval">Approval</option>
-                  <option value="Borda">Borda</option>
-                  <option value="Kemeny-Young">Kemeny-Young</option>
-                  <option value="Nanson">Nanson</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="winners" class="control-label col-sm-2">Winner</label>
-              <div class="col-sm-2">
-
-                  <input type="text" name="winner" class="form-control" >
-
-              </div>
-
-
-            </div>
-            <div class="form-group">
-              <label for="candidates" class="control-label col-sm-2">Start Date</label>
-              <div class="col-sm-10">
-                <div class="input-group input-append date" id="datePicker">
-              <input type="text" class="form-control" name="date" />
-              <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-              </div>
-              <script src = '@routes.Assets.at("/javascripts/datepicker.js")'></script>
-
-
-            </div>
-            </br>
-          </div>
-
-          <div class="form-group">
-            <label for="candidates" class="control-label col-sm-2">End Date</label>
-            <div class="col-sm-10">
-              <div class="input-group input-append date" id="datePicker1">
-            <input type="text" class="form-control" name="date" />
-            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-            </div>
-          <script src = '@routes.Assets.at("/javascripts/datepicker.js")'></script>
-
-
-          </div>
-
-
-          </br>
-          </div>
-            <div class="form-group">
-              <label for="tables" class="control-label col-sm-2">Table</label>
-              <div class="col-sm-10">
-                <select class="form-control" name="table" id="table">
-                  <option value="ACT">ACT</option>
-                  <option value="Concise">Concise</option>
-                </select>
-              </div>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button class="btn btn-primary" id="submit-activity-button">Submit</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  </div>
 }

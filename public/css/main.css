@@ -13,7 +13,7 @@ p {
 a {
     color: #3bc492;
     word-wrap: break-word;
-
+    margin-top: 5px;
     -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
     -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
     -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
@@ -100,7 +100,7 @@ a:after {
 /* Copyright Wrap */
 
 #c {
-	background:  #2f3537;
+	background:  #595959;
 	padding-top: 15px;
 	text-align: center;
   font-size: 19px;
@@ -109,4 +109,65 @@ a:after {
 #c p {
 	color: white
 
+}
+
+navbar .navbar-nav {
+    display: inline-block;
+    float: none;
+
+}
+
+.navbar .navbar-collapse {
+    text-align: center;
+}
+
+
+
+
+.navbar {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+.navbar-brand {
+    list-style-type: none;
+    margin-bottom: 0px;
+}
+
+
+.navbar-default {
+    background-color: #f7f9f9;
+}
+/* Special class on .container surrounding .navbar, used for positioning it into place. */
+.navbar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+/* Flip around the padding for proper display in narrow viewports */
+.navbar-wrapper .container {
+    padding-left: 0;
+    padding-right: 0;
+}
+.navbar-wrapper .navbar {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.navbar-content
+{
+    width:160px;
+    padding: 15px;
+    padding-bottom:0px;
+}
+.navbar-content:before, .navbar-content:after
+{
+    display: table;
+    content: "";
+    line-height: 0;
 }
