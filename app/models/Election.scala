@@ -18,7 +18,7 @@ import java.util.Date;
   * @param isInvite Specify Whether the election is invitable or not
   */
 
-case class Election(name:String, description:String , createrName:String,
+case class Election(name:String, description:String , creatorName:String,
                     creatorEmail : String, start : Date , end : Date , realtimeResult : Boolean ,
                     votingAlgo : String , candidates : String , isPublic : Boolean ,
                     isInvite : Boolean )
