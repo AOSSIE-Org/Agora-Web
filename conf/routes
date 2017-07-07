@@ -17,8 +17,9 @@ GET         /signIn                        controllers.SignInController.view
 
 
 GET         /home                          controllers.HomeController.indexAuthorized
-GET         /voteAutherized                controllers.HomeController.voteAuthorized
-
+GET         /voteAuthorized                controllers.HomeController.voteAuthorized
+GET			/user/createElection           controllers.ElectionController.createUserView
+GET			/guest/createElection          controllers.ElectionController.createGuestView
 
 
 GET         /profile                        controllers.HomeController.profile
