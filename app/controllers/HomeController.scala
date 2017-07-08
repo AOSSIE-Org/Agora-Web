@@ -10,7 +10,7 @@ import scala.concurrent.Future
 import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import play.api.i18n.{ I18nSupport, MessagesApi }
-
+import models.daos.ElectionDAOImpl
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -29,7 +29,7 @@ class HomeController @Inject() (
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-
+     val electionDAOImpl = new ElectionDAOImpl();
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.home(null)))
@@ -57,7 +57,7 @@ class HomeController @Inject() (
   }
 
   def profile = silhouette.SecuredAction.async{implicit request => {
-    Future.successful(Ok(views.html.profile(request.identity)))
+    Future.successful(Ok(views.html.profile(request.identity, electionDAOImpl.userElectionList(request.identity.email))))
   }
   }
 }

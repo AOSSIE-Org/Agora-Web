@@ -18,8 +18,7 @@ import models.MongoDBConnection
 
 
 class ElectionDAOImpl extends ElectionDAO {
-
-
+    val collectionRef = MongoDBConnection.getConnection();
 
 
   /**
@@ -43,12 +42,34 @@ class ElectionDAOImpl extends ElectionDAO {
       "candidates" -> candidates ,
       "isPublic" -> election.isPublic,
       "isInvite" -> election.isInvite,
+      "isCompleted" -> false,
       "createdTime" ->  new java.util.Date
   );
-  val collectionRef = MongoDBConnection.getConnection()
+
   collectionRef.save(electionObject)
   Future.successful(election)
   }
+
+
+  def view(id: ObjectId) : List[com.mongodb.casbah.Imports.DBObject] = {
+
+
+      val o : DBObject = MongoDBObject("_id" -> id)
+      val u = collectionRef.findOne(o)
+      val list = u.toList
+
+
+    return list;
+
+  }
+
+  def userElectionList(email : Option[String]) : List[com.mongodb.casbah.Imports.DBObject] = {
+          val o : DBObject = MongoDBObject("creatorEmail" -> email)
+          val u = collectionRef.find(o)
+          val list = u.toList
+          return list;
+  }
+
 }
 
 /**

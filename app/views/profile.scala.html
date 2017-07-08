@@ -1,4 +1,6 @@
-@(user: models.User)(implicit request: RequestHeader, messages: Messages)
+@(user: models.User , list: List[com.mongodb.casbah.Imports.DBObject] )(implicit request: RequestHeader, messages: Messages)
+
+@import java.math.BigInteger; var i = 0;
 
 @main(Messages("home.title"), Some(user)) {
 <div class="mainbody container-fluid">
@@ -51,88 +53,20 @@
                                         </tr>
                                     </thead>
                                     <tbody id="items">
+                                      @for((doc,index) <- list.zipWithIndex) {
+
                                         <tr>
-                                            <td>1</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>6</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
+
+                                            <td>@{index+1}</td>
+                                            <td>  <a href=user/election/@doc.get("_id")>@doc.get("name")</a></td>
+                                            <td>@doc.get("isCompleted")</td>
+                                            <td>@doc.get("votingAlgo")</td>
+                                            <td>@doc.get("end")</td>
+                                            <td>Table Cell</td>
 
                                         </tr>
-                                        <tr>
-                                            <td>7</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
 
-                                        </tr>
-                                        <tr>
-                                            <td>8</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>9</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
-                                        <tr>
-                                            <td>10</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                            <td>Table cell</td>
-                                        </tr>
+                                    	}
                                     </tbody>
                                 </table>
                             </div>

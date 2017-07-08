@@ -1,0 +1,23 @@
+@(user: models.User , list: List[com.mongodb.casbah.Imports.DBObject])(implicit request: RequestHeader, messages: Messages)
+
+
+@import java.math.BigInteger; var i = 0;
+
+@main(Messages("home.title"), Some(user)) {
+
+
+	<h3>Iterate over the list</h3>
+	@for(doc <- list) {
+		<p>
+			Result No. @{i += 1; i}:<br>
+			As JSON string: @doc
+		</p>
+		<div class="well">
+			<dl>
+				<dt>_id</dt>
+				<dd>@doc.get("_id")</dd>
+			</dl>
+		</div>
+	}
+
+}
