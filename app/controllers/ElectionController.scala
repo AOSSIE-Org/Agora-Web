@@ -30,14 +30,8 @@ import org.bson.types.ObjectId;
 @Singleton
 class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Silhouette[DefaultEnv] ) extends Controller with I18nSupport  {
 
-  /**
-    * Create an Action to render an HTML page.
-    *
-    * The configuration in the `routes` file means that this method
-    * will be called when the application receives a `GET` request with
-    * a path of `/`.
-    */
-  val electionDAOImpl = new ElectionDAOImpl();
+
+    val electionDAOImpl = new ElectionDAOImpl();
 
 
 
@@ -59,8 +53,6 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
   })
 
 
-
-
   def createUserView = silhouette.SecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.addElection(request.identity,ElectionForm.form)))
   }
@@ -76,6 +68,5 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
 
       Future.successful(Ok(views.html.election(request.identity,  electionDAOImpl.view(objectId: ObjectId) )))
   })
-
 
 }

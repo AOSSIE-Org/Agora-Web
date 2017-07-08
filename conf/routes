@@ -23,7 +23,7 @@ GET         /signIn                        controllers.SignInController.view
 
 GET         /home                          controllers.HomeController.indexAuthorized
 
-GET         /webjars/*file                 controllers.WebJarAssets.at(file)
+GET         /profile                        controllers.HomeController.profile
 
 GET         /profile                       controllers.HomeController.profile
 
