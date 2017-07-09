@@ -52,14 +52,10 @@ class ElectionDAOImpl extends ElectionDAO {
 
 
   def view(id: ObjectId) : List[com.mongodb.casbah.Imports.DBObject] = {
-
-
       val o : DBObject = MongoDBObject("_id" -> id)
       val u = collectionRef.findOne(o)
       val list = u.toList
-
-
-    return list;
+      return list;
 
   }
 
@@ -69,6 +65,15 @@ class ElectionDAOImpl extends ElectionDAO {
           val list = u.toList
           return list;
   }
+
+
+  def viewCandidate(id: ObjectId) : com.mongodb.casbah.Imports.MongoDBList = {
+          val o : DBObject = MongoDBObject("_id" -> id)
+          val u = collectionRef.findOne(o)
+          val list = collectionRef.findOne(o).get.getAs[MongoDBList]("candidates").get
+          return list
+
+      }
 
 }
 

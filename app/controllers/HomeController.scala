@@ -36,16 +36,6 @@ class HomeController @Inject() (
   }
 
 
-
-
-  def vote = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.vote(null)))
-  }
-
-  def voteAuthorized = silhouette.SecuredAction.async{ implicit request =>
-    Future.successful(Ok(views.html.vote(request.identity)))
-  }
-
   def signOut = silhouette.SecuredAction.async { implicit request =>
     val result = Redirect(routes.HomeController.index())
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))

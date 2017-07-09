@@ -1,4 +1,11 @@
 
+
+.vote {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-right: 10px;
+}
+
 /* Paragraph & Typographic */
 p {
     line-height: 28px;

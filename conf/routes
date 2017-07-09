@@ -4,34 +4,34 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /                              controllers.HomeController.index
+GET         /                                 controllers.HomeController.index
 
-GET         /guest/vote                       controllers.HomeController.vote
-GET         /user/vote                        controllers.HomeController.voteAuthorized
+GET         /guest/vote/:id                       controllers.ElectionController.voteGuest(id)
+GET         /user/vote/:id                        controllers.ElectionController.voteUser(id)
 
-GET         /user/createElection           controllers.ElectionController.createUserView
-GET         /guest/createElection          controllers.ElectionController.createGuestView
+GET         /user/createElection              controllers.ElectionController.createUserView
+GET         /guest/createElection             controllers.ElectionController.createGuestView
 
-POST        /createElection                controllers.ElectionController.create
-
-
-GET         /signOut                       controllers.HomeController.signOut
-GET         /authenticate/:provider        controllers.SocialAuthController.authenticate(provider)
-
-GET         /signIn                        controllers.SignInController.view
+POST        /createElection                   controllers.ElectionController.create
 
 
-GET         /home                          controllers.HomeController.indexAuthorized
+GET         /signOut                          controllers.HomeController.signOut
+GET         /authenticate/:provider           controllers.SocialAuthController.authenticate(provider)
 
-GET         /profile                        controllers.HomeController.profile
+GET         /signIn                           controllers.SignInController.view
 
-GET         /profile                       controllers.HomeController.profile
 
-GET         /guest/election/:id                  controllers.ElectionController.viewElection(id)
-GET         /user/election/:id                  controllers.ElectionController.viewElectionSecured(id)
+GET         /home                             controllers.HomeController.indexAuthorized
+
+GET         /profile                          controllers.HomeController.profile
+
+GET         /profile                          controllers.HomeController.profile
+
+GET         /guest/election/:id               controllers.ElectionController.viewElection(id)
+GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
 
 
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                  @controllers.Assets.at(path="/public", file)
+GET         /assets/*file                     controllers.Assets.at(path="/public", file)
