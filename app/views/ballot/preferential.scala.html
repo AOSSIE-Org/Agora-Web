@@ -11,15 +11,11 @@
     <div class="container">
         <div class="container text-center">
             <h2>Contest Title</h2>
-
             <div></div>
-
         </div>
         <div id="ballot-0" class="container">
             <div class="container">
-
                 <div class="col-md-4 col-md-offset-3" id="mydiv1">
-
                     <ul>
                       <p>Choice list:</p>
                       @for(doc <- mongoListOfObjects) {
@@ -28,12 +24,12 @@
                       }
                     </ul>
                 </div>
-                <div class="col-md-3 col-md-pull-1 well">
+                <div class="col-md-3 col-md-pull-1 well centered">
                     <p>Your ballot:</p>
-                    <div id ='mydiv'>
-                    </div>
+                    <ul class ="mydiv" id="sortable">
+                    </ul>
                 </div>
-                <script type='text/javascript' src='@routes.Assets.at("/javascripts/singleCandidate.js")'> </script>
+                <script type='text/javascript' src='@routes.Assets.at("/javascripts/preferential.js")'> </script>
             </div>
             <input id="order-0" class="order" name="order-0" type="hidden">
         </div>

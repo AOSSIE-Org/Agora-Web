@@ -1,5 +1,13 @@
 
 
+
+.preferential {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-top: 0 none;
+    background-color: #ffff33
+}
+
 .vote {
     margin-top: 2px;
     margin-bottom: 2px;
