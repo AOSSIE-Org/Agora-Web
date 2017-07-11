@@ -1,4 +1,4 @@
-@(user: models.User, mongoListOfObjects : com.mongodb.casbah.Imports.MongoDBList)(implicit request: RequestHeader, messages: Messages) @vote(user) {
+@(user: Option[models.User], mongoListOfObjects : com.mongodb.casbah.Imports.MongoDBList)(implicit request: RequestHeader, messages: Messages) @vote(user) {
 
 <form name="ballot" id="ballot-form">
   <input name="email" value="" type="hidden">

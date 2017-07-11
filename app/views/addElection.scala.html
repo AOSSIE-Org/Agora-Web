@@ -1,4 +1,4 @@
-@(user: models.User, electionForm: Form[Election])(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User], electionForm: Form[Election])(implicit request: RequestHeader, messages: Messages)
 
 
 @import helper._
@@ -12,7 +12,7 @@
     Seq("false" -> "False", "true" -> "True")
 }
 
-@main(Messages("home.title"), Some(user)) {
+@main(Messages("home.title"), user) {
 
     <div class="container centered">
         <div class="well">
@@ -24,7 +24,7 @@
     @b3.form(CSRF(routes.ElectionController.create())) {
         <div class="row">
             <div class="row">
-            @if(user == null) {
+            @if(user == None) {
                     <!--guest view of add Election form -->
                 <div class="col-md-4">
                     @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
@@ -62,8 +62,8 @@
                     @b3.tagInput(electionForm("Candidates"), '_label -> "Candidates")
 
                 </div>
-                @b3.hidden("Creator email", user.email, 'fooAttr -> "fooAttrValue")
-                @b3.hidden("Creator name", user.fullName, 'fooAttr -> "fooAttrValue")
+                @b3.hidden("Creator email", user.get.email, 'fooAttr -> "fooAttrValue")
+                @b3.hidden("Creator name", user.get.fullName, 'fooAttr -> "fooAttrValue")
             }
 
 

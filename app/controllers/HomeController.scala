@@ -32,7 +32,7 @@ class HomeController @Inject() (
      val electionDAOImpl = new ElectionDAOImpl();
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.home(null)))
+    Future.successful(Ok(views.html.home(Option(null))))
   }
 
 
@@ -43,11 +43,11 @@ class HomeController @Inject() (
   }
 
   def indexAuthorized = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.index(request.identity)))
+    Future.successful(Ok(views.html.index(Option(request.identity))))
   }
 
   def profile = silhouette.SecuredAction.async{implicit request => {
-    Future.successful(Ok(views.html.profile(request.identity, electionDAOImpl.userElectionList(request.identity.email))))
+    Future.successful(Ok(views.html.profile(Option(request.identity), electionDAOImpl.userElectionList(request.identity.email))))
   }
   }
 }

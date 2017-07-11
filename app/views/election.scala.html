@@ -1,9 +1,9 @@
-@(user: models.User , list: List[com.mongodb.casbah.Imports.DBObject])(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User] , list: List[com.mongodb.casbah.Imports.DBObject])(implicit request: RequestHeader, messages: Messages)
 
 
 @import java.math.BigInteger; var i = 0;
 
-@main(Messages("home.title"), Some(user)) {
+@main(Messages("home.title"), user) {
 
 
 	<h3>Iterate over the list</h3>

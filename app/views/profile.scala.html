@@ -1,8 +1,8 @@
-@(user: models.User , list: List[com.mongodb.casbah.Imports.DBObject] )(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User] , list: List[com.mongodb.casbah.Imports.DBObject] )(implicit request: RequestHeader, messages: Messages)
 
 @import java.math.BigInteger; var i = 0;
 
-@main(Messages("home.title"), Some(user)) {
+@main(Messages("home.title"), user) {
 <div class="mainbody container-fluid">
     <div class="row">
         <div style="padding-top:50px;"> </div>
@@ -11,9 +11,9 @@
                 <div class="panel-body">
                     <div class="media">
                         <div align="center">
-                            <img class="thumbnail img-responsive" src="@user.avatarURL" width="300px" height="300px">
+                            <img class="thumbnail img-responsive" src="@user.get.avatarURL" width="300px" height="300px">
                         </div>
-                        <h3>@user.fullName</h3>
+                        <h3>@user.get.fullName</h3>
                         <div class="media-body">
                             <hr>
                             <h3><strong>Bio</strong></h3>
@@ -23,7 +23,7 @@
                             <p>Earth</p>
                             <hr>
                             <h3><strong>Email</strong></h3>
-                            <p>@user.email</p>
+                            <p>@user.get.email</p>
                         </div>
                     </div>
                 </div>
