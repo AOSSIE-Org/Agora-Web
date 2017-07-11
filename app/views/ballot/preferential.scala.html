@@ -9,24 +9,27 @@
     <input name="code" value="" type="hidden">
 
     <div class="container">
-        <div class="container text-center">
-            <h2>Contest Title</h2>
-            <div></div>
-        </div>
         <div id="ballot-0" class="container">
             <div class="container">
-                <div class="col-md-4 col-md-offset-3" id="mydiv1">
+                <div class="col-md-4 col-md-offset-3" id="candidateDiv">
                     <ul>
-                      <p>Choice list:</p>
+                      <p>candidate List:</p>
                       @for(doc <- mongoListOfObjects) {
-                        <li class="r0_0 vote"><button id='AAA_@doc' value='@doc' type="button" class="btn btn-default btn-sm add vote">
+                        <li class="r0_0"><button id='AAA_@doc' value='@doc' type="button" class="btn btn-default btn-sm add vote">
                           Add</button><span>@doc</span></li>
                       }
                     </ul>
+
+
+
+
+
+
+
                 </div>
                 <div class="col-md-3 col-md-pull-1 well centered">
                     <p>Your ballot:</p>
-                    <ul class ="mydiv" id="sortable">
+                    <ul class ="ballotDiv" id="sortable">
                     </ul>
                 </div>
                 <script type='text/javascript' src='@routes.Assets.at("/javascripts/preferential.js")'> </script>

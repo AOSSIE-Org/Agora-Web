@@ -1,0 +1,64 @@
+@(user: models.User, mongoListOfObjects : com.mongodb.casbah.Imports.MongoDBList)(implicit request: RequestHeader, messages: Messages)
+
+
+
+@vote(user) {
+
+<form name="ballot" id="ballot-form">
+    <input name="email" value="" type="hidden">
+    <input name="code" value="" type="hidden">
+
+    <div class="container">
+        <div id="ballot-0" class="container">
+            <div class="container">
+                <div class="col-md-4"></div>
+                <div class="centered col-md-4" id="candidateDiv">
+
+
+                      <p>Candidate list:</p>
+                      @for(doc <- mongoListOfObjects) {
+                      <div class="col-md-12 vote centered">
+                          <div class="col-md-6  ">
+                            <label class="scored" for="sel1">@doc</label>
+                          </div>
+                          <div class="col-md-4">
+                              <select class="form-control input-sm" id="sel1">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                              </select>
+                          </div>
+                    </div>
+
+
+                      }
+
+                </div>
+
+
+            </div>
+            <input id="order-0" class="order" name="order-0" type="hidden">
+        </div>
+
+
+        <div class="container text-center">
+            <p>
+                <b>Instructions</b>:
+                Double check your ballot. Then click the "Vote!" button to cast your vote.
+            </p>
+            <div class="text-center bottomm10">
+                <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" value="Vote!">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Vote!</button>
+            </div>
+        </div>
+    </div>
+</form>
+}

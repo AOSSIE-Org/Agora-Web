@@ -74,7 +74,6 @@ class ElectionDAOImpl extends ElectionDAO {
           return list
 
       }
-
 }
 
 /**
