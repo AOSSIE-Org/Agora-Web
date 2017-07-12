@@ -37,42 +37,54 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
 
 
   def create = silhouette.SecuredAction.async { implicit request =>
-    ElectionForm.form.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(views.html.addElection(Option(request.identity) ,formWithErrors))),
-      {
-
-        election => {
-          electionDAOImpl.save(election);
-          Future.successful(Ok(views.html.profile(Option(request.identity), electionDAOImpl.userElectionList(request.identity.email))))
-        }
-      })
+    def values = ElectionForm.form.bindFromRequest.data
+    val name = values("name").toString
+    val description = values("description").toString
+    val creatorName = values("creatorName").toString
+    val creatorEmail = values("creatorEmail").toString
+    val format = new java.text.SimpleDateFormat("MM/dd/yyyy")
+    val start =format.parse(values("start").toString)
+    val end = format.parse(values("end").toString)
+    val realtimeResult  = values("realtimeResult").toBoolean
+    val votingAlgo = values("votingAlgo").toString
+    val candidates = values("candidates").split(",").toList
+    val isPublic = values("isPublic").toBoolean
+    val isInvite = values("isInvite").toBoolean
+    val isCompleted = false
+    val createdTime = new java.util.Date
+    val adminLink = ""
+    val inviteLink = ""
+    val election = new Election(new ObjectId,name,description,creatorName, creatorEmail,start,end,realtimeResult,votingAlgo
+    ,candidates,isPublic,isInvite,isCompleted,createdTime,adminLink,inviteLink)
+    electionDAOImpl.save(election)
+    Future.successful(Ok(views.html.profile(Option(request.identity), electionDAOImpl.userElectionList(request.identity.email))))
   }
 
   def createGuestView = silhouette.UnsecuredAction.async( implicit request => {
-    Future.successful(Ok(views.html.addElection(Option(null),ElectionForm.form)))
+    Future.successful(Ok(views.html.election.addElectionTest(Option(null))))
   })
 
 
   def createUserView = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.addElection(Option(request.identity),ElectionForm.form)))
+    Future.successful(Ok(views.html.election.addElectionTest(Option(request.identity))))
   }
 
   def viewElection(id: String) = silhouette.UnsecuredAction.async( implicit request =>{
       val objectId = new ObjectId(id);
 
-      Future.successful(Ok(views.html.election(Option(null),electionDAOImpl.view(objectId: ObjectId) )))
+      Future.successful(Ok(views.html.election.election(Option(null),electionDAOImpl.view(objectId) )))
   })
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async( implicit request =>{
       val objectId = new ObjectId(id);
 
-      Future.successful(Ok(views.html.election(Option(request.identity),  electionDAOImpl.view(objectId: ObjectId) )))
+      Future.successful(Ok(views.html.election.election(Option(request.identity),  electionDAOImpl.view(objectId) )))
   })
 
 
   def voteGuest(id: String) =  silhouette.UnsecuredAction.async( implicit request =>{
   val objectId = new ObjectId(id);
-      Future.successful(Ok(views.html.ballot.preferential(Option(null),electionDAOImpl.viewCandidate(objectId: ObjectId))))
+      Future.successful(Ok(views.html.ballot.preferential(Option(null),electionDAOImpl.viewCandidate(objectId))))
 
   })
 

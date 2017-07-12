@@ -1,4 +1,7 @@
-@(user: Option[models.User], mongoListOfObjects : com.mongodb.casbah.Imports.MongoDBList)(implicit request: RequestHeader, messages: Messages) @vote(user) {
+@(user: Option[models.User], elections : List[models.Election])(implicit request: RequestHeader, messages: Messages)
+
+
+@election.vote(user) {
 
 <form name="ballot" id="ballot-form">
   <input name="email" value="" type="hidden">
@@ -10,10 +13,11 @@
 
 
           <p>Candidate List:</p>
-          @for(doc
-          <- mongoListOfObjects) { <div class="col-md-12 scored centered">
+          @for(doc<- elections) {
+  @for(candidate <- doc.candidates){
+            <div class="col-md-12 scored centered">
             <div class="col-md-4">
-              <label class="scored" for="sel1">@doc</label>
+              <label class="scored" for="sel1">@candidate</label>
             </div>
             <div class="col-md-8">
               <div class="range-slider">
@@ -23,7 +27,7 @@
             </div>
         </div>
 
-
+}
       }
 
 

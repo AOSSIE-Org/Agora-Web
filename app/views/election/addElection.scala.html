@@ -1,4 +1,4 @@
-@(user: Option[models.User], electionForm: Form[Election])(implicit request: RequestHeader, messages: Messages)
+<!-- @(user: Option[models.User])(implicit request: RequestHeader, messages: Messages)
 
 
 @import helper._
@@ -6,7 +6,8 @@
 
 
 @algo = @{
-    Seq("EVACS" -> "EVACS", "Simple" -> "Simple" ,"Egalitarian" -> "Egalitarian", "Majority" -> "Majority" ,"Borda" -> "Borda", "Approval" -> "Approval" ,"Nanson" -> "Nanson", "Kemeny-Young" -> "Kemeny-Young" )
+    Seq("EVACS" -> "EVACS", "Simple" -> "Simple" ,"Egalitarian" -> "Egalitarian", "Majority" -> "Majority" ,
+    "Borda" -> "Borda", "Approval" -> "Approval" ,"Nanson" -> "Nanson", "Kemeny-Young" -> "Kemeny-Young" )
 }
 @result = @{
     Seq("false" -> "False", "true" -> "True")
@@ -25,8 +26,8 @@
         <div class="row">
             <div class="row">
             @if(user == None) {
-                    <!--guest view of add Election form -->
-                <div class="col-md-4">
+                    guest view of add Election form
+                <! <div class="col-md-4">
                     @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
                     @b3.email(electionForm("Creator email"), '_label -> "Creator email", 'placeholder -> "example@mail.com")
                     @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "2017-06-22")
@@ -43,10 +44,10 @@
                     @b3.text(electionForm("Creator name"), '_label -> "Creator name", 'placeholder -> "full name")
                     @b3.select(electionForm("Voting Algo"), options = algo, '_label -> "Voting Algo")
                     @b3.tagInput(electionForm("Candidates"), '_label -> "Candidates")
-                </div>
-            } else {
+                </div> -->
+            <!-- } else { -->
                     <!--user view of add election form-->
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     @b3.text(electionForm("Name"), '_label -> "Election Name", 'placeholder -> "Election name")
                     @b3.date(electionForm("Starting Date"), '_label -> "Starting Date", 'value -> "2017-06-19")
                     @b3.select(electionForm("Voting Preference"), options = result, '_label -> "Voting Algo")
@@ -77,5 +78,9 @@
         <br>
         }
 
-    </div>
-}
+
+
+
+
+    </div> -->
+<!-- } -->

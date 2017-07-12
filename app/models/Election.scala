@@ -1,6 +1,7 @@
 package models
 
 import java.util.Date;
+import org.bson.types.ObjectId
 
 /**
   * Election model which is created by user or guest
@@ -18,10 +19,10 @@ import java.util.Date;
   * @param isInvite Specify Whether the election is invitable or not
   */
 
-case class Election(name:String, description:String , creatorName:String,
+case class Election(_id: ObjectId,name:String, description:String , creatorName:String,
                     creatorEmail : String, start : Date , end : Date , realtimeResult : Boolean ,
-                    votingAlgo : String , candidates : String , isPublic : Boolean ,
-                    isInvite : Boolean )
+                    votingAlgo : String , candidates : List[String] , isPublic : Boolean ,
+                    isInvite : Boolean, isCompleted: Boolean, createdTime : Date , adminLink: String, inviteLink: String)
 
 
 

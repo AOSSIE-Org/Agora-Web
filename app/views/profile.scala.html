@@ -1,4 +1,4 @@
-@(user: Option[models.User] , list: List[com.mongodb.casbah.Imports.DBObject] )(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User] , list: List[models.Election] )(implicit request: RequestHeader, messages: Messages)
 
 @import java.math.BigInteger; var i = 0;
 
@@ -58,10 +58,10 @@
                                         <tr>
 
                                             <td>@{index+1}</td>
-                                            <td>  <a href=user/election/@doc.get("_id")>@doc.get("name")</a></td>
-                                            <td>@doc.get("isCompleted")</td>
-                                            <td>@doc.get("votingAlgo")</td>
-                                            <td>@doc.get("end")</td>
+                                            <td>  <a href=user/election/@doc._id>@doc.name</a></td>
+                                            <td>@doc.isCompleted</td>
+                                            <td>@doc.votingAlgo</td>
+                                            <td>@doc.end</td>
                                             <td>Table Cell</td>
 
                                         </tr>

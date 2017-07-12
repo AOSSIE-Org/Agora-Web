@@ -24,8 +24,8 @@ libraryDependencies ++= Seq(
  "com.adrianhurt" %% "play-bootstrap" % "1.1.1-P25-B3",
  "com.mohiva" %% "play-silhouette-testkit" % "4.0.0" % "test",
  "org.webjars" % "bootstrap-tagsinput" % "0.6.1",
- "se.radley" %% "play-plugins-salat" % "1.5.0",
  "org.webjars" % "jquery-ui" % "1.12.1",
+ "com.novus" %% "salat" % "1.9.9",
  specs2 % Test,
  cache,
  filters

@@ -15,11 +15,26 @@ import org.bson.types.ObjectId
 
 import models.MongoDBConnection
 
+import play.api.Play
+
+import com.novus.salat._
+import com.novus.salat.global._
 
 
-class ElectionDAOImpl extends ElectionDAO {
+import com.mongodb.casbah.commons.conversions.scala.RegisterConversionHelpers
+
+
+
+
+class ElectionDAOImpl ()extends ElectionDAO  {
+
+
     val collectionRef = MongoDBConnection.getConnection();
+    RegisterConversionHelpers()
 
+implicit val ctx = new Context {
+   val name = "Custom_Classloader"
+}
 
   /**
    * Saves a Election.
@@ -29,7 +44,7 @@ class ElectionDAOImpl extends ElectionDAO {
    */
   def save(election: Election) = {
 
-  val candidates = election.candidates.split(",")
+  val candidates = election.candidates
   val  electionObject : MongoDBObject = MongoDBObject(
       "name" -> election.name,
       "description" -> election.description,
@@ -46,7 +61,9 @@ class ElectionDAOImpl extends ElectionDAO {
       "createdTime" ->  new java.util.Date
   );
 
-  collectionRef.save(electionObject)
+  val bsonElection = grater[Election].asDBObject(election)
+
+  collectionRef.save(bsonElection)
   Future.successful(election)
   }
 
@@ -59,19 +76,20 @@ class ElectionDAOImpl extends ElectionDAO {
 
   }
 
-  def userElectionList(email : Option[String]) : List[com.mongodb.casbah.Imports.DBObject] = {
+  def userElectionList(email : Option[String]) : List[models.Election] = {
           val o : DBObject = MongoDBObject("creatorEmail" -> email)
           val u = collectionRef.find(o)
           val list = u.toList
-          return list;
+          val filteredElections = list map (doc => grater[Election].asObject(doc))
+          return filteredElections;
   }
 
 
-  def viewCandidate(id: ObjectId) : com.mongodb.casbah.Imports.MongoDBList = {
+  def viewCandidate(id: ObjectId) : List[models.Election] = {
           val o : DBObject = MongoDBObject("_id" -> id)
-          val u = collectionRef.findOne(o)
-          val list = collectionRef.findOne(o).get.getAs[MongoDBList]("candidates").get
-          return list
+          val list = collectionRef.findOne(o).toList
+          val filteredElections = list map (doc => grater[Election].asObject(doc))
+          return filteredElections
 
       }
 }
