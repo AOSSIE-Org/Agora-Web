@@ -61,12 +61,12 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
   }
 
   def createGuestView = silhouette.UnsecuredAction.async( implicit request => {
-    Future.successful(Ok(views.html.election.addElectionTest(Option(null))))
+    Future.successful(Ok(views.html.election.addElection(Option(null))))
   })
 
 
   def createUserView = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.election.addElectionTest(Option(request.identity))))
+    Future.successful(Ok(views.html.election.addElection(Option(request.identity))))
   }
 
   def viewElection(id: String) = silhouette.UnsecuredAction.async( implicit request =>{
