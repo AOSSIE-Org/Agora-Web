@@ -61,7 +61,7 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
   }
 
   def createGuestView = silhouette.UnsecuredAction.async( implicit request => {
-    Future.successful(Ok(views.html.election.addElection(Option(null))))
+    Future.successful(Ok(views.html.election.addElection(None)))
   })
 
 
@@ -72,7 +72,7 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
   def viewElection(id: String) = silhouette.UnsecuredAction.async( implicit request =>{
       val objectId = new ObjectId(id);
 
-      Future.successful(Ok(views.html.election.election(Option(null),electionDAOImpl.view(objectId) )))
+      Future.successful(Ok(views.html.election.election(None,electionDAOImpl.view(objectId) )))
   })
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async( implicit request =>{
@@ -84,7 +84,7 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
 
   def voteGuest(id: String) =  silhouette.UnsecuredAction.async( implicit request =>{
   val objectId = new ObjectId(id);
-      Future.successful(Ok(views.html.ballot.preferential(Option(null),electionDAOImpl.viewCandidate(objectId))))
+      Future.successful(Ok(views.html.ballot.preferential(None,electionDAOImpl.viewCandidate(objectId))))
 
   })
 

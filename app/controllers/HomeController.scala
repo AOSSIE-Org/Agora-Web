@@ -32,7 +32,7 @@ class HomeController @Inject() (
      val electionDAOImpl = new ElectionDAOImpl();
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.home(Option(null))))
+    Future.successful(Ok(views.html.home(None)))
   }
 
 
