@@ -1,4 +1,4 @@
-@(user: Option[models.User], elections : List[models.Election])(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User], candidates : List[String])(implicit request: RequestHeader, messages: Messages)
 
 
 @election.vote(user) {
@@ -13,8 +13,7 @@
 
 
           <p>Candidate List:</p>
-          @for(doc<- elections) {
-  @for(candidate <- doc.candidates){
+  @for(candidate <- candidates){
             <div class="col-md-12 scored centered">
             <div class="col-md-4">
               <label class="scored" for="sel1">@candidate</label>
@@ -27,7 +26,7 @@
             </div>
         </div>
 
-}
+
       }
 
 

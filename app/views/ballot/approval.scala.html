@@ -1,4 +1,4 @@
-@(user: Option[models.User], elections : List[models.Election])(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User], candidates : List[String])(implicit request: RequestHeader, messages: Messages)
 
 
 
@@ -17,10 +17,8 @@
                   <p>Candidate List:</p>
 
                     <ul id="candidateList" class="candidateList ui-helper-reset ui-helper-clearfix">
-                      @for(doc <- elections) {
-                        @for(candidate <- doc.candidates){
+                        @for(candidate <- candidates){
                         <li class="r0_0 ui-widget-content ui-corner-tr ">  <p>@candidate</p></li>
-                      }
                       }
                     </ul>
                   </div>

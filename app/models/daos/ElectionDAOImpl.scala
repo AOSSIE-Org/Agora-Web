@@ -85,11 +85,11 @@ implicit val ctx = new Context {
   }
 
 
-  def viewCandidate(id: ObjectId) : List[models.Election] = {
+  def viewCandidate(id: ObjectId) : List[String] = {
           val o : DBObject = MongoDBObject("_id" -> id)
           val list = collectionRef.findOne(o).toList
           val filteredElections = list map (doc => grater[Election].asObject(doc))
-          return filteredElections
+          return filteredElections.head.candidates
 
       }
 }
