@@ -11,5 +11,14 @@ $( function() {
           $( this ).replaceWith('<button id="' + this.id+ '" type="button" class="btn btn-default btn-sm add vote" value= "'+this.value +' ">Add</button>');
     })
 
+      $(".text-center.bottomm10").on("click", '#enter-vote-btn',function() {
+        var str = "";
+          $(".ballotDiv").children().each(function () {
+                  str+=this.innerHTML+">";
+                  str = str.replace(/\s/g, '');
+                });
+          $("#ballotinput").attr("value", str.substring(0, str.length-1));
+
+      })
 
   } );
