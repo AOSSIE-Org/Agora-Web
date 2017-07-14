@@ -1,10 +1,11 @@
 @(user: Option[models.User], candidates : List[String])(implicit request: RequestHeader, messages: Messages)
 
-
+@import helper._
+@import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 @election.vote(user) {
 
-<form name="ballot" id="ballot-form">
+@b3.form(CSRF(routes.ElectionController.vote())) {
     <input name="email" value="" type="hidden">
     <input name="code" value="" type="hidden">
 
@@ -28,9 +29,10 @@
                     <div id ='ballotDiv'>
                     </div>
                 </div>
+
+
                 <script type='text/javascript' src='@routes.Assets.at("/javascripts/singleCandidate.js")'> </script>
             </div>
-            <input id="order-0" class="order" name="order-0" type="hidden">
         </div>
 
 
@@ -40,11 +42,14 @@
                 Double check your ballot. Then click the "Vote!" button to cast your vote.
             </p>
             <div class="text-center bottomm10">
+
+                <input type="hidden" class="form-control" name="ballot" id="ballot">
                 <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" value="Vote!">
                     <span class="glyphicon glyphicon-ok"></span>
                     Vote!</button>
+
             </div>
         </div>
     </div>
-</form>
+}
 }
