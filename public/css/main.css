@@ -277,10 +277,10 @@ lable {
   /*.candidateList li img { width: 100%; cursor: move; }*/
   .candidateList li p { margin: 10px;}
 
-  #ballot { float: right; width: 221px; min-height: 18em; padding: 1%; }
-  #ballot h4 { line-height: 16px; margin: 0 0 0.4em; }
-  #ballot h4 .ui-icon { float: left; }
-  #ballot .candidateList h5 { display: none; }
+  #ballotL { float: right; width: 221px; min-height: 18em; padding: 1%; }
+  #ballotL h4 { line-height: 16px; margin: 0 0 0.4em; }
+  #ballotL h4 .ui-icon { float: left; }
+  #ballotL .candidateList h5 { display: none; }
 
 
 

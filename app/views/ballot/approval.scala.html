@@ -1,10 +1,11 @@
 @(user: Option[models.User], candidates : List[String])(implicit request: RequestHeader, messages: Messages)
 
-
+@import helper._
+@import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 @election.vote(user) {
 
-<form name="ballot" id="ballot-form">
+@b3.form(CSRF(routes.ElectionController.vote())) {
     <input name="email" value="" type="hidden">
     <input name="code" value="" type="hidden">
 
@@ -18,14 +19,14 @@
 
                     <ul id="candidateList" class="candidateList ui-helper-reset ui-helper-clearfix">
                         @for(candidate <- candidates){
-                        <li class="r0_0 ui-widget-content ui-corner-tr ">  <p>@candidate</p></li>
+                        <li class="r0_0 ui-widget-content ui-corner-tr " value=@candidate>  <p>@candidate</p></li>
                       }
                     </ul>
                   </div>
                   <div class="col-md-6 centered">
                         <p>Your ballot:</p>
-                        <ul id="ballot" class="ui-widget-content ui-state-default centered">
-                            <h4 class="ui-widget-header">Ballot</h4>
+                        <ul id="ballotL"class="ui-widget-content ui-state-default centered">
+
                         </ul>
                       </div>
 
@@ -33,8 +34,9 @@
 
                 <script type='text/javascript' src='@routes.Assets.at("/javascripts/dragDrop.js")'> </script>
             </div>
-            <input id="order-0" class="order" name="order-0" type="hidden">
         </div>
+
+        <input type="hidden" class="form-control" name="ballotinput" id="ballotinput">
 
 
         <div class="container text-center">
@@ -49,5 +51,5 @@
             </div>
         </div>
     </div>
-</form>
+}
 }

@@ -1,8 +1,8 @@
 $( function() {
-
-    // There's the candidateList and the trash
+    var $selected = []
+    // There's the candidateList
     var $candidateList = $( "#candidateList" ),
-      $ballot = $( "#ballot" );
+      $ballot = $( "#ballotL" );
 
     // Let the candidateList items be draggable
     $( "li", $candidateList ).draggable({
@@ -13,44 +13,51 @@ $( function() {
       cursor: "move"
     });
 
-    // Let the trash be droppable, accepting the candidateList items
+    // Let the ballot be droppable, accepting the candidateList items
     $ballot.droppable({
       accept: "#candidateList > li",
       classes: {
         "ui-droppable-active": "ui-state-highlight"
       },
       drop: function( event, ui ) {
-        deleteImage( ui.draggable );
+        selectCandidate( ui.draggable );
       }
     });
 
-    // Let the candidateList be droppable as well, accepting items from the trash
+    // Let the candidateList be droppable as well, accepting items from the ballot
     $candidateList.droppable({
       accept: "#ballot li",
       classes: {
         "ui-droppable-active": "custom-state-active"
       },
       drop: function( event, ui ) {
-        recycleImage( ui.draggable );
+        removeCandidate( ui.draggable );
       }
     });
 
-    // Image deletion function
-    var recycle_icon = "<a href='link/to/recycle/script/when/we/have/js/off' title='Recycle this image' class='ui-icon ui-icon-refresh'>Recycle image</a>";
-    function deleteImage( $item ) {
+
+    function selectCandidate( $item ) {
       $item.fadeOut(function() {
         var $list = $( "ul", $ballot ).length ?
           $( "ul", $ballot ) :
-          $( "<ul class='candidateList ui-helper-reset'/>" ).appendTo( $ballot );
+          $( '<ul class="candidateList ui-helper-reset" id="ballot"/>' ).appendTo( $ballot );
 
         $item.find( "a.ui-icon-ballot" ).remove();
         $item.append( ).appendTo( $list ).fadeIn();
+
+        // $selected.pop();
+        $selected.push($item.children().text());
+        // $selected.push("}");
+        // console.log($selected);
+        $("#ballotinput").attr("value","{"+$selected.toString()+"}");
       });
     }
 
-    // Image recycle function
-    var trash_icon = "<a href='link/to/trash/script/when/we/have/js/off' title='Delete this image' class='ui-icon ui-icon-trash'>Delete image</a>";
-    function recycleImage( $item ) {
+
+
+
+
+    function removeCandidate( $item ) {
       $item.fadeOut(function() {
         $item
           .find( "a.ui-icon-refresh" )
@@ -61,5 +68,19 @@ $( function() {
           .appendTo( $candidateList )
           .fadeIn();
       });
-    }
-  } );
+
+      var index = $selected.indexOf($item.children().text());
+      if (index > -1) {
+        $selected.splice(index, 1);
+}
+// console.log($selected);
+
+      // console.log($($ballot).find("[id^='ballot'].candidateList.ui-helper-reset"));
+
+      $("#ballotinput").attr("value","{"+$selected.toString()+"}");
+
+
+
+  }
+
+})
