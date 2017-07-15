@@ -68,11 +68,12 @@ implicit val ctx = new Context {
   }
 
 
-  def view(id: ObjectId) : List[com.mongodb.casbah.Imports.DBObject] = {
+  def view(id: ObjectId) : List[models.Election] = {
       val o : DBObject = MongoDBObject("_id" -> id)
       val u = collectionRef.findOne(o)
       val list = u.toList
-      return list;
+      val filteredElections = list map (doc => grater[Election].asObject(doc))
+      return filteredElections;
 
   }
 
@@ -89,7 +90,11 @@ implicit val ctx = new Context {
           val o : DBObject = MongoDBObject("_id" -> id)
           val list = collectionRef.findOne(o).toList
           val filteredElections = list map (doc => grater[Election].asObject(doc))
+          var value = null;
+          if(!filteredElections.isEmpty){
           return filteredElections.head.candidates
+          }
+          return null;
 
       }
 }
