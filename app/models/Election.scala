@@ -22,7 +22,7 @@ import org.bson.types.ObjectId
 case class Election(_id: ObjectId,name:String, description:String , creatorName:String,
                     creatorEmail : String, start : Date , end : Date , realtimeResult : Boolean ,
                     votingAlgo : String , candidates : List[String] , isPublic : Boolean ,
-                    isInvite : Boolean, isCompleted: Boolean, createdTime : Date , adminLink: String, inviteLink: String)
+                    isInvite : Boolean, isCompleted: Boolean, createdTime : Date , adminLink: String, inviteLink: String,ballot: List[String])
 
 
 

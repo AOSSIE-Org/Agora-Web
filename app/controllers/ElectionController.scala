@@ -9,7 +9,7 @@ import utils.auth.DefaultEnv
 import models.Election
 import play.api.data._
 import play.api.data.Forms._
-import forms.ElectionForm
+import forms._
 import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import scala.concurrent.Future
 
@@ -21,6 +21,7 @@ import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 
 import models.daos.ElectionDAOImpl
 import org.bson.types.ObjectId;
+
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -54,8 +55,9 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
     val createdTime = new java.util.Date
     val adminLink = ""
     val inviteLink = ""
+    val ballot = List[String]()
     val election = new Election(new ObjectId,name,description,creatorName, creatorEmail,start,end,realtimeResult,votingAlgo
-    ,candidates,isPublic,isInvite,isCompleted,createdTime,adminLink,inviteLink)
+    ,candidates,isPublic,isInvite,isCompleted,createdTime,adminLink,inviteLink,ballot)
     electionDAOImpl.save(election)
     Future.successful(Ok(views.html.profile(Option(request.identity), electionDAOImpl.userElectionList(request.identity.email))))
   }
@@ -83,16 +85,19 @@ class ElectionController @Inject()(val messagesApi: MessagesApi , silhouette: Si
 
   def voteGuest(id: String) =  silhouette.UnsecuredAction.async( implicit request =>{
   val objectId = new ObjectId(id);
-      Future.successful(Ok(views.html.ballot.ranked(None,Option(electionDAOImpl.viewCandidate(objectId)))))
+      Future.successful(Ok(views.html.ballot.ranked(None,Option(electionDAOImpl.viewCandidate(objectId)),Option(id))))
 
   })
 
   def voteUser(id: String) = silhouette.SecuredAction.async( implicit request =>{
   val objectId = new ObjectId(id);
-      Future.successful(Ok(views.html.ballot.approval(Option(request.identity),  electionDAOImpl.viewCandidate(objectId: ObjectId))))
+      Future.successful(Ok(views.html.ballot.ranked(Option(request.identity), Option(electionDAOImpl.viewCandidate(objectId: ObjectId)), Option(id))))
   })
 
   def vote() =  silhouette.UnsecuredAction.async( implicit request =>{
+
+        def values = BallotForm.form.bindFromRequest.data
+        electionDAOImpl.vote(new ObjectId(values("id")),values("ballotinput"));
         Future.successful(Ok(views.html.home(None)))
   })
 
