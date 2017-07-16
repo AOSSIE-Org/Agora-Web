@@ -1,4 +1,5 @@
-@(user: Option[models.User], candidates : List[String])(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User], candidates : Option[List[String]] , id : Option[String])(implicit request: RequestHeader, messages: Messages)
+
 
 @import helper._
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
@@ -14,7 +15,7 @@
 
 
           <p>Candidate List:</p>
-  @for(candidate <- candidates){
+  @for(candidate <- candidates.get){
             <div class="col-md-12 scored centered">
             <div class="col-md-4">
               <label class="scored" for="sel1">@candidate</label>
@@ -45,6 +46,7 @@
     <div class="text-center bottomm10">
       <input type="hidden" class="form-control" name="ballotinput" id="ballotinput">
       <input name="email" value="" type="hidden">
+      <input name="id" value=@id type="hidden">
       <input name="code" value="" type="hidden">
       <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" value="Vote!">
                     <span class="glyphicon glyphicon-ok"></span>
