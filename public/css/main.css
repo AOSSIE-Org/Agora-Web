@@ -373,3 +373,101 @@ lable {
   font-size: 1.2em;
   /*width: 120px;*/
 }
+
+
+/*------------------------------------------------*/
+/*    Page: election details
+/*------------------------------------------------*/
+.election-section {
+  margin-bottom: 30px;
+}
+.election-section h3 {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  margin-top: 0;
+}
+.election-section.activity h3 {
+  margin-bottom: 0;
+}
+.election-section dl {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+.election-section dl dd {
+  margin-bottom: 10px;
+}
+@media screen and (min-width: 768px) {
+  .election-section dl.dl-horizontal dt {
+    width: 95px;
+    margin-bottom: 10px;
+  }
+  .election-section dl.dl-horizontal dd {
+    margin-left: 105px;
+    margin-bottom: 0;
+  }
+}
+.election-section ul.team-list {
+  margin-top: 10px;
+}
+.election-section ul.team-list > li {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 0 10px;
+}
+.election-section ul.team-list > li img {
+  width: 40px;
+  margin-bottom: 8px;
+}
+.election-section ul.team-list > li p {
+  margin-bottom: 0;
+  line-height: 1;
+}
+.election-section ul.team-list > li span {
+  font-size: 10px;
+}
+.election-section ul.team-list > li.team-add > i {
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 17px;
+  width: 40px;
+  height: 40px;
+  font-size: 28px;
+  background-color: #ccc;
+  color: inherit;
+}
+.election-section ul.team-list > li.team-add .btn {
+  position: relative;
+  top: -7px;
+}
+
+ul.election-activity-list > li {
+  border-top: 1px dashed #CCC;
+}
+ul.election-activity-list > li:first-child {
+  border-top: none;
+}
+ul.election-activity-list > li .activity-item .avatar, ul.election-activity-list > li .activity-item > i {
+  width: 24px;
+}
+ul.election-activity-list > li .activity-item > i {
+  font-size: 24px;
+}
+
+.election-progress {
+  margin-top: 20px;
+}
+.election-progress .pie-chart {
+  width: 100px;
+}
+.election-progress .pie-chart .percent {
+  line-height: 100px;
+}
+.election-progress .percent, .election-progress .chart-title {
+  color: inherit;
+}
