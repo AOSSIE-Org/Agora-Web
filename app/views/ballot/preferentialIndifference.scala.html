@@ -14,24 +14,29 @@
             <div class="container">
                 <div class="col-md-4" id="candidateDiv">
                     <ul id="ballot">
+                      @if(candidates!=None){
                       <p>candidate List:</p>
                           @for(candidate <- candidates.get){
                         <li class="r0_0"><button id='AAA_@candidate' value='@candidate' type="button" class="btn btn-default btn-sm add vote">
                           Add</button><span>@candidate</span></li>
                         }
+                      }
 
                     </ul>
                 </div>
+                  <p>Your ballot:</p>
                 <div class="col-md-7 well centered">
-                    <p>Your ballot:</p>
+
+                  @if(candidates!=None){
                     @for(index <- 0 until candidates.get.size){
-                      @if(index==0){
+                  @if(index==0){
                     <ul id="sortable@index" class="droptrue sortable ballotDiv"></ul>
                   }else{
                     <ul id="sortable@index" class="droptrue sortable"></ul>
 
                   }
                     }
+                  }
                 </div>
                 <script type='text/javascript' src='@routes.Assets.at("/javascripts/preferentialIndifference.js")'> </script>
             </div>
