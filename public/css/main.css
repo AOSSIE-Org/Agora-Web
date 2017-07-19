@@ -3,6 +3,7 @@
   margin-bottom: 5px;
   font-weight: bold;
   border: 1px groove #ffcc99 ;
+  height: auto;
   /*border-top: 0 none;
   border-bottom: 0 none;*/
   /*background-color: #ffff33;*/
@@ -306,6 +307,14 @@ lable {
   display: none;
 }
 
+.ballotDiv{
+  text-align: left;
+}
+
+.ballotDiv button {
+  margin-right: 5px;
+}
+
 .stepwizard-step p {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -399,18 +408,10 @@ lable {
 .election-section dl dd {
   margin-bottom: 10px;
 }
-@media screen and (min-width: 768px) {
-  .election-section dl.dl-horizontal dt {
-    width: 95px;
-    margin-bottom: 10px;
-  }
-  .election-section dl.dl-horizontal dd {
-    margin-left: 105px;
-    margin-bottom: 0;
-  }
-}
+
 .election-section ul.team-list {
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 .election-section ul.team-list > li {
   text-align: center;
@@ -446,18 +447,7 @@ lable {
   top: -7px;
 }
 
-ul.election-activity-list > li {
-  border-top: 1px dashed #CCC;
-}
-ul.election-activity-list > li:first-child {
-  border-top: none;
-}
-ul.election-activity-list > li .activity-item .avatar, ul.election-activity-list > li .activity-item > i {
-  width: 24px;
-}
-ul.election-activity-list > li .activity-item > i {
-  font-size: 24px;
-}
+
 
 .election-progress {
   margin-top: 20px;
@@ -470,4 +460,9 @@ ul.election-activity-list > li .activity-item > i {
 }
 .election-progress .percent, .election-progress .chart-title {
   color: inherit;
+}
+
+
+#sortable{
+  min-height: 18em;
 }
