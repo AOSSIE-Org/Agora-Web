@@ -1,0 +1,57 @@
+@(user: Option[models.User], candidates : Option[List[String]] , id : Option[String])(implicit request: RequestHeader, messages: Messages)
+
+
+@import helper._
+@import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
+
+@election.vote(user) {
+
+@b3.form(CSRF(routes.ElectionController.vote())) {
+    <input name="email" value="" type="hidden">
+    <input name="code" value="" type="hidden">
+
+    <div class="container">
+        <div id="ballot-0">
+            <div class="container">
+                <div class="col-md-3"></div>
+                <div class="col-md-6 ui-widget ui-helper-clearfix" id="candidateDiv">
+                  <div class="centered col-md-6">
+                  <p>Candidate List:</p>
+
+                    <ul id="candidateList" class="candidateList ui-helper-reset ui-helper-clearfix">
+                        @for(candidate <- candidates.get){
+                        <li class="r0_0 ui-widget-content ui-corner-tr " value=@candidate>  <p>@candidate</p></li>
+                      }
+                    </ul>
+                  </div>
+                  <div class="col-md-6 centered">
+                        <p>Your ballot:</p>
+                        <ul id="ballotL"class="ui-widget-content ui-state-default centered">
+
+                        </ul>
+                      </div>
+
+                    </div>
+
+                <script type='text/javascript' src='@routes.Assets.at("/javascripts/dragDrop.js")'> </script>
+            </div>
+        </div>
+
+        <input type="hidden" class="form-control" name="ballotinput" id="ballotinput">
+        <input name="id" value=@id type="hidden">
+
+
+        <div class="container text-center">
+            <p>
+                <b>Instructions</b>:
+                Double check your ballot. Then click the "Vote!" button to cast your vote.
+            </p>
+            <div class="text-center bottomm10">
+                <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" value="Vote!">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Vote!</button>
+            </div>
+        </div>
+    </div>
+}
+}

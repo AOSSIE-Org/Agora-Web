@@ -32,19 +32,10 @@ class HomeController @Inject() (
      val electionDAOImpl = new ElectionDAOImpl();
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.home(null)))
+    Future.successful(Ok(views.html.home(None)))
   }
 
 
-
-
-  def vote = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.vote(null)))
-  }
-
-  def voteAuthorized = silhouette.SecuredAction.async{ implicit request =>
-    Future.successful(Ok(views.html.vote(request.identity)))
-  }
 
   def signOut = silhouette.SecuredAction.async { implicit request =>
     val result = Redirect(routes.HomeController.index())
@@ -53,11 +44,11 @@ class HomeController @Inject() (
   }
 
   def indexAuthorized = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.index(request.identity)))
+    Future.successful(Ok(views.html.index(Option(request.identity))))
   }
 
   def profile = silhouette.SecuredAction.async{implicit request => {
-    Future.successful(Ok(views.html.profile(request.identity, electionDAOImpl.userElectionList(request.identity.email))))
+    Future.successful(Ok(views.html.profile(Option(request.identity), electionDAOImpl.userElectionList(request.identity.email))))
   }
   }
 }

@@ -1,6 +1,6 @@
-@(user: models.User)(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User])(implicit request: RequestHeader, messages: Messages)
 
-@main(Messages("home.title"), Some(user)) {
+@main(Messages("home.title"), user) {
     <div id="headerwrap">
         <div class="container">
             <div class="row centered">
@@ -52,9 +52,6 @@
 
         </div>
     </div>
-
-    <script src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
-    <script type='text/javascript' src='@routes.Assets.at("/javascripts/custom.js")'></script>
     </body>
     </html>
 }
