@@ -1,5 +1,6 @@
 package controllers
 
+import java.util.Date
 import javax.inject._
 
 import com.mohiva.play.silhouette.api.Silhouette
@@ -25,43 +26,26 @@ class ElectionController @Inject()(
 ) extends Controller with I18nSupport {
   val electionDAOImpl = new ElectionDAOImpl()
 
-  def create = silhouette.SecuredAction.async { implicit request =>
-    def values         = ElectionForm.form.bindFromRequest.data
-    val name           = values("name").toString
-    val description    = values("description").toString
-    val creatorName    = values("creatorName").toString
-    val creatorEmail   = values("creatorEmail").toString
-    val format         = new java.text.SimpleDateFormat("MM/dd/yyyy")
-    val start          = format.parse(values("start").toString)
-    val end            = format.parse(values("end").toString)
-    val realtimeResult = values("realtimeResult").toBoolean
-    val votingAlgo     = values("votingAlgo").toString
-    val candidates     = values("candidates").split(",").toList
-    val isPublic       = values("isPublic").toBoolean
-    val isInvite       = values("isInvite").toBoolean
-    val isCompleted    = false
-    val createdTime    = new java.util.Date
-    val adminLink      = ""
-    val inviteLink     = ""
-    val ballot         = List[String]()
+  def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>
+    def electionData = request.body
     val election = new Election(
       new ObjectId,
-      name,
-      description,
-      creatorName,
-      creatorEmail,
-      start,
-      end,
-      realtimeResult,
-      votingAlgo,
-      candidates,
-      isPublic,
-      isInvite,
-      isCompleted,
-      createdTime,
-      adminLink,
-      inviteLink,
-      ballot
+      electionData.name,
+      electionData.description,
+      electionData.creatorName,
+      electionData.creatorEmail,
+      electionData.startingDate,
+      electionData.endingDate,
+      electionData.isRealTime,
+      electionData.votingAlgo,
+      electionData.candidates.split(",").toList,
+      electionData.isPublic,
+      electionData.isInvite,
+      isCompleted = false,
+      createdTime = new Date(),
+      adminLink = "",
+      inviteLink = "",
+      ballot = List.empty[String]
     )
     electionDAOImpl.save(election)
     Future.successful(
@@ -120,9 +104,9 @@ class ElectionController @Inject()(
     )
   }
 
-  def vote = silhouette.UnsecuredAction.async { implicit request =>
-    def values = BallotForm.form.bindFromRequest.data
-    electionDAOImpl.vote(new ObjectId(values("id")), values("ballotinput"))
+  def vote = silhouette.UnsecuredAction.async(parse.form(BallotForm.form)) { implicit request =>
+    val ballotData = request.body
+    electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
     Future.successful(Ok(views.html.home(None)))
   }
 }
