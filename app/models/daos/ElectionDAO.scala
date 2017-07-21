@@ -1,7 +1,5 @@
 package models.daos
 
-import java.util.UUID
-
 import models.Election
 
 import scala.concurrent.Future
@@ -9,9 +7,7 @@ import scala.concurrent.Future
 /**
  * Give access to the Election object.
  */
-
 trait ElectionDAO {
-
 
   /**
    * Saves a Election.

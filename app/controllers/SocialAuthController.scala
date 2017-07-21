@@ -7,52 +7,59 @@ import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.impl.providers._
 import models.services.UserService
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{ Action, Controller }
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
 /**
-  * The social auth controller.
-  */
+ * The social auth controller.
+ */
 class SocialAuthController @Inject()(
-                                      val messagesApi: MessagesApi,
-                                      silhouette: Silhouette[DefaultEnv],
-                                      userService: UserService,
-                                      authInfoRepository: AuthInfoRepository,
-                                      socialProviderRegistry: SocialProviderRegistry)
-  extends Controller with I18nSupport with Logger {
+  val messagesApi: MessagesApi,
+  silhouette: Silhouette[DefaultEnv],
+  userService: UserService,
+  authInfoRepository: AuthInfoRepository,
+  socialProviderRegistry: SocialProviderRegistry
+) extends Controller with I18nSupport with Logger {
 
   /**
-    * Authenticates a user against a social provider.
-    *
-    * @param provider The ID of the provider to authenticate against.
-    * @return The result to display.
-    */
+   * Authenticates a user against a social provider.
+   *
+   * @param provider The ID of the provider to authenticate against.
+   * @return The result to display.
+   */
   def authenticate(provider: String) = Action.async { implicit request =>
-    (socialProviderRegistry.get[SocialProvider](provider) match {
+    val authFuture = socialProviderRegistry.get[SocialProvider](provider) match {
       case Some(p: SocialProvider with CommonSocialProfileBuilder) =>
         p.authenticate().flatMap {
           case Left(result) => Future.successful(result)
-          case Right(authInfo) => for {
-            profile <- p.retrieveProfile(authInfo)
-            user <- userService.save(profile)
-            authInfo <- authInfoRepository.save(profile.loginInfo, authInfo)
-            authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
-            value <- silhouette.env.authenticatorService.init(authenticator)
-            result <- silhouette.env.authenticatorService.embed(value, Redirect(routes.HomeController.indexAuthorized()))
-          } yield {
-            silhouette.env.eventBus.publish(LoginEvent(user, request))
-            result
-          }
+          case Right(authInfo) =>
+            for {
+              profile       <- p.retrieveProfile(authInfo)
+              user          <- userService.save(profile)
+              authInfo      <- authInfoRepository.save(profile.loginInfo, authInfo)
+              authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
+              value         <- silhouette.env.authenticatorService.init(authenticator)
+              result <- silhouette.env.authenticatorService
+                         .embed(value, Redirect(routes.HomeController.indexAuthorized()))
+            } yield {
+              silhouette.env.eventBus.publish(LoginEvent(user, request))
+              result
+            }
         }
-      case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
-    }).recover {
+      case _ =>
+        Future.failed(
+          new ProviderException(s"Cannot authenticate with unexpected social provider $provider")
+        )
+    }
+    authFuture.recover {
       case e: ProviderException =>
         logger.error("Unexpected provider error", e)
-        Redirect(routes.SignInController.view()).flashing("error" -> Messages("could.not.authenticate"))
+        Redirect(routes.SignInController.view())
+          .flashing("error" -> Messages("could.not.authenticate"))
     }
   }
 }
