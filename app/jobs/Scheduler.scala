@@ -8,11 +8,16 @@ import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
 /**
  * Schedules the jobs.
  */
-class Scheduler @Inject() (
+class Scheduler @Inject()(
   system: ActorSystem,
-  @Named("auth-token-cleaner") authTokenCleaner: ActorRef) {
+  @Named("auth-token-cleaner") authTokenCleaner: ActorRef
+) {
 
-  QuartzSchedulerExtension(system).schedule("AuthTokenCleaner", authTokenCleaner, AuthTokenCleaner.Clean)
+  QuartzSchedulerExtension(system).schedule(
+    "AuthTokenCleaner",
+    authTokenCleaner,
+    AuthTokenCleaner.Clean
+  )
 
   authTokenCleaner ! AuthTokenCleaner.Clean
 }
