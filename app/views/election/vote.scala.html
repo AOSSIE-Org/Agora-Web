@@ -1,0 +1,11 @@
+@(user: Option[models.User])(content: Html)(implicit request: RequestHeader, messages: Messages)
+
+@main(Messages("home.title"), user) {
+    <div class="container">
+        <div class="container text-center">
+            <h1>Election Title</h1>
+            <div><p>This is the description.</p></div>
+        </div>
+        @content
+    </div>
+}

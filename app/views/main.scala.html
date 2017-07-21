@@ -14,13 +14,20 @@
         <meta charset="utf-8">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
+        <script src='@routes.Assets.at("lib/jquery-ui/jquery-ui.min.js")'></script>
+        <link rel="stylesheet" href='@routes.Assets.at("lib/jquery-ui/jquery-ui.css")'>
         <link rel="stylesheet" href='@routes.Assets.at("lib/bootstrap/css/bootstrap.css")'>
         <script type='text/javascript' src='@routes.Assets.at("lib/bootstrap/js/bootstrap.js")'></script>
-        <script type='text/javascript' src='@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("/javascripts/main.js")'></script>
+        <link id="bsdp-css" href='@routes.Assets.at("lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css")' rel="stylesheet">
+
+        <script src='@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js")'></script>
         <link href='@routes.Assets.at("lib/font-awesome/css/font-awesome.css")' rel="stylesheet">
         <link href='@routes.Assets.at("/css/main.css")' rel="stylesheet">
-        <link rel="stylesheet" href='@routes.Assets.at("/css/bootstrap-tagsinput.css")'>
-        <script src=@routes.Assets.at("/javascripts/bootstrap-tagsinput.min.js")></script>
+        <link rel="stylesheet" href='@routes.Assets.at("lib/bootstrap-tagsinput/bootstrap-tagsinput.css")'>
+        <script src='@routes.Assets.at("lib/bootstrap-tagsinput/bootstrap-tagsinput.min.js")'></script>
+
+
     </head>
 
 
@@ -45,18 +52,6 @@
     }
           </div>
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-             @user.map { u =>
-            @if(u == null) {
-              <li><a href="/vote">Vote</a></li>
-} else {
-        <li><a href="/voteAuthorized">Vote</a></li>
-    }}.getOrElse{
-         <li><a href="/vote">Vote</a></li>
-    }
-            </ul>
-
-
             @user.map { u =>
 
         @if(u != null) {
@@ -127,7 +122,11 @@
                     </div>
                 }
                 @content
+
             </div>
         </main>
+
+
+
     </body>
 </html>

@@ -1,0 +1,51 @@
+@(user: Option[models.User], candidates : Option[List[String]] , id : Option[String])(implicit request: RequestHeader, messages: Messages)
+
+@import helper._
+@import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
+
+@election.vote(user) {
+
+@b3.form(CSRF(routes.ElectionController.vote())) {
+    <input name="email" value="" type="hidden">
+    <input name="code" value="" type="hidden">
+
+    <div class="container">
+        <div id="ballot-0" class="container">
+            <div class="container">
+                <div class="col-md-4 col-md-offset-3" id="candidateDiv">
+                    <ul id="ballot">
+                      <p>candidate List:</p>
+                          @for(candidate <- candidates.get){
+                        <li class="r0_0"><button id='AAA_@candidate' value='@candidate' type="button" class="btn btn-default btn-sm add vote">
+                          Add</button><span>@candidate</span></li>
+                        }
+
+                    </ul>
+                </div>
+                <div class="col-md-3 col-md-pull-1 well centered">
+                    <p>Your ballot:</p>
+                    <ul class ="ballotDiv" id="sortable">
+                    </ul>
+                </div>
+                <script type='text/javascript' src='@routes.Assets.at("/javascripts/preferential.js")'> </script>
+            </div>
+
+        </div>
+
+
+        <div class="container text-center">
+            <p>
+                <b>Instructions</b>:
+                Double check your ballot. Then click the "Vote!" button to cast your vote.
+            </p>
+            <div class="text-center bottomm10">
+              <input type="hidden" class="form-control" name="ballotinput" id="ballotinput">
+              <input name="id" value=@id type="hidden">
+                <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" value="Vote!">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Vote!</button>
+            </div>
+        </div>
+    </div>
+}
+}

@@ -15,12 +15,27 @@ import org.bson.types.ObjectId
 
 import models.MongoDBConnection
 
+import play.api.Play
+
+import com.novus.salat._
+import com.novus.salat.global._
+import scala.collection.mutable.ListBuffer
 
 
-class ElectionDAOImpl extends ElectionDAO {
+import com.mongodb.casbah.commons.conversions.scala.RegisterConversionHelpers
 
 
 
+
+class ElectionDAOImpl ()extends ElectionDAO  {
+
+
+    val collectionRef = MongoDBConnection.getConnection();
+    RegisterConversionHelpers()
+
+implicit val ctx = new Context {
+   val name = "Custom_Classloader"
+}
 
   /**
    * Saves a Election.
@@ -29,25 +44,66 @@ class ElectionDAOImpl extends ElectionDAO {
    * @return The saved Election.
    */
   def save(election: Election) = {
-
-  val candidates = election.candidates.split(",")
-  val  electionObject : MongoDBObject = MongoDBObject(
-      "name" -> election.name,
-      "description" -> election.description,
-      "creatorName" -> election.creatorName,
-      "creatorEmail" -> election.creatorEmail,
-      "start" -> election.start,
-      "end" -> election.end ,
-      "realtimeResult" -> election.realtimeResult ,
-      "votingAlgo" -> election.votingAlgo,
-      "candidates" -> candidates ,
-      "isPublic" -> election.isPublic,
-      "isInvite" -> election.isInvite,
-      "createdTime" ->  new java.util.Date
-  );
-  val collectionRef = MongoDBConnection.getConnection()
-  collectionRef.save(electionObject)
+  val candidates = election.candidates
+  val bsonElection = grater[Election].asDBObject(election)
+  collectionRef.save(bsonElection)
   Future.successful(election)
+  }
+
+
+  def view(id: ObjectId) : List[models.Election] = {
+      val o : DBObject = MongoDBObject("_id" -> id)
+      val u = collectionRef.findOne(o)
+      val list = u.toList
+      val filteredElections = list map (doc => grater[Election].asObject(doc))
+      return filteredElections;
+
+  }
+
+  def userElectionList(email : Option[String]) : List[models.Election] = {
+          val o : DBObject = MongoDBObject("creatorEmail" -> email)
+          val u = collectionRef.find(o)
+          val list = u.toList
+          val filteredElections = list map (doc => grater[Election].asObject(doc))
+          return filteredElections;
+  }
+
+
+  def viewCandidate(id: ObjectId) : List[String] = {
+          val o : DBObject = MongoDBObject("_id" -> id)
+          val list = collectionRef.findOne(o).toList
+          val filteredElections = list map (doc => grater[Election].asObject(doc))
+          var value = null;
+          if(!filteredElections.isEmpty){
+          return filteredElections.head.candidates
+          }
+          return null;
+
+      }
+
+  def vote(id: ObjectId , ballotinput: String) : Boolean = {
+          val o : DBObject = MongoDBObject("_id" -> id)
+          var ballot = ListBuffer[String]()
+          ballot+= ballotinput
+          val c = ballot.toList ::: getBallot(id)
+
+
+
+
+          val update = $set("ballot" -> c)
+          val list = collectionRef.update( o, update )
+          return true
+  }
+
+  def getBallot(id: ObjectId): List[String] = {
+          val o : DBObject = MongoDBObject("_id" -> id)
+          val list = collectionRef.findOne(o).toList
+          val filteredElections = list map (doc => grater[Election].asObject(doc))
+          var value = null;
+          if(!filteredElections.isEmpty){
+              return filteredElections.head.ballot
+          }
+          return null
   }
 }
 

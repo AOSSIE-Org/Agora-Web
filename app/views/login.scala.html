@@ -1,6 +1,6 @@
-@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+@(user: Option[models.User])(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
 
-@main(Messages("home.title"), Some(user)) {
+@main(Messages("home.title"), user) {
     <br>
     <br>
     <div class="container">
