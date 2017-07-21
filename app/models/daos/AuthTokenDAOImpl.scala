@@ -20,14 +20,14 @@ class AuthTokenDAOImpl extends AuthTokenDAO {
    * @param id The unique token ID.
    * @return The found token or None if no token for the given ID could be found.
    */
-  def find(id: UUID) = Future.successful(tokens.get(id))
+  def find(id: UUID): Future[Option[AuthToken]] = Future.successful(tokens.get(id))
 
   /**
    * Finds expired tokens.
    *
    * @param dateTime The current date time.
    */
-  def findExpired(dateTime: DateTime) = Future.successful {
+  def findExpired(dateTime: DateTime): Future[Seq[AuthToken]] = Future.successful {
     tokens.filter {
       case (id, token) =>
         token.expiry.isBefore(dateTime)
@@ -40,7 +40,7 @@ class AuthTokenDAOImpl extends AuthTokenDAO {
    * @param token The token to save.
    * @return The saved token.
    */
-  def save(token: AuthToken) = {
+  def save(token: AuthToken): Future[AuthToken] = {
     tokens += (token.id -> token)
     Future.successful(token)
   }
@@ -51,7 +51,7 @@ class AuthTokenDAOImpl extends AuthTokenDAO {
    * @param id The ID for which the token should be removed.
    * @return A future to wait for the process to be completed.
    */
-  def remove(id: UUID) = {
+  def remove(id: UUID): Future[Unit] = {
     tokens -= id
     Future.successful(())
   }
