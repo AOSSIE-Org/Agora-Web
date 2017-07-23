@@ -6,8 +6,8 @@
 # An example controller showing a sample home page
 GET         /                                 controllers.HomeController.index
 
-GET         /guest/vote/:id                       controllers.ElectionController.voteGuest(id)
-GET         /user/vote/:id                        controllers.ElectionController.voteUser(id)
+GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
+GET         /user/vote/:id                    controllers.ElectionController.voteUser(id)
 
 GET         /user/createElection              controllers.ElectionController.createUserView
 GET         /guest/createElection             controllers.ElectionController.createGuestView

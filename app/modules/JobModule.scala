@@ -12,7 +12,7 @@ class JobModule extends ScalaModule with AkkaGuiceSupport {
   /**
    * Configures the module.
    */
-  def configure() = {
+  def configure(): Unit = {
     bindActor[AuthTokenCleaner]("auth-token-cleaner")
     bind[Scheduler].asEagerSingleton()
   }
