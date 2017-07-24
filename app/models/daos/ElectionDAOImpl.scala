@@ -31,7 +31,7 @@ class ElectionDAOImpl() extends ElectionDAO {
   }
 
   def view(id: ObjectId): List[models.Election] = {
-    val o: DBObject       = MongoDBObject("_id" -> id)
+    val o: DBObject       = MongoDBObject("id" -> id)
     val u                 = collectionRef.findOne(o)
     val list              = u.toList
     list.map(doc => grater[Election].asObject(doc))
@@ -45,7 +45,7 @@ class ElectionDAOImpl() extends ElectionDAO {
   }
 
   def viewCandidate(id: ObjectId): List[String] = {
-    val o: DBObject = MongoDBObject("_id" -> id)
+    val o: DBObject = MongoDBObject("id" -> id)
     val list = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
     if (filteredElections.nonEmpty) {
@@ -56,7 +56,7 @@ class ElectionDAOImpl() extends ElectionDAO {
   }
 
   def vote(id: ObjectId, ballotinput: String): Boolean = {
-    val o: DBObject = MongoDBObject("_id" -> id)
+    val o: DBObject = MongoDBObject("id" -> id)
     var ballot      = ListBuffer[String]()
     ballot += ballotinput
     val c = ballot.toList ::: getBallot(id)
@@ -66,7 +66,7 @@ class ElectionDAOImpl() extends ElectionDAO {
   }
 
   def getBallot(id: ObjectId): List[String] = {
-    val o: DBObject       = MongoDBObject("_id" -> id)
+    val o: DBObject       = MongoDBObject("id" -> id)
     val list              = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
     var value             = null
