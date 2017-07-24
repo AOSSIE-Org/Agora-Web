@@ -19,7 +19,6 @@ class CustomUnsecuredErrorHandler extends UnsecuredErrorHandler {
    * @param request The request header.
    * @return The result to send to the client.
    */
-  override def onNotAuthorized(implicit request: RequestHeader) = {
+  override def onNotAuthorized(implicit request: RequestHeader) =
     Future.successful(Redirect(controllers.routes.HomeController.index()))
-  }
 }
