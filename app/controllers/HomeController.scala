@@ -11,7 +11,7 @@ import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import models.daos.ElectionDAOImpl
-
+import play.api.libs.mailer.{ Email, MailerClient }
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -19,7 +19,8 @@ import models.daos.ElectionDAOImpl
 @Singleton
 class HomeController @Inject() (
                                  val messagesApi: MessagesApi,
-                                 silhouette: Silhouette[DefaultEnv]
+                                 silhouette: Silhouette[DefaultEnv],
+                                 mailerClient: MailerClient
                                ) extends Controller with I18nSupport  {
 
   /**

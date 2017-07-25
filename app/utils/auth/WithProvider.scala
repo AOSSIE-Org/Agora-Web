@@ -14,10 +14,9 @@ case class WithProvider[A <: Authenticator](provider: String) extends Authorizat
   /**
    * Indicates if a user is authorized to access an action.
    */
-  override def isAuthorized[B](user: User, authenticator: A)(
-    implicit
-    request: Request[B]): Future[Boolean] = {
-
+  override def isAuthorized[B](
+    user: User,
+    authenticator: A
+  )(implicit request: Request[B]): Future[Boolean] =
     Future.successful(user.loginInfo.providerID == provider)
-  }
 }
