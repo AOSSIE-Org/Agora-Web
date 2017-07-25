@@ -35,5 +35,6 @@ case class Election(
   createdTime: Date,
   adminLink: String,
   inviteCode: String,
-  ballot: List[String]
+  ballot: List[String],
+  voterList : List[String]
 )

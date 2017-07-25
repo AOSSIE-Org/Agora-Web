@@ -31,6 +31,7 @@ GET         /guest/election/:id               controllers.ElectionController.vie
 GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
 POST        /guest/vote                       controllers.ElectionController.vote()
 
+POST        /user/election/invite/         controllers.ElectionController.addVoter()
 
 
 # Map static resources from the /public folder to the /assets URL path

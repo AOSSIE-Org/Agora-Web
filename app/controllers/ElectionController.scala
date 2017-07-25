@@ -7,6 +7,7 @@ import com.mohiva.play.silhouette.api.Silhouette
 import forms._
 import models.Election
 import models.daos.ElectionDAOImpl
+import models.services.MailerService
 import org.bson.types.ObjectId
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc._
@@ -14,7 +15,7 @@ import utils.auth.DefaultEnv
 import models.PassCodeGenerator
 import scala.util.Random
 import scala.concurrent.Future
-
+import play.api.libs.mailer.{ Email, MailerClient }
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -23,9 +24,13 @@ import scala.concurrent.Future
 @Singleton
 class ElectionController @Inject()(
   val messagesApi: MessagesApi,
-  silhouette: Silhouette[DefaultEnv]
+  silhouette: Silhouette[DefaultEnv],
+  mailerClient: MailerClient
 ) extends Controller with I18nSupport {
+
   val electionDAOImpl = new ElectionDAOImpl()
+  val mailerService = new MailerService(mailerClient)
+
 
   def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>
     def electionData = request.body
@@ -46,7 +51,8 @@ class ElectionController @Inject()(
       createdTime = new Date(),
       adminLink = "",
       inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
-      ballot = List.empty[String]
+      ballot = List.empty[String],
+      voterList = List.empty[String]
     )
     electionDAOImpl.save(election)
     Future.successful(
@@ -111,9 +117,14 @@ class ElectionController @Inject()(
     Future.successful(Ok(views.html.home(None)))
   }
 
-  def addVoter(id: String) = silhouette.SecuredAction.async { implicit request =>
-    val objectId = new ObjectId(id)
-
+  def addVoter() = silhouette.SecuredAction.async( parse.form(VoterForm.form) ) { implicit request =>
+    def voterData = request.body
+    val objectId = new ObjectId(voterData.id)
+    val con = electionDAOImpl.addVoter(objectId , voterData.email)
+    if(con){
+      println(electionDAOImpl.getInviteCode(objectId))
+      mailerService.sendEmail(voterData.email, electionDAOImpl.getInviteCode(objectId))
+    }
     Future.successful(
       Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
     )

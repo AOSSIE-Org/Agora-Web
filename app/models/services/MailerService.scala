@@ -7,20 +7,19 @@ import javax.inject.Inject
 
 class MailerService @Inject() (mailerClient: MailerClient) {
 
-  def sendEmail() = {
-    val cid = "1234"
-    val email = Email(
+  def sendEmail(email: String , passCode : String) = {
+    val emailSend = Email(
       "Simple email",
-      "Mister FROM <from@email.com>",
-      Seq("Miss TO <to@email.com>"),
+      "AGORA FROM <aossie@gmail.com>",
+      Seq("Voter TO <"+ email + ">") ,
       // adds attachment
 
       // sends text, HTML or both...
-      bodyText = Some("A text message"),
-      bodyHtml = Some(s"""<html><body><p>An <b>html</b> message with cid </p></body></html>""")
+      bodyText = Some("Invitation For Election"),
+      bodyHtml = Some(s"""<html><body><p><b>Passcode :</b> $passCode  </p> <br /> <p> You have to enter above passcode inorder to validate your identidity before voting</p></body></html>""")
     )
-    mailerClient.send(email)
-    println("Done");
+    mailerClient.send(emailSend)
+    println(emailSend);
   }
 
 }
