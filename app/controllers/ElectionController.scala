@@ -123,7 +123,7 @@ class ElectionController @Inject()(
     val con = electionDAOImpl.addVoter(objectId , voterData.email)
     if(con){
       println(electionDAOImpl.getInviteCode(objectId))
-      mailerService.sendEmail(voterData.email, electionDAOImpl.getInviteCode(objectId))
+      mailerService.sendEmail(voterData.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voterData.email))
     }
     Future.successful(
       Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
