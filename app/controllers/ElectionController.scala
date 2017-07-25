@@ -11,7 +11,8 @@ import org.bson.types.ObjectId
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc._
 import utils.auth.DefaultEnv
-
+import models.PassCodeGenerator
+import scala.util.Random
 import scala.concurrent.Future
 
 /**
@@ -44,7 +45,7 @@ class ElectionController @Inject()(
       isCompleted = false,
       createdTime = new Date(),
       adminLink = "",
-      inviteLink = "",
+      inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
       ballot = List.empty[String]
     )
     electionDAOImpl.save(election)
@@ -108,5 +109,13 @@ class ElectionController @Inject()(
     val ballotData = request.body
     electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
     Future.successful(Ok(views.html.home(None)))
+  }
+
+  def addVoter(id: String) = silhouette.SecuredAction.async { implicit request =>
+    val objectId = new ObjectId(id)
+
+    Future.successful(
+      Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
+    )
   }
 }

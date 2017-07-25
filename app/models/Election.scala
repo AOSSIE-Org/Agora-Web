@@ -34,6 +34,6 @@ case class Election(
   isCompleted: Boolean,
   createdTime: Date,
   adminLink: String,
-  inviteLink: String,
+  inviteCode: String,
   ballot: List[String]
 )
