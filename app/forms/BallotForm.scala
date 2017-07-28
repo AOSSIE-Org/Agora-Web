@@ -8,17 +8,16 @@ import play.api.data.Forms._
  */
 object BallotForm {
 
-  case class BallotData(id: String, ballotInput: String, email: String, code: String)
+  case class BallotData(id: String, ballotInput: String , passCode : String )
 
   /**
    * A play framework form.
    */
   val form = Form(
     mapping(
-      "id"          -> text,
+      "id"          -> nonEmptyText,
       "ballotinput" -> nonEmptyText,
-      "email"       -> text,
-      "code"        -> text
+      "passCode" -> nonEmptyText
     )(BallotData.apply)(BallotData.unapply)
   )
 }

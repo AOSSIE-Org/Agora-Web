@@ -10,7 +10,7 @@ class MailerService @Inject() (mailerClient: MailerClient) {
   def sendEmail(email: String , passCode : String) = {
     val emailSend = Email(
       "Simple email",
-      "AGORA FROM <aossie@gmail.com>",
+      "AGORA <aossie@gmail.com>",
       Seq("Voter TO <"+ email + ">") ,
       // adds attachment
 

@@ -9,7 +9,7 @@ import models.Election
 import models.daos.ElectionDAOImpl
 import models.services.MailerService
 import org.bson.types.ObjectId
-import play.api.i18n.{ I18nSupport, MessagesApi }
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.mvc._
 import utils.auth.DefaultEnv
 import models.PassCodeGenerator
@@ -87,12 +87,16 @@ class ElectionController @Inject()(
 
   def voteGuest(id: String) = silhouette.UnsecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
+    val election = electionDAOImpl.view(objectId).head
+    println(election)
     Future.successful(
       Ok(
-        views.html.ballot.preferential(
+        views.html.ballot.ranked(
           None,
           Option(electionDAOImpl.viewCandidate(objectId)),
-          Option(id)
+          Option(id),
+          Option(election.name),
+          Option(election.description)
         )
       )
     )
@@ -100,21 +104,33 @@ class ElectionController @Inject()(
 
   def voteUser(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
+    val election = electionDAOImpl.view(objectId).head
     Future.successful(
       Ok(
         views.html.ballot.ranked(
           Option(request.identity),
-          Option(electionDAOImpl.viewCandidate(objectId: ObjectId)),
-          Option(id)
+          Option(electionDAOImpl.viewCandidate(objectId)),
+          Option(id),
+          Option(election.name),
+          Option(election.description)
         )
       )
     )
   }
 
-  def vote = silhouette.UnsecuredAction.async(parse.form(BallotForm.form)) { implicit request =>
+  def vote = Action (parse.form(BallotForm.form)) { implicit request =>
     val ballotData = request.body
+    val objectId = new ObjectId(ballotData.id)
+    println(PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
+    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
+      println(ballotData)
     electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
-    Future.successful(Ok(views.html.home(None)))
+    Redirect(routes.ElectionController.thankVoter()).flashing("success" -> Messages("thank.voting"))
+
+    }
+    else{
+      Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("could.not.verify"))
+    }
   }
 
   def addVoter() = silhouette.SecuredAction.async( parse.form(VoterForm.form) ) { implicit request =>
@@ -126,7 +142,16 @@ class ElectionController @Inject()(
       mailerService.sendEmail(voterData.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voterData.email))
     }
     Future.successful(
-      Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
+      Ok
+        (
+          views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId))
+        )
     )
+  }
+
+
+  def thankVoter = Action { implicit request => {
+      Ok(views.html.election.thankVoting(None))
+  }
   }
 }

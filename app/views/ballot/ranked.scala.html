@@ -1,9 +1,9 @@
-@(user: Option[models.User], candidates : Option[List[String]] , id : Option[String])(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User], candidates : Option[List[String]] , id : Option[String] , name : Option[String] , description: Option[String] )(implicit request: RequestHeader, messages: Messages)
 
 @import helper._
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
-@election.vote(user) {
+@election.vote(user , id , name , description) {
 
 
 
@@ -27,6 +27,7 @@
                                     <option value=@{index+1}>@{index+1}</option>
                                 }
                               </select>
+                                  <script type='text/javascript' src='@routes.Assets.at("/javascripts/ranked.js")'> </script>
                           </div>
                     </div>
                   }
@@ -40,26 +41,6 @@
 
             </div>
         </div>
-
-
-        <div class="container text-center">
-            <p>
-                <b>Instructions</b>:
-                Double check your ballot. Then click the "Vote!" button to cast your vote.
-            </p>
-              @b3.form(CSRF(routes.ElectionController.vote())) {
-            <div class="text-center bottomm10">
-              <input type="hidden" class="form-control" name="ballotinput" id="ballotinput">
-              <input name="email" value="" type="hidden">
-              <input name="code" value="" type="hidden">
-              <input name="id" value=@id type="hidden">
-                <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" >
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Vote!</button>
-            </div>
-              <script type='text/javascript' src='@routes.Assets.at("/javascripts/ranked.js")'> </script>
-          }
-        </div>
-    </div>
+  </div>
 
 }

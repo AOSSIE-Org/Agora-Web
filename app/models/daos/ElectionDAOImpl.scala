@@ -55,6 +55,8 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
   }
 
+
+
   def vote(id: ObjectId, ballotinput: String): Boolean = {
     val o: DBObject = MongoDBObject("id" -> id)
     var ballot      = ListBuffer[String]()
@@ -110,5 +112,20 @@ class ElectionDAOImpl() extends ElectionDAO {
       } else {
         null // FIXME: replace null with None
       }
+  }
+
+  def removeVoter(id : ObjectId, email : String ): Boolean = {
+    val o: DBObject       = MongoDBObject("id" -> id)
+    val list              = collectionRef.findOne(o).toList
+    val filteredElections = list.map(doc => grater[Election].asObject(doc))
+    val c = getVoterList(id)
+
+    if(c.contains(email)){
+    val update = $set("voterList" -> c.filter(_ != email) )
+      collectionRef.update( o, update )
+      return true
+    }
+    return false
+
   }
 }

@@ -1,11 +1,42 @@
-@(user: Option[models.User])(content: Html)(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User], id : Option[String] , name : Option[String] , description : Option[String])(content: Html)(implicit request: RequestHeader, messages: Messages)
 
-@main(Messages("home.title"), user) {
-    <div class="container">
-        <div class="container text-center">
-            <h1>Election Title</h1>
-            <div><p>This is the description.</p></div>
+@import helper._
+@import b3.vertical.fieldConstructor // Declares a vertical field constructor as default
+
+
+@main(Messages("vote.page"), user) {
+        <div class="container well text-center">
+            <h1>@name</h1>
+            <div><p>@description</p></div>
         </div>
         @content
-    </div>
+
+      @b3.form(CSRF(routes.ElectionController.vote())) {
+       <div class="container text-center">
+         <p>
+           <b>Instructions</b>: Double check your ballot. Then click the "Vote!" button to cast your vote.
+         </p>
+         <div class="text-center bottomm10">
+           <label class="control-label col-md-3" >Verification Code</label>
+               <div class=" col-md-9">
+                   <input class="form-control input-validation-error" data-val="true" data-val-required="The Code field is required." required name="passCode" id="passCode">
+              </div>
+           <input name="id" value=@id type="hidden">
+           <input type="hidden" class="form-control" name="ballotinput" id="ballotinput">
+           <br />
+           <br />
+           <br />
+           <button class="btn btn-lg btn-success" id="enter-vote-btn" type="submit" name="submit" value="Vote!">
+                         <span class="glyphicon glyphicon-ok"></span>
+                         Vote!</button>
+
+         </div>
+       </div>
+       <br />
+       <br />
+       <br />
+       <br />
+
+     }
+    
 }

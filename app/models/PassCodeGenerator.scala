@@ -20,9 +20,16 @@ object PassCodeGenerator {
   }
 
   def decrypt(key: String, encryptedValue: String): String = {
+
     val cipher: Cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec(key))
+    try {
     new String(cipher.doFinal(Base64.decodeBase64(encryptedValue)))
+    }
+    catch {
+      case e: Exception => "Wrong code"
+    }
+
   }
 
   def keyToSpec(key: String): SecretKeySpec = {

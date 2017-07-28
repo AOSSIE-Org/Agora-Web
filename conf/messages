@@ -3,11 +3,13 @@
 
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
+could.not.verify = Could not verify with your verification code! Please check your email and try again!
+
+thank.voting = Your vote has been recorded.
 
 home.title = Agora - Home
-sign.up.title = Agora - Sign Up
 sign.in.title = Agora - Sign In
-
+vote.page = Vote
 
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
