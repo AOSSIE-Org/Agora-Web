@@ -85,11 +85,9 @@ class ElectionController @Inject()(
     )
   }
 
-  def voteGuest(id: String) = silhouette.UnsecuredAction.async { implicit request =>
+  def voteGuest(id: String) = Action { implicit request =>
     val objectId = new ObjectId(id)
     val election = electionDAOImpl.view(objectId).head
-    println(election)
-    Future.successful(
       Ok(
         views.html.ballot.ranked(
           None,
@@ -97,23 +95,7 @@ class ElectionController @Inject()(
           Option(id),
           Option(election.name),
           Option(election.description)
-        )
-      )
-    )
-  }
 
-  def voteUser(id: String) = silhouette.SecuredAction.async { implicit request =>
-    val objectId = new ObjectId(id)
-    val election = electionDAOImpl.view(objectId).head
-    Future.successful(
-      Ok(
-        views.html.ballot.ranked(
-          Option(request.identity),
-          Option(electionDAOImpl.viewCandidate(objectId)),
-          Option(id),
-          Option(election.name),
-          Option(election.description)
-        )
       )
     )
   }
@@ -121,7 +103,6 @@ class ElectionController @Inject()(
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
     val ballotData = request.body
     val objectId = new ObjectId(ballotData.id)
-    println(PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
     if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
       println(ballotData)
     electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
