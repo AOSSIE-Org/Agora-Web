@@ -55,14 +55,11 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
   }
 
-
-
   def vote(id: ObjectId, ballotinput: String): Boolean = {
     val o: DBObject = MongoDBObject("id" -> id)
     var ballot      = ListBuffer[String]()
     ballot += ballotinput
     val c = ballot.toList ::: getBallot(id)
-
     val update = $set("ballot" -> c)
     collectionRef.update( o, update )
     true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
@@ -94,13 +91,19 @@ class ElectionDAOImpl() extends ElectionDAO {
 
   def addVoter(id: ObjectId , email : String ): Boolean = {
       val o: DBObject = MongoDBObject("id" -> id)
-      var voterList      = ListBuffer[String]()
-      voterList += email
-      val c = voterList.toList ::: getVoterList(id)
-      println(c)
-      val update = $set("voterList" -> c )
-      collectionRef.update( o, update )
-      true
+      val defaultVoterList =  getVoterList(id);
+      if(!defaultVoterList.contains(email)){
+        var voterList      = ListBuffer[String]()
+        voterList += email
+        val c = voterList.toList ::: getVoterList(id)
+        println(c)
+        val update = $set("voterList" -> c )
+        collectionRef.update( o, update )
+        true
+      }
+      else{
+        false
+      }
   }
 
   def getInviteCode(id: ObjectId): String = {

@@ -14,11 +14,13 @@
 
 	@for(election <- elections) {
 		<div class="container-fluid primary-content">
+
 		  <div class="primary-content-heading clearfix">
 		    <h2>@election.name</h2>
 		    <hr style="border:1px solid #fff">
 		  </div>
 		  <div class="row">
+
 		    <div class="col-md-12">
 		      <div class="project-section well general-info">
 		        <h3>Description</h3>
@@ -61,7 +63,7 @@
 
 		              <input type="hidden" class="form-control" name="id" value=@election.id>
 		              <div class="form-group">
-		                <label for="exampleInputEmail1">Voter's Email</label>
+		                <label for="InputEmail1">Voter's Email</label>
 		                <input type="text" class="form-control" name="email" placeholder="Email" required>
 		              </div>
 		              <button class="btn btn-success pull-right" type="submit">Submit</button>
@@ -73,11 +75,13 @@
 		            } @b3.form(CSRF(routes.ElectionController.upload()), 'enctype -> "multipart/form-data") {
 		            <div class="modal-body">
 		              <div class="form-group">
-		                <label for="exampleInputEmail1">Upload emails as a text file: </label>
+		                <label for="InputEmail1">Upload emails as a text file: </label>
 		                <input class="form-control" type="file" accept="text/plain" id="emailFile" name="emailFile" required>
 		                <!-- <label class="btn btn-primary"> Upload <input type="file" name="name" id="name" style="display: none;"> </label> -->
 		                <input type="hidden" class="form-control" name="id" value=@election.id id="id">
+
 		              </div>
+
 		            </div>
 		            <div class="modal-footer">
 		              <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Close</button>
@@ -92,6 +96,9 @@
 
 		    </div>
 		  </div>
+			<script type='text/javascript' src='@routes.Assets.at("/javascripts/fileUpload.js")'></script>
+
   	</div>
+
   }
 }

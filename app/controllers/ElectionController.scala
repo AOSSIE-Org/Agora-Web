@@ -146,13 +146,18 @@ class ElectionController @Inject()(
     if(con){
       println(electionDAOImpl.getInviteCode(objectId))
       mailerService.sendEmail(voterData.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voterData.email))
+      Future.successful(
+        Ok
+          (
+            views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId))
+          )
+      )
     }
+    else{
     Future.successful(
-      Ok
-        (
-          views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId))
-        )
+      Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("error.voter"))
     )
+    }
   }
 
   def thankVoter = Action { implicit request =>

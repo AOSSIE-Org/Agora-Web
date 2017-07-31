@@ -1,8 +1,7 @@
-$(document).ready(function() {
+$( function() {
 var file = document.getElementById('emailFile');
-console.log(file.value);
 file.onchange = function(e){
-  console.log(file.value);
+  console.log(file);
   try{
     var ext = this.value.match(/\.([^\.]+)$/)[1];
 
