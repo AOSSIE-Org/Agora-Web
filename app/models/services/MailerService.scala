@@ -16,7 +16,7 @@ class MailerService @Inject() (mailerClient: MailerClient) {
 
       // sends text, HTML or both...
       bodyText = Some("Invitation For Election"),
-      bodyHtml = Some(s"""<html><body><p><b>Passcode :</b> $passCode  </p> <br /> <p> You have to enter above passcode inorder to validate your identidity before voting</p></body></html>""")
+      bodyHtml = Some(s"""<html><body><p><b>Passcode :</b> $passCode  </p> <br /> <p> You have to enter above passcode in order to validate your identity before voting</p></body></html>""")
     )
     mailerClient.send(emailSend)
     println(emailSend);
