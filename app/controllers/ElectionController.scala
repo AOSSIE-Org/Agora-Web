@@ -3,19 +3,43 @@ package controllers
 import java.util.Date
 import javax.inject._
 
-import com.mohiva.play.silhouette.api.Silhouette
+
 import forms._
 import models.Election
 import models.daos.ElectionDAOImpl
 import models.services.MailerService
+import models.PassCodeGenerator
+import utils.auth.DefaultEnv
+
+import com.mohiva.play.silhouette.api.Silhouette
 import org.bson.types.ObjectId
+
+import akka.stream.IOResult
+import akka.stream.scaladsl._
+import akka.util.ByteString
+
 import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.mvc._
-import utils.auth.DefaultEnv
-import models.PassCodeGenerator
-import scala.util.Random
-import scala.concurrent.Future
 import play.api.libs.mailer.{ Email, MailerClient }
+import play.api.mvc.MultipartFormData.FilePart
+import play.core.parsers.Multipart.FileInfo
+import play.api.libs.streams._
+
+import java.io.File
+import java.nio.file.attribute.PosixFilePermission._
+import java.nio.file.attribute.PosixFilePermissions
+import java.nio.file.{Files, Path}
+import java.util
+import javax.inject._
+
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.FileInputStream
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -25,7 +49,8 @@ import play.api.libs.mailer.{ Email, MailerClient }
 class ElectionController @Inject()(
   val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
-  mailerClient: MailerClient
+  mailerClient: MailerClient,
+  ec: ExecutionContext
 ) extends Controller with I18nSupport {
 
   val electionDAOImpl = new ElectionDAOImpl()
@@ -130,9 +155,74 @@ class ElectionController @Inject()(
     )
   }
 
-
-  def thankVoter = Action { implicit request => {
+  def thankVoter = Action { implicit request =>
+    {
       Ok(views.html.election.thankVoting(None))
+    }
   }
+
+  type FilePartHandler[A] = FileInfo => Accumulator[ByteString, FilePart[A]]
+
+  /**
+   * Uses a custom FilePartHandler to return a type of "File" rather than
+   * using Play's TemporaryFile class.
+   */
+  private def handleFilePartAsFile: FilePartHandler[File] = {
+    case FileInfo(partName, filename, contentType) =>
+      val attr = PosixFilePermissions.asFileAttribute(util.EnumSet.of(OWNER_READ, OWNER_WRITE))
+      val path: Path = Files.createTempFile("multipartBody", "tempFile", attr)
+      val file = path.toFile
+      val fileSink: Sink[ByteString, Future[IOResult]] = FileIO.toPath(path)
+      val accumulator: Accumulator[ByteString, IOResult] = Accumulator(fileSink)
+      accumulator.map {
+        case IOResult(count, status) =>
+          FilePart(partName, filename, contentType, file)
+      }
+  }
+
+  def addVoter( email : String , id : String) : Boolean = {
+    val objectId = new ObjectId(id)
+    val con = electionDAOImpl.addVoter(objectId ,email)
+    if(con){
+      println(electionDAOImpl.getInviteCode(objectId))
+      mailerService.sendEmail(email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),email))
+    }
+    con
+  }
+
+  /**
+   * A generic operation on the temporary file that deletes the temp file after completion.
+   */
+  private def operateOnTempFile(file: File) = {
+    val size = Files.size(file.toPath)
+    Files.deleteIfExists(file.toPath)
+    size
+  }
+
+  /**
+   * Uploads a multipart file as a POST request.
+   * @return
+   */
+  def upload = silhouette.SecuredAction.async(parse.multipartFormData(handleFilePartAsFile)) { implicit request =>
+    val id : String = request.body.dataParts.get("id").head.mkString
+    println(id)
+    val fileOption = request.body.file("name").map {
+      case FilePart(key, filename, contentType, file) =>
+      val inStream = new FileInputStream(file)
+      val reader = new BufferedReader(new InputStreamReader(inStream));
+      var  line : String = reader.readLine();
+      while(line != null && line != ""){
+            addVoter(line,id)
+            line = reader.readLine();
+      }
+      val data = operateOnTempFile(file)
+
+    }
+    Future.successful(
+      Ok
+        (
+          views.html.election.election(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
+        )
+    )
   }
 }

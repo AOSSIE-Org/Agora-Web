@@ -33,7 +33,7 @@ POST        /guest/vote                       controllers.ElectionController.vot
 POST        /user/election/invite/            controllers.ElectionController.addVoter()
 
 GET         /vote/                            controllers.ElectionController.thankVoter()
-
+POST        /upload/                          controllers.ElectionController.upload()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)

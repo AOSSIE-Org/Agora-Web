@@ -6,7 +6,7 @@ could.not.authenticate = Could not authenticate with social provider! Please try
 could.not.verify = Could not verify with your verification code! Please check your email and try again!
 
 thank.voting = Your vote has been recorded.
-
+add.voter = Voter has been added successfully
 home.title = Agora - Home
 sign.in.title = Agora - Sign In
 vote.page = Vote
