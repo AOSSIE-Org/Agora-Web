@@ -134,7 +134,7 @@ class ElectionController @Inject()(
         )
       }
       case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
-      | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin" 
+      | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin"
       | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
       Ok(
           views.html.ballot.preferential(
@@ -196,7 +196,11 @@ class ElectionController @Inject()(
           )
         )
       }
-    }
+      case _ => {
+      Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
+      }
+
+      }
   }
 
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
