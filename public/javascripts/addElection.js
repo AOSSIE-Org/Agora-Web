@@ -41,7 +41,7 @@ $(document).ready(function() {
 
   $('div.setup-panel div a.btn-primary').trigger('click');
 
-  var date_input = $('input[name="start"]'); //our date input has the name "date"
+  var date_input = $('input[name="start"]'); //our start date input has the name "start"
   var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
   var options = {
     container: container,
@@ -53,15 +53,20 @@ $(document).ready(function() {
 
 
 
-  var date_inputend = $('input[name="end"]'); //our date input has the name "date"
+  var date_inputend = $('input[name="end"]'); //our end date input has the name "end"
   var containerend = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
   var optionsend = {
-    container: containerend,
-    todayHighlight: true,
-    autoclose: true,
-    startDate: new Date()
-  };
+     container: containerend,
+     todayHighlight: true,
+     autoclose: true,
+     startDate: new Date()
+   };
   date_inputend.datepicker(optionsend);
 
+  date_input[0].onchange = function(e){
+    var date = new Date(this.value)
+    date.setDate(date.getDate() + 1)
+    date_inputend.datepicker('setStartDate', date)
+  }
 
 });

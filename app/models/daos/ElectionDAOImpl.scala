@@ -44,6 +44,13 @@ class ElectionDAOImpl() extends ElectionDAO {
     list.map(doc => grater[Election].asObject(doc))
   }
 
+  def userElectionListCount(email: Option[String]): Int = {
+    val o: DBObject       = MongoDBObject("creatorEmail" -> email)
+    val u                 = collectionRef.find(o)
+    val list              = u.toList
+    list.length
+  }
+
   def viewCandidate(id: ObjectId): List[String] = {
     val o: DBObject = MongoDBObject("id" -> id)
     val list = collectionRef.findOne(o).toList

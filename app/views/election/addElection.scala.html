@@ -5,12 +5,15 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
-@algo = @{
-    Seq("EVACS" -> "EVACS", "Simple" -> "Simple" ,"Egalitarian" -> "Egalitarian", "Majority" -> "Majority" ,"Borda" -> "Borda", "Approval" -> "Approval" ,"Nanson" -> "Nanson", "Kemeny-Young" -> "Kemeny-Young" )
+@algo = @{List("Range Voting","Instant Runoff 2-round","Egalitarian","Majority","Borda","Approval","Nanson",
+                "Kemeny-Young","Schulze","Copeland","SMC","Ranked Pairs","Random Ballot","Coomb’s","Contingent Method",
+                "Minimax Condorcet","Top Cycle","Uncovered Set","Warren STV","Meek STV","Oklahoma Method",
+                "Sequential Proportional Approval voting","Proportional Approval voting","Satisfaction Approval voting",
+                "Baldwin","Exhaustive ballot","Exhaustive ballot with dropoff","Scottish STV","Cumulative voting",
+                "Preferential block voting","Contingent Method")
 }
-@result = @{
-    Seq("false" -> "False", "true" -> "True")
-}
+
+@result = @{List("false","true")}
 
 @main(Messages("home.title"), user) {
 
@@ -64,8 +67,9 @@
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Preference</label>
                   <select class="selectpicker form-control" name="isPublic">
-                    <option value="false">False</option>
-                    <option value="true">True</option>
+                    @for(value <- result){
+                    <option value=@value>@value</option>
+                  }
                   </select>
 
                 </div>
@@ -86,8 +90,9 @@
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Preference</label>
                   <select class="selectpicker form-control" name="isPublic">
-                    <option value="false">False</option>
-                    <option value="true">True</option>
+                    @for(value <- result){
+                    <option value=@value>@value</option>
+                  }
                   </select>
 
                 </div>
@@ -111,35 +116,26 @@
 
                     <label for="exampleInputEmail1">Invite Voters</label>
                     <select class="selectpicker form-control" name="isInvite">
-                      <option value="false">False</option>
-                      <option value="true">True</option>
+                      @for(value <- result){
+                      <option value=@value>@value</option>
+                    }
                     </select>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Realtime Result</label>
                   <select class="selectpicker form-control" name="realtimeResult">
-                    <option value="false">False</option>
-                    <option value="true">True</option>
+                    @for(value <- result){
+                    <option value=@value>@value</option>
+                  }
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Algorithm</label>
                   <select class="selectpicker form-control" name="votingAlgo">
-                    <option value="EVACS">EVACS</option>
-                    <option value="Simple">Simple</option>
-                    <option value="Egalitarian">Egalitarian</option>
 
-                    <option value="Majority">Majority</option>
-
-                    <option value="Borda">Borda</option>
-
-                    <option value="Approval">Approval</option>
-
-
-                    <option value="Nanson">Nanson</option>
-
-
-                    <option value="Kemeny-Young">Kemeny-Young</option>
+                    @for(value <- algo){
+                        <option value=@value>@value</option>
+                    }
 
 
                   </select>

@@ -59,35 +59,41 @@ class ElectionController @Inject()(
 
   def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>
     def electionData = request.body
-    val election = new Election(
-      new ObjectId,
-      electionData.name,
-      electionData.description,
-      electionData.creatorName,
-      electionData.creatorEmail,
-      electionData.startingDate,
-      electionData.endingDate,
-      electionData.isRealTime,
-      electionData.votingAlgo,
-      electionData.candidates.split(",").toList,
-      electionData.isPublic,
-      electionData.isInvite,
-      isCompleted = false,
-      createdTime = new Date(),
-      adminLink = "",
-      inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
-      ballot = List.empty[String],
-      voterList = List.empty[String]
-    )
-    electionDAOImpl.save(election)
-    Future.successful(
-      Ok(
-        views.html.profile(
-          Option(request.identity),
-          electionDAOImpl.userElectionList(request.identity.email)
+    if(electionDAOImpl.userElectionListCount(Option(electionData.creatorEmail))<3){
+      val election = new Election(
+        new ObjectId,
+        electionData.name,
+        electionData.description,
+        electionData.creatorName,
+        electionData.creatorEmail,
+        electionData.startingDate,
+        electionData.endingDate,
+        electionData.isRealTime,
+        electionData.votingAlgo,
+        electionData.candidates.split(",").toList,
+        electionData.isPublic,
+        electionData.isInvite,
+        isCompleted = false,
+        createdTime = new Date(),
+        adminLink = "",
+        inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
+        ballot = List.empty[String],
+        voterList = List.empty[String]
+      )
+      electionDAOImpl.save(election)
+      Future.successful(
+        Ok(
+          views.html.profile(
+            Option(request.identity),
+            electionDAOImpl.userElectionList(request.identity.email)
+          )
         )
       )
-    )
+    }else{
+      Future.successful(
+        Redirect(routes.HomeController.profile).flashing("error" -> Messages("maximum.election"))
+      )
+    }
   }
 
   def createGuestView = silhouette.UnsecuredAction.async { implicit request =>
@@ -113,16 +119,84 @@ class ElectionController @Inject()(
   def voteGuest(id: String) = Action { implicit request =>
     val objectId = new ObjectId(id)
     val election = electionDAOImpl.view(objectId).head
-      Ok(
-        views.html.ballot.ranked(
-          None,
-          Option(electionDAOImpl.viewCandidate(objectId)),
-          Option(id),
-          Option(election.name),
-          Option(election.description)
 
+    election.votingAlgo match {
+      case "Range Voting" =>{
+          Ok(
+            views.html.ballot.scored(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
+      | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin" 
+      | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
+      Ok(
+          views.html.ballot.preferential(
+            None,
+            Option(electionDAOImpl.viewCandidate(objectId)),
+            Option(id),
+            Option(election.name),
+            Option(election.description)
+
+        )
       )
-    )
+      }
+
+      case "Approval" | "Proportional Approval voting" | "Satisfaction Approval voting" | "Sequential Proportional Approval voting"  => {
+        Ok(
+            views.html.ballot.approval(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Majority" => {
+        Ok(
+            views.html.ballot.singleCandidate(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Ranked Pairs" => {
+        Ok(
+            views.html.ballot.ranked(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Cumulative voting" => {
+        Ok(
+            views.html.ballot.scored(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+    }
   }
 
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
@@ -144,7 +218,6 @@ class ElectionController @Inject()(
     val objectId = new ObjectId(voterData.id)
     val con = electionDAOImpl.addVoter(objectId , voterData.email)
     if(con){
-      println(electionDAOImpl.getInviteCode(objectId))
       mailerService.sendEmail(voterData.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voterData.email))
       Future.successful(
         Ok
@@ -230,4 +303,8 @@ class ElectionController @Inject()(
         )
     )
   }
+
+
+
+
 }

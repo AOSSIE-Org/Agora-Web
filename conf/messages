@@ -4,6 +4,8 @@
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
 could.not.verify = Could not verify with your verification code! Please check your email and try again!
+maximum.election = you have reached a limit for creating election.
+
 
 thank.voting = Your vote has been recorded.
 add.voter = Voter has been added successfully
