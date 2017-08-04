@@ -124,12 +124,22 @@ class ElectionDAOImpl() extends ElectionDAO {
       }
   }
 
+  def getCreatorEmail(id: ObjectId): Option[String] = {
+    val o: DBObject       = MongoDBObject("id" -> id)
+    val list              = collectionRef.findOne(o).toList
+    val filteredElections = list.map(doc => grater[Election].asObject(doc))
+    if (filteredElections.nonEmpty) {
+      Option(filteredElections.head.creatorEmail)
+    } else {
+      None // FIXME: replace null with None
+    }
+  }
+
   def removeVoter(id : ObjectId, email : String ): Boolean = {
     val o: DBObject       = MongoDBObject("id" -> id)
     val list              = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
     val c = getVoterList(id)
-
     if(c.contains(email)){
     val update = $set("voterList" -> c.filter(_ != email) )
       collectionRef.update( o, update )

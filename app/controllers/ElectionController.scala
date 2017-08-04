@@ -106,14 +106,21 @@ class ElectionController @Inject()(
 
   def viewElection(id: String) = silhouette.UnsecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    Future.successful(Ok(views.html.election.election(None, electionDAOImpl.view(objectId))))
+    Future.successful(Ok(views.html.election.adminElectionView(None, electionDAOImpl.view(objectId))))
   }
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    Future.successful(
-      Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
-    )
+    if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
+      Future.successful(
+        Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
+      )
+    }
+    else{
+      Future.successful(
+        Ok(views.html.election.userElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
+      )
+    }
   }
 
   def voteGuest(id: String) = Action { implicit request =>
@@ -226,7 +233,7 @@ class ElectionController @Inject()(
       Future.successful(
         Ok
           (
-            views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId))
+            views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
           )
       )
     }
@@ -303,7 +310,7 @@ class ElectionController @Inject()(
     Future.successful(
       Ok
         (
-          views.html.election.election(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
+          views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
         )
     )
   }

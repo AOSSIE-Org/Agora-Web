@@ -69,8 +69,6 @@ $(document).ready(function() {
     date_inputend.datepicker('setStartDate', date)
   }
 
-  $('.bootstrap-tagsinput').tagsinput({
-    maxTags: 10
-  });
+  $("a.my-tool-tip").tooltip();
 
 });

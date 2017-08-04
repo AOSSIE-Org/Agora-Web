@@ -75,7 +75,12 @@
 		            } @b3.form(CSRF(routes.ElectionController.upload()), 'enctype -> "multipart/form-data") {
 		            <div class="modal-body">
 		              <div class="form-group">
-		                <label for="InputEmail1">Upload emails as a text file: </label>
+		                <label for="InputEmail1">Upload emails as a text file:
+											<a class='my-tool-tip' data-toggle="tooltip" data-placement="left"
+												title='Emails should be separated by line-breaks. Each email should be given in the format
+												"[email]" (e.g. "john.doe@@gmail.com"). Without quotation marks'>
+												<i class='glyphicon glyphicon-info-sign'></i>
+										</a></label>
 		                <input class="form-control" type="file" accept="text/plain" id="emailFile" name="emailFile" required>
 		                <!-- <label class="btn btn-primary"> Upload <input type="file" name="name" id="name" style="display: none;"> </label> -->
 		                <input type="hidden" class="form-control" name="id" value=@election.id id="id">
