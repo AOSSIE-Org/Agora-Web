@@ -18,7 +18,6 @@ libraryDependencies ++= Seq(
   "com.iheart"             %% "ficus" % "1.2.6",
   "org.webjars"            % "bootstrap-datepicker" % "1.6.4",
   "org.webjars"            % "font-awesome" % "4.7.0",
-  "com.typesafe.play"      %% "play-mailer" % "5.0.0",
   "com.enragedginger"      %% "akka-quartz-scheduler" % "1.5.0-akka-2.4.x",
   "com.adrianhurt"         %% "play-bootstrap" % "1.1.1-P25-B3",
   "com.mohiva"             %% "play-silhouette-testkit" % "4.0.0" % "test",
@@ -26,7 +25,7 @@ libraryDependencies ++= Seq(
   "org.webjars"            % "jquery-ui" % "1.12.1",
   "com.novus"              %% "salat" % "1.9.9",
   "com.typesafe.play"      %% "play-mailer-guice" % "6.0.0",
-  "com.typesafe.play"      %% "play-mailer" % "6.0.0",
+  "org.quartz-scheduler"   % "quartz" % "2.2.2",
   specs2              % Test,
   cache,
   filters

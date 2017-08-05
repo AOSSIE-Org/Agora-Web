@@ -5,6 +5,8 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import countvotes._
+import scheduler.Scheduler
+import scheduler.Scheduler.scheduler
 
 import scala.concurrent.Future
 import utils.auth.DefaultEnv
@@ -31,8 +33,12 @@ class HomeController @Inject() (
    * a path of `/`.
    */
      val electionDAOImpl = new ElectionDAOImpl();
+     scheduler.start()
+     Scheduler.CountVotesDaily()
+
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
+
     Future.successful(Ok(views.html.home(None)))
   }
 

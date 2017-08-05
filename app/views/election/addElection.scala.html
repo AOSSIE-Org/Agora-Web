@@ -117,7 +117,7 @@
                     <label for="exampleInputEmail1">Invite Voters</label>
                     <select class="selectpicker form-control" name="isInvite">
                       @for(value <- result){
-                      <option value=@value>@value</option>
+                      <option value='@value'>@value</option>
                     }
                     </select>
                 </div>
@@ -125,7 +125,7 @@
                   <label for="exampleInputEmail1">Realtime Result</label>
                   <select class="selectpicker form-control" name="realtimeResult">
                     @for(value <- result){
-                    <option value=@value>@value</option>
+                    <option value='@value'>@value</option>
                   }
                   </select>
                 </div>
@@ -134,7 +134,7 @@
                   <select class="selectpicker form-control" name="votingAlgo">
 
                     @for(value <- algo){
-                        <option value=@value>@value</option>
+                        <option value='@value'>@value</option>
                     }
 
 
