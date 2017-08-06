@@ -3,7 +3,7 @@ package models.daos
 import com.mongodb.casbah.Imports.{ DBObject, _ }
 import com.mongodb.casbah.commons.conversions.scala.RegisterConversionHelpers
 import com.novus.salat._
-import models.{ Election, MongoDBConnection }
+import models.{ Election, MongoDBConnection , Ballot}
 import org.bson.types.ObjectId
 
 import scala.collection.mutable.ListBuffer
@@ -62,17 +62,20 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
   }
 
-  def vote(id: ObjectId, ballotinput: String): Boolean = {
+  def vote(id: ObjectId, ballot: Ballot): Boolean = {
     val o: DBObject = MongoDBObject("id" -> id)
-    var ballot      = ListBuffer[String]()
-    ballot += ballotinput
-    val c = ballot.toList ::: getBallot(id)
-    val update = $set("ballot" -> c)
+    println(ballot)
+    var ballotList      = ListBuffer[Ballot]()
+    ballotList += ballot
+    // println(getBallot(id))
+    val c = ballotList.toList ::: getBallot(id)
+    val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
+    val update = $set("ballot" -> bsonBallot )
     collectionRef.update( o, update )
     true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
   }
 
-  def getBallot(id: ObjectId): List[String] = {
+  def getBallot(id: ObjectId): List[Ballot] = {
     val o: DBObject       = MongoDBObject("id" -> id)
     val list              = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
@@ -102,6 +105,7 @@ class ElectionDAOImpl() extends ElectionDAO {
       if(!defaultVoterList.contains(email)){
         var voterList      = ListBuffer[String]()
         voterList += email
+        println(voterList)
         val c = voterList.toList ::: getVoterList(id)
         println(c)
         val update = $set("voterList" -> c )

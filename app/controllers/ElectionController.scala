@@ -6,6 +6,7 @@ import javax.inject._
 
 import forms._
 import models.Election
+import models.Ballot
 import models.daos.ElectionDAOImpl
 import models.services.MailerService
 import models.PassCodeGenerator
@@ -71,13 +72,13 @@ class ElectionController @Inject()(
         electionData.isRealTime,
         electionData.votingAlgo,
         electionData.candidates.split(",").toList,
-        electionData.isPublic,
+        electionData.ballotVisibility,
         electionData.isInvite,
         isCompleted = false,
         createdTime = new Date(),
         adminLink = "",
         inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
-        ballot = List.empty[String],
+        ballot = List.empty[Ballot],
         voterList = List.empty[String]
       )
       electionDAOImpl.save(election)
@@ -111,6 +112,7 @@ class ElectionController @Inject()(
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
+    // println(electionDAOImpl.getBallot(objectId))
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
@@ -214,10 +216,9 @@ class ElectionController @Inject()(
     val ballotData = request.body
     val objectId = new ObjectId(ballotData.id)
     if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
-      println(ballotData)
-    electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
-    Redirect(routes.ElectionController.thankVoter()).flashing("success" -> Messages("thank.voting"))
-
+      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
+      electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)
+      Redirect(routes.ElectionController.thankVoter()).flashing("success" -> Messages("thank.voting"))
     }
     else{
       Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("could.not.verify"))
@@ -294,12 +295,12 @@ class ElectionController @Inject()(
    */
   def upload = silhouette.SecuredAction.async(parse.multipartFormData(handleFilePartAsFile)) { implicit request =>
     val id : String = request.body.dataParts.get("id").head.mkString
-    println(id)
-    val fileOption = request.body.file("name").map {
+    val fileOption = request.body.file("emailFile").map {
       case FilePart(key, filename, contentType, file) =>
       val inStream = new FileInputStream(file)
       val reader = new BufferedReader(new InputStreamReader(inStream));
       var  line : String = reader.readLine();
+      println(line)
       while(line != null && line != ""){
             addVoter(line,id)
             line = reader.readLine();

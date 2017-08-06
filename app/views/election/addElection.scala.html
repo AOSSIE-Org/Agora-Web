@@ -13,7 +13,10 @@
                 "Preferential block voting","Contingent Method")
 }
 
-@result = @{List("false","true")}
+@booleanResult = @{List("false","true")}
+
+
+@ballotVisibility = @{List("Public","Admin","Hidden")}
 
 @main(Messages("home.title"), user) {
 
@@ -66,8 +69,8 @@
               }else{
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Preference</label>
-                  <select class="selectpicker form-control" name="isPublic">
-                    @for(value <- result){
+                  <select class="selectpicker form-control" name="ballotVisibility">
+                    @for(value <- ballotVisibility){
                     <option value=@value>@value</option>
                   }
                   </select>
@@ -89,8 +92,8 @@
                   @if(user == None) {
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Preference</label>
-                  <select class="selectpicker form-control" name="isPublic">
-                    @for(value <- result){
+                  <select class="selectpicker form-control" name="ballotVisibility">
+                    @for(value <- ballotVisibility){
                     <option value=@value>@value</option>
                   }
                   </select>
@@ -116,7 +119,7 @@
 
                     <label for="exampleInputEmail1">Invite Voters</label>
                     <select class="selectpicker form-control" name="isInvite">
-                      @for(value <- result){
+                      @for(value <- booleanResult){
                       <option value='@value'>@value</option>
                     }
                     </select>
@@ -124,7 +127,7 @@
                 <div class="form-group">
                   <label for="exampleInputEmail1">Realtime Result</label>
                   <select class="selectpicker form-control" name="realtimeResult">
-                    @for(value <- result){
+                    @for(value <- booleanResult){
                     <option value='@value'>@value</option>
                   }
                   </select>
