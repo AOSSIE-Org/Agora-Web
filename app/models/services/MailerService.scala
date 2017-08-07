@@ -19,7 +19,6 @@ class MailerService @Inject() (mailerClient: MailerClient) {
       bodyHtml = Some(s"""<html><body><p><b>Passcode :</b> $passCode  </p> <br /> <p> You have to enter above passcode in order to validate your identity before voting</p></body></html>""")
     )
     mailerClient.send(emailSend)
-    println(emailSend);
   }
 
 }

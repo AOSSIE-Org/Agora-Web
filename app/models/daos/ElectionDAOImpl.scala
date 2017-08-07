@@ -3,7 +3,7 @@ package models.daos
 import com.mongodb.casbah.Imports.{ DBObject, _ }
 import com.mongodb.casbah.commons.conversions.scala.RegisterConversionHelpers
 import com.novus.salat._
-import models.{ Election, MongoDBConnection , Ballot}
+import models.{ Election, MongoDBConnection , Ballot , Voter}
 import org.bson.types.ObjectId
 
 import scala.collection.mutable.ListBuffer
@@ -64,10 +64,8 @@ class ElectionDAOImpl() extends ElectionDAO {
 
   def vote(id: ObjectId, ballot: Ballot): Boolean = {
     val o: DBObject = MongoDBObject("id" -> id)
-    println(ballot)
     var ballotList      = ListBuffer[Ballot]()
     ballotList += ballot
-    // println(getBallot(id))
     val c = ballotList.toList ::: getBallot(id)
     val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
     val update = $set("ballot" -> bsonBallot )
@@ -87,7 +85,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
   }
 
-  def getVoterList(id: ObjectId): List[String] = {
+  def getVoterList(id: ObjectId): List[Voter] = {
     val o: DBObject       = MongoDBObject("id" -> id)
     val list              = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
@@ -99,16 +97,15 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
   }
 
-  def addVoter(id: ObjectId , email : String ): Boolean = {
+  def addVoter(id: ObjectId , voter : Voter ): Boolean = {
       val o: DBObject = MongoDBObject("id" -> id)
       val defaultVoterList =  getVoterList(id);
-      if(!defaultVoterList.contains(email)){
-        var voterList      = ListBuffer[String]()
-        voterList += email
-        println(voterList)
+      if(!defaultVoterList.contains(voter)){
+        var voterList      = ListBuffer[Voter]()
+        voterList += voter
         val c = voterList.toList ::: getVoterList(id)
-        println(c)
-        val update = $set("voterList" -> c )
+        val bsonBallot = c.map(doc => grater[Voter].asDBObject(doc))
+        val update = $set("voterList" -> bsonBallot )
         collectionRef.update( o, update )
         true
       }
@@ -144,12 +141,14 @@ class ElectionDAOImpl() extends ElectionDAO {
     val list              = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
     val c = getVoterList(id)
-    if(c.contains(email)){
-    val update = $set("voterList" -> c.filter(_ != email) )
-      collectionRef.update( o, update )
-      return true
-    }
+    for(voter <- c){
+        if(voter.email==email){
+          val update = $set("voterList" -> c.filter(_ != voter).map(doc => grater[Voter].asDBObject(doc)))
+          collectionRef.update( o, update )
+          return true
+        }
+      }
     return false
+    }
 
-  }
 }

@@ -7,6 +7,7 @@ import javax.inject._
 import forms._
 import models.Election
 import models.Ballot
+import models.Voter
 import models.daos.ElectionDAOImpl
 import models.services.MailerService
 import models.PassCodeGenerator
@@ -79,7 +80,7 @@ class ElectionController @Inject()(
         adminLink = "",
         inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
         ballot = List.empty[Ballot],
-        voterList = List.empty[String]
+        voterList = List.empty[Voter]
       )
       electionDAOImpl.save(election)
       Future.successful(
@@ -112,7 +113,6 @@ class ElectionController @Inject()(
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    // println(electionDAOImpl.getBallot(objectId))
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
@@ -227,10 +227,11 @@ class ElectionController @Inject()(
 
   def addVoter() = silhouette.SecuredAction.async( parse.form(VoterForm.form) ) { implicit request =>
     def voterData = request.body
+    val voter = new Voter(voterData.email.split(",")(0),voterData.email.split(",")(1))
     val objectId = new ObjectId(voterData.id)
-    val con = electionDAOImpl.addVoter(objectId , voterData.email)
+    val con = electionDAOImpl.addVoter(objectId , voter)
     if(con){
-      mailerService.sendEmail(voterData.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voterData.email))
+      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email))
       Future.successful(
         Ok
           (
@@ -272,10 +273,10 @@ class ElectionController @Inject()(
 
   def addVoter( email : String , id : String) : Boolean = {
     val objectId = new ObjectId(id)
-    val con = electionDAOImpl.addVoter(objectId ,email)
+    val voter = new Voter(email.split(",")(0),email.split(",")(1))
+    val con = electionDAOImpl.addVoter(objectId ,voter)
     if(con){
-      println(electionDAOImpl.getInviteCode(objectId))
-      mailerService.sendEmail(email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),email))
+      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email))
     }
     con
   }
@@ -300,7 +301,6 @@ class ElectionController @Inject()(
       val inStream = new FileInputStream(file)
       val reader = new BufferedReader(new InputStreamReader(inStream));
       var  line : String = reader.readLine();
-      println(line)
       while(line != null && line != ""){
             addVoter(line,id)
             line = reader.readLine();
