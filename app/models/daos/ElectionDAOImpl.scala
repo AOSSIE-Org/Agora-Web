@@ -100,7 +100,14 @@ class ElectionDAOImpl() extends ElectionDAO {
   def addVoter(id: ObjectId , voter : Voter ): Boolean = {
       val o: DBObject = MongoDBObject("id" -> id)
       val defaultVoterList =  getVoterList(id);
-      if(!defaultVoterList.contains(voter)){
+      var con : Boolean = true
+      for(voterD <- defaultVoterList){
+          if(voterD.email==voter.email){
+            con = false;
+          }
+      }
+
+      if(con){
         var voterList      = ListBuffer[Voter]()
         voterList += voter
         val c = voterList.toList ::: getVoterList(id)

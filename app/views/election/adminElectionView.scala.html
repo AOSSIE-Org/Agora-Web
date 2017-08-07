@@ -48,11 +48,50 @@
 		          </div>
 		        </div>
 					  <div class="row">
-							
+
 						</div>
 
 		      </div>
+					<div class="panel panel-default">
+							<div class="container"><h2>Voter Details</h2></div>
+							<div class="panel-body">
+
+					                    <div class="tab-content">
+					                        <div class="tab-pane active" id="home">
+					                            <div class="table-responsive">
+					                                <table class="table table-hover">
+					                                    <thead>
+					                                        <tr>
+					                                            <th>#</th>
+					                                            <th>Voter name</th>
+					                                            <th>Email</th>
+					                                        </tr>
+					                                    </thead>
+					                                    <tbody id="items">
+					                                      @for((doc, index) <- election.voterList.zipWithIndex) {
+
+					                                        <tr>
+
+					                                            <td>@{index+1}</td>
+					                                            <td>@doc.name</td>
+					                                            <td>@doc.email</td>
+
+
+					                                        </tr>
+
+					                                    	}
+					                                    </tbody>
+					                                </table>
+					                            </div>
+
+					            </div>
+					        </div>
+								</div>
+							</div>
+
+
 		      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addVoterModal">Add Voters</button>
+					<button type="button" class="btn btn-info btn-lg">View Ballot</button>
 
 		      <!-- Modal -->
 		      <div id="addVoterModal" class="modal fade" role="dialog">
@@ -67,7 +106,11 @@
 
 		              <input type="hidden" class="form-control" name="id" value=@election.id>
 		              <div class="form-group">
-		                <label for="InputEmail1">Voter's Email</label>
+		                <label for="InputEmail1">Voter's Email
+											<a class='my-tool-tip' data-toggle="tooltip" data-placement="left"
+												title='Voter should be given in the format "[name],[email]" (e.g. "John Doe,john.doe@@gmail.com"). Without quotation marks'>
+												<i class='glyphicon glyphicon-info-sign'></i>
+										</a></label>
 		                <input type="text" class="form-control" name="email" placeholder="Email" required>
 		              </div>
 		              <button class="btn btn-success pull-right" type="submit">Submit</button>
@@ -81,7 +124,7 @@
 		              <div class="form-group">
 		                <label for="InputEmail1">Upload emails as a text file:
 											<a class='my-tool-tip' data-toggle="tooltip" data-placement="left"
-												title='Emails should be separated by line-breaks. Each email should be given in the format "[email]" (e.g. "john.doe@@gmail.com"). Without quotation marks'>
+												title='Voters should be separated by line-breaks. Each voter should be given in the format "[name],[email]" (e.g. "John Doe,john.doe@@gmail.com"). Without quotation marks'>
 												<i class='glyphicon glyphicon-info-sign'></i>
 										</a></label>
 		                <input class="form-control" type="file" accept="text/plain" id="emailFile" name="emailFile" required>

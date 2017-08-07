@@ -30,6 +30,7 @@ case class Election(
   votingAlgo: String,
   candidates: List[String],
   ballotVisibility: String,
+  voterListVisibility : Boolean,
   isInvite: Boolean,
   isCompleted: Boolean,
   createdTime: Date,

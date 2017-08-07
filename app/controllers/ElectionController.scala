@@ -74,6 +74,7 @@ class ElectionController @Inject()(
         electionData.votingAlgo,
         electionData.candidates.split(",").toList,
         electionData.ballotVisibility,
+        electionData.voterListVisibility,
         electionData.isInvite,
         isCompleted = false,
         createdTime = new Date(),
@@ -227,6 +228,7 @@ class ElectionController @Inject()(
 
   def addVoter() = silhouette.SecuredAction.async( parse.form(VoterForm.form) ) { implicit request =>
     def voterData = request.body
+    try{
     val voter = new Voter(voterData.email.split(",")(0),voterData.email.split(",")(1))
     val objectId = new ObjectId(voterData.id)
     val con = electionDAOImpl.addVoter(objectId , voter)
@@ -245,6 +247,14 @@ class ElectionController @Inject()(
     )
     }
   }
+  catch {
+    case e: Exception => {
+      Future.successful(
+        Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("format.voter"))
+      )
+    }
+  }
+}
 
   def thankVoter = Action { implicit request =>
     {
@@ -296,6 +306,7 @@ class ElectionController @Inject()(
    */
   def upload = silhouette.SecuredAction.async(parse.multipartFormData(handleFilePartAsFile)) { implicit request =>
     val id : String = request.body.dataParts.get("id").head.mkString
+        try{
     val fileOption = request.body.file("emailFile").map {
       case FilePart(key, filename, contentType, file) =>
       val inStream = new FileInputStream(file)
@@ -314,6 +325,14 @@ class ElectionController @Inject()(
           views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
         )
     )
+  }
+  catch {
+    case e:  Exception =>
+        Future.successful(
+          Redirect(routes.ElectionController.viewElectionSecured(id)).flashing("error" -> Messages("file.error"))
+        )
+
+    }
   }
 
 

@@ -17,6 +17,7 @@ object ElectionForm {
     creatorEmail: String,
     candidates: String,
     ballotVisibility: String,
+    voterListVisibility:  Boolean,
     startingDate: Date,
     endingDate: Date,
     isInvite: Boolean,
@@ -29,17 +30,18 @@ object ElectionForm {
    */
   val form = Form(
     mapping(
-      "name"             -> nonEmptyText,
-      "description"      -> nonEmptyText,
-      "creatorName"      -> nonEmptyText,
-      "creatorEmail"     -> email,
-      "candidates"       -> nonEmptyText,
-      "ballotVisibility" -> nonEmptyText,
-      "start"            -> date("MM/dd/yyyy"),
-      "end"              -> date("MM/dd/yyyy"),
-      "isInvite"         -> boolean,
-      "realtimeResult"   -> boolean,
-      "votingAlgo"       -> nonEmptyText
+      "name"                -> nonEmptyText,
+      "description"         -> nonEmptyText,
+      "creatorName"         -> nonEmptyText,
+      "creatorEmail"        -> email,
+      "candidates"          -> nonEmptyText,
+      "ballotVisibility"    -> nonEmptyText,
+      "voterListVisibility" -> boolean,
+      "start"               -> date("MM/dd/yyyy"),
+      "end"                 -> date("MM/dd/yyyy"),
+      "isInvite"            -> boolean,
+      "realtimeResult"      -> boolean,
+      "votingAlgo"          -> nonEmptyText
     )(ElectionData.apply)(ElectionData.unapply)
   )
 }
