@@ -116,7 +116,6 @@ class ElectionController @Inject()(
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    println(electionDAOImpl.getActiveElection())
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))

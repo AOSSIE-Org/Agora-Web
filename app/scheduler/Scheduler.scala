@@ -10,13 +10,13 @@ object Scheduler {
 
   def CountVotesDaily() {
     val job = newJob(classOf[CountVotes]).build()
-    val trigger = newTrigger().withSchedule(cronSchedule("0/10 * * * * ?")).build()
+    val trigger = newTrigger().withSchedule(cronSchedule("0 0 12 * * ?")).build()
     scheduler.scheduleJob(job, trigger)
   }
 
   def UpdateTableDaily() {
     val job = newJob(classOf[UpdateTable]).build()
-    val trigger = newTrigger().withSchedule(cronSchedule("0/10 * * * * ?")).build()
+    val trigger = newTrigger().withSchedule(cronSchedule("0 0 12 * * ?")).build()
     scheduler.scheduleJob(job, trigger)
   }
 
