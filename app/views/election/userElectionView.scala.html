@@ -14,7 +14,6 @@
 
 	@for(election <- elections) {
 		<div class="container-fluid primary-content">
-
 		  <div class="primary-content-heading clearfix">
 		    <h2>@election.name</h2>
 		    <hr style="border:1px solid #fff">
@@ -49,6 +48,46 @@
 		      </div>
 		    </div>
 		  </div>
+@if(election.voterListVisibility==true){
+			<div class="panel panel-default">
+					<div class="container"><h2>Voter Details</h2></div>
+					<div class="panel-body">
+
+													<div class="tab-content">
+															<div class="tab-pane active" id="home">
+																	<div class="table-responsive">
+																			<table class="table table-hover">
+																					<thead>
+																							<tr>
+																									<th>#</th>
+																									<th>Voter name</th>
+																							</tr>
+																					</thead>
+																					<tbody id="items">
+																						@for((doc, index) <- election.voterList.zipWithIndex) {
+
+																							<tr>
+
+																									<td>@{index+1}</td>
+																									<td>@doc.name</td>
+
+
+																							</tr>
+
+																						}
+																					</tbody>
+																			</table>
+																	</div>
+
+									</div>
+							</div>
+						</div>
+					</div>
+				}
+
+			@if(election.ballotVisibility=="Public"){
+				<button type="button" class="btn btn-info btn-lg">View Ballot</button>
+			}
 			<script type='text/javascript' src='@routes.Assets.at("/javascripts/fileUpload.js")'></script>
 
   	</div>

@@ -13,4 +13,11 @@ object Scheduler {
     val trigger = newTrigger().withSchedule(cronSchedule("0/10 * * * * ?")).build()
     scheduler.scheduleJob(job, trigger)
   }
+
+  def UpdateTableDaily() {
+    val job = newJob(classOf[UpdateTable]).build()
+    val trigger = newTrigger().withSchedule(cronSchedule("0/10 * * * * ?")).build()
+    scheduler.scheduleJob(job, trigger)
+  }
+
 }

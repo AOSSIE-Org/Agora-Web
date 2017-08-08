@@ -77,11 +77,13 @@ class ElectionController @Inject()(
         electionData.voterListVisibility,
         electionData.isInvite,
         isCompleted = false,
+        isStarted = false,
         createdTime = new Date(),
         adminLink = "",
         inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
         ballot = List.empty[Ballot],
-        voterList = List.empty[Voter]
+        voterList = List.empty[Voter],
+        isCounted = false
       )
       electionDAOImpl.save(election)
       Future.successful(
@@ -114,6 +116,7 @@ class ElectionController @Inject()(
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
+    println(electionDAOImpl.getActiveElection())
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))

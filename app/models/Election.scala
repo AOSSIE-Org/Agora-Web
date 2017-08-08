@@ -33,9 +33,11 @@ case class Election(
   voterListVisibility : Boolean,
   isInvite: Boolean,
   isCompleted: Boolean,
+  isStarted : Boolean,
   createdTime: Date,
   adminLink: String,
   inviteCode: String,
   ballot: List[Ballot],
-  voterList : List[Voter]
+  voterList : List[Voter],
+  isCounted : Boolean
 )

@@ -35,7 +35,7 @@ class HomeController @Inject() (
      val electionDAOImpl = new ElectionDAOImpl();
      scheduler.start()
      Scheduler.CountVotesDaily()
-
+     Scheduler.UpdateTableDaily()
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
 

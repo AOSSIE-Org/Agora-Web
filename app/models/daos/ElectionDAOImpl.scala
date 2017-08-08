@@ -158,4 +158,70 @@ class ElectionDAOImpl() extends ElectionDAO {
     return false
     }
 
+
+    def getStartDate(id: ObjectId): Option[java.util.Date] = {
+        val o: DBObject       = MongoDBObject("id" -> id)
+        val list              = collectionRef.findOne(o).toList
+        val filteredElections = list.map(doc => grater[Election].asObject(doc))
+        if (filteredElections.nonEmpty) {
+          Option(filteredElections.head.start)
+        } else {
+          None
+        }
+    }
+
+    def getEndDate(id: ObjectId): Option[java.util.Date] = {
+        val o: DBObject       = MongoDBObject("id" -> id)
+        val list              = collectionRef.findOne(o).toList
+        val filteredElections = list.map(doc => grater[Election].asObject(doc))
+        if (filteredElections.nonEmpty) {
+          Option(filteredElections.head.end)
+        } else {
+          None
+        }
+    }
+
+    //get all the inactive elections
+    def getInactiveElections() :  List[models.Election] = {
+        val o: DBObject       = MongoDBObject("isStarted" -> false)
+        val u                 = collectionRef.find(o)
+        val list              = u.toList
+      list.map(doc => grater[Election].asObject(doc))
+    }
+
+    //get all the completed and uncount elections
+    def getCompletedElections() :  Option[List[models.Election]] = {
+        val o: DBObject       = MongoDBObject("isCompleted" -> true , "isCounted" -> false)
+        val u                 = collectionRef.find(o)
+        val list              = u.toList
+        Option(list.map(doc => grater[Election].asObject(doc)))
+    }
+
+    //Update finished election
+    def updateCompleteElection(id : ObjectId) : Boolean = {
+      val o: DBObject = MongoDBObject("id" -> id)
+      val update = $set("isCompleted" -> true )
+      collectionRef.update( o, update )
+      true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
+    }
+
+    //Update finished election
+    def updateActiveElection(id : ObjectId) : Boolean = {
+      val o: DBObject = MongoDBObject("id" -> id)
+      val update = $set("isStarted" -> true )
+      collectionRef.update( o, update )
+      true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
+    }
+
+
+
+    //get the all unfinished elections
+    def getActiveElection() : List[models.Election] = {
+      val o: DBObject       = MongoDBObject("isStarted" -> true , "isCompleted" -> false)
+      val u                 = collectionRef.find(o)
+      val list              = u.toList
+      list.map(doc => grater[Election].asObject(doc))
+    }
+
+
 }
