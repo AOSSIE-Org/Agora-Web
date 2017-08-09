@@ -3,13 +3,9 @@ package controllers
 import javax.inject._
 
 import play.api.mvc._
-<<<<<<< HEAD
 import countvotes._
 import scheduler.Scheduler
 import scheduler.Scheduler.scheduler
-=======
->>>>>>> b27f05c23bce30b1e8a426542ad769552b4da775
-
 import scala.concurrent.Future
 import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
