@@ -14,14 +14,8 @@ before_script:
   - sbt sbt-version
 
 stages:
-  - test
   - deploy
 
-test:
-  stage: test
-  script:
-    # Test the project
-    - sbt clean test
 
 deploy:
   stage: deploy
