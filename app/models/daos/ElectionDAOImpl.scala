@@ -230,6 +230,4 @@ class ElectionDAOImpl() extends ElectionDAO {
       val list              = u.toList
       list.map(doc => grater[Election].asObject(doc))
     }
-
-
 }

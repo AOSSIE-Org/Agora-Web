@@ -8,6 +8,8 @@ import play.api.data.Forms._
  */
 object BallotForm {
 
+  case class BallotData(id: String, ballotInput: String, email: String, code: String)
+
   case class BallotData(id: String, ballotInput: String , passCode : String )
 
   /**

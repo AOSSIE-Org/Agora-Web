@@ -2,11 +2,13 @@ package controllers
 
 import javax.inject._
 
-import play.api._
 import play.api.mvc._
+<<<<<<< HEAD
 import countvotes._
 import scheduler.Scheduler
 import scheduler.Scheduler.scheduler
+=======
+>>>>>>> b27f05c23bce30b1e8a426542ad769552b4da775
 
 import scala.concurrent.Future
 import utils.auth.DefaultEnv
@@ -42,8 +44,6 @@ class HomeController @Inject() (
     Future.successful(Ok(views.html.home(None)))
   }
 
-
-
   def signOut = silhouette.SecuredAction.async { implicit request =>
     val result = Redirect(routes.HomeController.index())
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
@@ -54,8 +54,14 @@ class HomeController @Inject() (
     Future.successful(Ok(views.html.index(Option(request.identity))))
   }
 
-  def profile = silhouette.SecuredAction.async{implicit request => {
-    Future.successful(Ok(views.html.profile(Option(request.identity), electionDAOImpl.userElectionList(request.identity.email))))
-  }
+  def profile = silhouette.SecuredAction.async { implicit request =>
+    Future.successful(
+      Ok(
+        views.html.profile(
+          Option(request.identity),
+          electionDAOImpl.userElectionList(request.identity.email)
+        )
+      )
+    )
   }
 }
