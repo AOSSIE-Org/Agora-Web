@@ -13,4 +13,4 @@ automatically recompile and hot-reload the application on the next HTTP request.
 
 You can check the hosted version from following url
 
-https://fathomless-taiga-85734.herokuapp.com
+https://agora-web-aossie.herokuapp.com
