@@ -50,6 +50,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Singleton
 class ElectionController @Inject()(
   val messagesApi: MessagesApi,
+<<<<<<< HEAD
   silhouette: Silhouette[DefaultEnv],
   mailerClient: MailerClient,
   ec: ExecutionContext
@@ -337,7 +338,42 @@ class ElectionController @Inject()(
     }
   }
 
+  def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
+    val objectId = new ObjectId(id)
+    Future.successful(
+      Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
+    )
+  }
 
+  def voteGuest(id: String) = silhouette.UnsecuredAction.async { implicit request =>
+    val objectId = new ObjectId(id)
+    Future.successful(
+      Ok(
+        views.html.ballot.preferential(
+          None,
+          Option(electionDAOImpl.viewCandidate(objectId)),
+          Option(id)
+        )
+      )
+    )
+  }
 
+  def voteUser(id: String) = silhouette.SecuredAction.async { implicit request =>
+    val objectId = new ObjectId(id)
+    Future.successful(
+      Ok(
+        views.html.ballot.ranked(
+          Option(request.identity),
+          Option(electionDAOImpl.viewCandidate(objectId: ObjectId)),
+          Option(id)
+        )
+      )
+    )
+  }
 
+  def vote = silhouette.UnsecuredAction.async(parse.form(BallotForm.form)) { implicit request =>
+    val ballotData = request.body
+    electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
+    Future.successful(Ok(views.html.home(None)))
+  }
 }

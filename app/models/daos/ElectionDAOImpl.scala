@@ -223,5 +223,4 @@ class ElectionDAOImpl() extends ElectionDAO {
       list.map(doc => grater[Election].asObject(doc))
     }
 
-
 }
