@@ -111,11 +111,15 @@ class ElectionController @Inject()(
 
   def viewElection(id: String) = silhouette.UnsecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    Future.successful(Ok(views.html.election.adminElectionView(None, electionDAOImpl.view(objectId))))
+    Future.successful(Ok(views.html.election.userElectionView(None, electionDAOImpl.view(objectId))))
   }
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
+    val election = electionDAOImpl.view(objectId).head
+    if(election.realtimeResult){
+      //countVotes
+    }
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
@@ -131,7 +135,7 @@ class ElectionController @Inject()(
   def voteGuest(id: String) = Action { implicit request =>
     val objectId = new ObjectId(id)
     val election = electionDAOImpl.view(objectId).head
-
+if(election.isStarted){
     election.votingAlgo match {
       case "Range Voting" =>{
           Ok(
@@ -211,8 +215,12 @@ class ElectionController @Inject()(
       case _ => {
       Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
       }
-
       }
+
+    }
+    else{
+      Redirect(routes.HomeController.index()).flashing("error" -> Messages("Election is not yet started"))
+    }
   }
 
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>

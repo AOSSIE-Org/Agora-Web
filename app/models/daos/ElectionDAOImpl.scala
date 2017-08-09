@@ -224,4 +224,12 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
 
+    def getActiveElectionWithRealTimeResult() : List[models.Election] = {
+      val o: DBObject       = MongoDBObject("isStarted" -> true , "isCompleted" -> false , "realtimeResult" -> true)
+      val u                 = collectionRef.find(o)
+      val list              = u.toList
+      list.map(doc => grater[Election].asObject(doc))
+    }
+
+
 }
