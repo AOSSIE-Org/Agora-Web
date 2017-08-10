@@ -219,7 +219,7 @@ if(election.isStarted){
 
     }
     else{
-      Redirect(routes.HomeController.index()).flashing("error" -> Messages("Election is not yet started"))
+      Redirect(routes.ElectionController.redirectVoter()).flashing("error" -> Messages("Election is not yet started"))
     }
   }
 
@@ -229,7 +229,7 @@ if(election.isStarted){
     if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
       val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
       electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)
-      Redirect(routes.ElectionController.thankVoter()).flashing("success" -> Messages("thank.voting"))
+      Redirect(routes.ElectionController.redirectVoter()).flashing("success" -> Messages("thank.voting"))
     }
     else{
       Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("could.not.verify"))
@@ -266,9 +266,9 @@ if(election.isStarted){
   }
 }
 
-  def thankVoter = Action { implicit request =>
+  def redirectVoter = Action { implicit request =>
     {
-      Ok(views.html.election.thankVoting(None))
+      Ok(views.html.election.redirectVoting(None))
     }
   }
 
@@ -316,26 +316,26 @@ if(election.isStarted){
    */
   def upload = silhouette.SecuredAction.async(parse.multipartFormData(handleFilePartAsFile)) { implicit request =>
     val id : String = request.body.dataParts.get("id").head.mkString
-        try{
-    val fileOption = request.body.file("emailFile").map {
-      case FilePart(key, filename, contentType, file) =>
-      val inStream = new FileInputStream(file)
-      val reader = new BufferedReader(new InputStreamReader(inStream));
-      var  line : String = reader.readLine();
-      while(line != null && line != ""){
-            addVoter(line,id)
-            line = reader.readLine();
-      }
-      val data = operateOnTempFile(file)
+    try{
+      val fileOption = request.body.file("emailFile").map {
+        case FilePart(key, filename, contentType, file) =>
+        val inStream = new FileInputStream(file)
+        val reader = new BufferedReader(new InputStreamReader(inStream));
+        var  line : String = reader.readLine();
+        while(line != null && line != ""){
+              addVoter(line,id)
+              line = reader.readLine();
+        }
+        val data = operateOnTempFile(file)
 
+      }
+      Future.successful(
+        Ok
+          (
+            views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
+          )
+      )
     }
-    Future.successful(
-      Ok
-        (
-          views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
-        )
-    )
-  }
   catch {
     case e:  Exception =>
         Future.successful(
@@ -344,5 +344,4 @@ if(election.isStarted){
 
     }
   }
-
 }

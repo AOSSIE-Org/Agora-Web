@@ -14,7 +14,7 @@ home.title = Agora - Home
 sign.in.title = Agora - Sign In
 vote.page = Vote
 file.error = your file is not in recommended format, Recheck your file
-format.voter = Recheck the your format
+format.voter = Recheck the format
 
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
