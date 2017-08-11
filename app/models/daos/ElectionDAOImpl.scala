@@ -66,14 +66,14 @@ class ElectionDAOImpl() extends ElectionDAO {
     val o: DBObject = MongoDBObject("id" -> id)
     var ballotList      = ListBuffer[Ballot]()
     ballotList += ballot
-    val c = ballotList.toList ::: getBallot(id)
+    val c = ballotList.toList ::: getBallots(id)
     val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
     val update = $set("ballot" -> bsonBallot )
     collectionRef.update( o, update )
     true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
   }
 
-  def getBallot(id: ObjectId): List[Ballot] = {
+  def getBallots(id: ObjectId): List[Ballot] = {
     val o: DBObject       = MongoDBObject("id" -> id)
     val list              = collectionRef.findOne(o).toList
     val filteredElections = list.map(doc => grater[Election].asObject(doc))
@@ -223,11 +223,21 @@ class ElectionDAOImpl() extends ElectionDAO {
       list.map(doc => grater[Election].asObject(doc))
     }
 
-
     def getActiveElectionWithRealTimeResult() : List[models.Election] = {
       val o: DBObject       = MongoDBObject("isStarted" -> true , "isCompleted" -> false , "realtimeResult" -> true)
       val u                 = collectionRef.find(o)
       val list              = u.toList
       list.map(doc => grater[Election].asObject(doc))
+    }
+
+    def getBallotVisibility(id : ObjectId) : Option[String] = {
+      val o: DBObject = MongoDBObject("id" -> id)
+      val list              = collectionRef.findOne(o).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      if (filteredElections.nonEmpty) {
+        Option(filteredElections.head.ballotVisibility)
+      } else {
+        None
+      }
     }
 }

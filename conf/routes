@@ -30,7 +30,7 @@ GET         /profile                          controllers.HomeController.profile
 GET         /guest/election/:id               controllers.ElectionController.viewElection(id)
 GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
 POST        /guest/vote                       controllers.ElectionController.vote()
-
+GET         /ballot/:id                       controllers.ElectionController.viewBallot(id)
 POST        /user/election/invite/            controllers.ElectionController.addVoter()
 
 GET         /vote/                            controllers.ElectionController.redirectVoter()

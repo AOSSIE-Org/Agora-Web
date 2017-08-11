@@ -354,4 +354,29 @@ if(election.isStarted){
 
     }
   }
+
+
+  def viewBallot(id : String) = Action {  implicit request =>
+    val objectId = new ObjectId(id)
+    if(electionDAOImpl.getBallotVisibility(objectId)!=None){
+      if(electionDAOImpl.getBallotVisibility(objectId).get=="Public"){
+        Ok(
+          views.html.ballot.viewPublic(None,electionDAOImpl.getBallots(objectId))
+        )
+      }
+      else if(electionDAOImpl.getBallotVisibility(objectId).get=="Visible"){
+        Ok(
+          views.html.ballot.viewPrivate(None,electionDAOImpl.getBallots(objectId))
+        )
+      }
+      else{
+        Redirect(routes.HomeController.index()).flashing("error" -> Messages("dont.access"))
+      }
+    }
+    else{
+      Redirect(routes.HomeController.index()).flashing("error" -> Messages("invalid.id"))
+    }
+
+
+  }
 }
