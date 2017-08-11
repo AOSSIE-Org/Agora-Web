@@ -90,10 +90,11 @@
 							</div>
 
 
-		      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addVoterModal">Add Voters</button>
+		      <a type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addVoterModal">Add Voters</a>
 					@if(election.ballotVisibility!="Hidden"){
 					<a href="/ballot/@election.id" type="button" class="btn btn-info btn-lg">View Ballot</a>
 					}
+
 		      <!-- Modal -->
 		      <div id="addVoterModal" class="modal fade" role="dialog">
 		        <div class="modal-dialog">
@@ -143,6 +144,8 @@
 
 		        </div>
 		      </div>
+					<br>
+					<br>
 
 		    </div>
 		  </div>
