@@ -243,7 +243,14 @@ class ElectionDAOImpl() extends ElectionDAO {
     def update(election : Election) : Boolean = {
       val bsonElection = grater[Election].asDBObject(election)
       val query = MongoDBObject("id" -> election.id)
-      val res2 = collectionRef.update(query, bsonElection)
-      true
+      val list              = collectionRef.findOne(query).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      if(!filteredElections.head.isStarted){
+        val res2 = collectionRef.update(query, bsonElection)
+        true
+      }
+      else{
+        false
+      }
     }
 }

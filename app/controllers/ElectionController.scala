@@ -378,13 +378,22 @@ if(election.isStarted){
     }
   }
 
-  def updateElection(id: String) = Action { implicit request =>
+  def updateElection(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
     val election = electionDAOImpl.view(objectId).head
-    Ok(views.html.election.editElection(None,election))
+    if(!election.isStarted && request.identity.email.get == election.creatorEmail ){
+      Future.successful(
+        Ok(views.html.election.editElection(Option(request.identity),election))
+      )
+    }else{
+      Future.successful(
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+      )
+
+    }
   }
 
-  def update =silhouette.SecuredAction.async(parse.form(EditElectionForm.form)) { implicit request =>
+  def update = silhouette.SecuredAction.async(parse.form(EditElectionForm.form)) { implicit request =>
     def electionData = request.body
     val election = new Election(
         new ObjectId(electionData.id),
@@ -409,7 +418,7 @@ if(election.isStarted){
         voterList = List.empty[Voter],
         isCounted = false
       )
-      electionDAOImpl.update(election)
+      if(electionDAOImpl.update(election)){
       Future.successful(
         Ok(
           views.html.profile(
@@ -418,5 +427,10 @@ if(election.isStarted){
           )
         )
       )
+    }else{
+      Future.successful(
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+      )
+    }
   }
 }
