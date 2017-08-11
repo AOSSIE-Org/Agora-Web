@@ -35,6 +35,7 @@ POST        /user/election/invite/            controllers.ElectionController.add
 
 GET         /vote/                            controllers.ElectionController.redirectVoter()
 POST        /upload/                          controllers.ElectionController.upload()
-
+POST        /update/                          controllers.ElectionController.update()
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)
+GET         /edit/:id                       controllers.ElectionController.updateElection(id)

@@ -240,4 +240,10 @@ class ElectionDAOImpl() extends ElectionDAO {
         None
       }
     }
+    def update(election : Election) : Boolean = {
+      val bsonElection = grater[Election].asDBObject(election)
+      val query = MongoDBObject("id" -> election.id)
+      val res2 = collectionRef.update(query, bsonElection)
+      true
+    }
 }

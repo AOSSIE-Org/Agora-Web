@@ -376,7 +376,47 @@ if(election.isStarted){
     else{
       Redirect(routes.HomeController.index()).flashing("error" -> Messages("invalid.id"))
     }
+  }
 
+  def updateElection(id: String) = Action { implicit request =>
+    val objectId = new ObjectId(id)
+    val election = electionDAOImpl.view(objectId).head
+    Ok(views.html.election.editElection(None,election))
+  }
 
+  def update =silhouette.SecuredAction.async(parse.form(EditElectionForm.form)) { implicit request =>
+    def electionData = request.body
+    val election = new Election(
+        new ObjectId(electionData.id),
+        electionData.name,
+        electionData.description,
+        electionData.creatorName,
+        electionData.creatorEmail,
+        electionData.startingDate,
+        electionData.endingDate,
+        electionData.isRealTime,
+        electionData.votingAlgo,
+        electionData.candidates.split(",").toList,
+        electionData.ballotVisibility,
+        electionData.voterListVisibility,
+        electionData.isInvite,
+        isCompleted = false,
+        isStarted = false,
+        createdTime = new Date(),
+        adminLink = "",
+        inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
+        ballot = List.empty[Ballot],
+        voterList = List.empty[Voter],
+        isCounted = false
+      )
+      electionDAOImpl.update(election)
+      Future.successful(
+        Ok(
+          views.html.profile(
+            Option(request.identity),
+            electionDAOImpl.userElectionList(request.identity.email)
+          )
+        )
+      )
   }
 }
