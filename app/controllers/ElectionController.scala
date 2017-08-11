@@ -9,6 +9,7 @@ import models.Election
 import models.Ballot
 import models.Voter
 import models.daos.ElectionDAOImpl
+import models.daos.ResultFileDAOImpl
 import models.services.MailerService
 import models.PassCodeGenerator
 import utils.auth.DefaultEnv
@@ -42,6 +43,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import models.services.Countvotes
+
+
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -56,7 +60,13 @@ class ElectionController @Inject()(
 ) extends Controller with I18nSupport {
 
   val electionDAOImpl = new ElectionDAOImpl()
+  val resultFileDAOImpl = new ResultFileDAOImpl()
   val mailerService = new MailerService(mailerClient)
+
+  def result = Action { implicit request =>
+
+    Ok.sendFile(resultFileDAOImpl.getResult())
+  }
 
 
   def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>

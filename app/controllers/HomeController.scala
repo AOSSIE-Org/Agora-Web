@@ -3,7 +3,6 @@ package controllers
 import javax.inject._
 
 import play.api.mvc._
-import countvotes._
 import scheduler.Scheduler
 import scheduler.Scheduler.scheduler
 import scala.concurrent.Future
