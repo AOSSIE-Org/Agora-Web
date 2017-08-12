@@ -395,8 +395,10 @@ if(election.isStarted){
 
   def update = silhouette.SecuredAction.async(parse.form(EditElectionForm.form)) { implicit request =>
     def electionData = request.body
+    val objectId = new ObjectId(electionData.id)
+    val oldElection = electionDAOImpl.view(objectId).head
     val election = new Election(
-        new ObjectId(electionData.id),
+        objectId,
         electionData.name,
         electionData.description,
         electionData.creatorName,
@@ -411,11 +413,11 @@ if(election.isStarted){
         electionData.isInvite,
         isCompleted = false,
         isStarted = false,
-        createdTime = new Date(),
-        adminLink = "",
-        inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
-        ballot = List.empty[Ballot],
-        voterList = List.empty[Voter],
+        createdTime = oldElection.createdTime,
+        adminLink = oldElection.adminLink,
+        inviteCode = oldElection.inviteCode,
+        ballot = oldElection.ballot,
+        voterList = oldElection.voterList,
         isCounted = false
       )
       if(electionDAOImpl.update(election)){

@@ -26,5 +26,3 @@ deploy:
     - gem install dpl
     # Deploy to Heroku
     - dpl --provider=heroku --app=agora-web-aossie --api-key=$HEROKU_API_KEY
-  only:
-    - master
