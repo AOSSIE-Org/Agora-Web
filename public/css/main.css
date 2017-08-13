@@ -350,6 +350,7 @@ lable {
   display: table-cell;
   text-align: center;
   position: relative;
+  width: 3000px;
 }
 
 .btn-circle {

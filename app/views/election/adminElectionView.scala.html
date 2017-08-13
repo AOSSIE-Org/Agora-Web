@@ -24,9 +24,16 @@
 		    <div class="col-md-12">
 		      <div class="project-section well general-info">
 		        <h3>Description</h3>
-		        <a href=# class="btn btn-sm btn-default pull-right">Edit Election</a>
-		        <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
-		        <p>@election.description</p>
+						@if(!election.isStarted){
+		       	 <a href=/edit/@election.id   class="btn btn-sm btn-default pull-right">Edit Election</a>
+						}
+						@if( (election.isCompleted || election.realtimeResult) && election.isStarted ){
+							<a href=/result/@election.id   class="btn btn-sm btn-default pull-right">Election Result</a>
+						}
+						@if(election.isStarted && !election.isCompleted){
+		       	 <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
+					 }
+						<p>@election.description</p>
 		        <div class="row">
 		          <div class="col-md-4">
 		            <dl class="dl-horizontal">
@@ -38,10 +45,21 @@
 		              <dt>Created By:</dt>
 		              <dd>@election.creatorName</dd>
 		              <dt>Status:</dt>
-		              <dd><span class="label label-warning">INACTIVE</span></dd>
+									@if(election.isStarted && !election.isCompleted){
+		              	<dd><span class="label label-success">ACTIVE</span></dd>
+									}
+									@if(!election.isStarted){
+										<dd><span class="label label-warning">INACTIVE</span></dd>
+
+									}
+									@if(election.isStarted && election.isCompleted){
+										<dd><span class="label label-primary">COMPLETED</span></dd>
+
+									}
 		              <dt>Candidates:</dt> @for(candidate
-		              <- election.candidates){ <dd>
-		                <span class="label label-info">@candidate</span>
+		              <- election.candidates){
+										<dd>
+		                	<span class="label label-info">@candidate</span>
 		                </dd>
 		                }
 		            </dl>
@@ -90,10 +108,11 @@
 							</div>
 
 
-		      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addVoterModal">Add Voters</button>
+		      <a type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addVoterModal">Add Voters</a>
 					@if(election.ballotVisibility!="Hidden"){
-					<button type="button" class="btn btn-info btn-lg">View Ballot</button>
+					<a href="/ballot/@election.id" type="button" class="btn btn-info btn-lg">View Ballot</a>
 					}
+
 		      <!-- Modal -->
 		      <div id="addVoterModal" class="modal fade" role="dialog">
 		        <div class="modal-dialog">
@@ -143,6 +162,8 @@
 
 		        </div>
 		      </div>
+					<br>
+					<br>
 
 		    </div>
 		  </div>

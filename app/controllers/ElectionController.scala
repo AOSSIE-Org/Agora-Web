@@ -9,6 +9,7 @@ import models.Election
 import models.Ballot
 import models.Voter
 import models.daos.ElectionDAOImpl
+import models.daos.ResultFileDAOImpl
 import models.services.MailerService
 import models.PassCodeGenerator
 import utils.auth.DefaultEnv
@@ -42,6 +43,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import models.services.Countvotes
+
+
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -56,7 +60,12 @@ class ElectionController @Inject()(
 ) extends Controller with I18nSupport {
 
   val electionDAOImpl = new ElectionDAOImpl()
+  val resultFileDAOImpl = new ResultFileDAOImpl()
   val mailerService = new MailerService(mailerClient)
+
+  def result(id : String) = Action { implicit request =>
+    Ok.sendFile(resultFileDAOImpl.getResult(id))
+  }
 
 
   def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>
@@ -117,9 +126,6 @@ class ElectionController @Inject()(
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
     val election = electionDAOImpl.view(objectId).head
-    if(election.realtimeResult){
-      //countVotes
-    }
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
@@ -226,9 +232,14 @@ if(election.isStarted){
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
     val ballotData = request.body
     val objectId = new ObjectId(ballotData.id)
-    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
-      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
-      electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)
+    var election = electionDAOImpl.view(objectId).head
+    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))){
+      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))
+      if(electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)){
+        if(election.realtimeResult){
+          resultFileDAOImpl.saveResult(electionDAOImpl.getBallots(objectId),election.votingAlgo,election.candidates,election.id)
+        }
+      }
       Redirect(routes.ElectionController.redirectVoter()).flashing("success" -> Messages("thank.voting"))
     }
     else{
@@ -342,6 +353,87 @@ if(election.isStarted){
           Redirect(routes.ElectionController.viewElectionSecured(id)).flashing("error" -> Messages("file.error"))
         )
 
+    }
+  }
+
+
+  def viewBallot(id : String) = Action {  implicit request =>
+    val objectId = new ObjectId(id)
+    if(electionDAOImpl.getBallotVisibility(objectId)!=None){
+      if(electionDAOImpl.getBallotVisibility(objectId).get=="Public"){
+        Ok(
+          views.html.ballot.viewPublic(None,electionDAOImpl.getBallots(objectId))
+        )
+      }
+      else if(electionDAOImpl.getBallotVisibility(objectId).get=="Visible"){
+        Ok(
+          views.html.ballot.viewPrivate(None,electionDAOImpl.getBallots(objectId))
+        )
+      }
+      else{
+        Redirect(routes.HomeController.index()).flashing("error" -> Messages("dont.access"))
+      }
+    }
+    else{
+      Redirect(routes.HomeController.index()).flashing("error" -> Messages("invalid.id"))
+    }
+  }
+
+  def updateElection(id: String) = silhouette.SecuredAction.async { implicit request =>
+    val objectId = new ObjectId(id)
+    val election = electionDAOImpl.view(objectId).head
+    if(!election.isStarted && request.identity.email.get == election.creatorEmail ){
+      Future.successful(
+        Ok(views.html.election.editElection(Option(request.identity),election))
+      )
+    }else{
+      Future.successful(
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+      )
+
+    }
+  }
+
+  def update = silhouette.SecuredAction.async(parse.form(EditElectionForm.form)) { implicit request =>
+    def electionData = request.body
+    val objectId = new ObjectId(electionData.id)
+    val oldElection = electionDAOImpl.view(objectId).head
+    val election = new Election(
+        objectId,
+        electionData.name,
+        electionData.description,
+        electionData.creatorName,
+        electionData.creatorEmail,
+        electionData.startingDate,
+        electionData.endingDate,
+        electionData.isRealTime,
+        electionData.votingAlgo,
+        electionData.candidates.split(",").toList,
+        electionData.ballotVisibility,
+        electionData.voterListVisibility,
+        electionData.isInvite,
+        isCompleted = false,
+        isStarted = false,
+        createdTime = oldElection.createdTime,
+        adminLink = oldElection.adminLink,
+        inviteCode = oldElection.inviteCode,
+        ballot = oldElection.ballot,
+        voterList = oldElection.voterList,
+        isCounted = false
+      )
+      if(electionDAOImpl.update(election)){
+      Future.successful(
+        Ok(
+          views.html.profile(
+            Option(request.identity),
+            electionDAOImpl.userElectionList(request.identity.email)
+          )
+        )
+      )
+    }else{
+      Future.successful(
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+      )
     }
   }
 }

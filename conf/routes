@@ -23,17 +23,19 @@ GET         /signIn                           controllers.SignInController.view
 GET         /home                             controllers.HomeController.indexAuthorized
 
 GET         /profile                          controllers.HomeController.profile
+GET         /result/:id                       controllers.ElectionController.result(id)
 
 GET         /profile                          controllers.HomeController.profile
 
 GET         /guest/election/:id               controllers.ElectionController.viewElection(id)
 GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
 POST        /guest/vote                       controllers.ElectionController.vote()
-
+GET         /ballot/:id                       controllers.ElectionController.viewBallot(id)
 POST        /user/election/invite/            controllers.ElectionController.addVoter()
 
 GET         /vote/                            controllers.ElectionController.redirectVoter()
 POST        /upload/                          controllers.ElectionController.upload()
-
+POST        /update/                          controllers.ElectionController.update()
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)
+GET         /edit/:id                       controllers.ElectionController.updateElection(id)

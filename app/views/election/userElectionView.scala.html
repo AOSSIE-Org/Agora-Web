@@ -36,7 +36,17 @@
 		              <dt>Created By:</dt>
 		              <dd>@election.creatorName</dd>
 		              <dt>Status:</dt>
-		              <dd><span class="label label-warning">INACTIVE</span></dd>
+									@if(election.isStarted && !election.isCompleted){
+		              	<dd><span class="label label-success">ACTIVE</span></dd>
+									}
+									@if(!election.isStarted){
+										<dd><span class="label label-warning">INACTIVE</span></dd>
+
+									}
+									@if(election.isStarted && election.isCompleted){
+										<dd><span class="label label-primary">COMPLETED</span></dd>
+
+									}
 		              <dt>Candidates:</dt> @for(candidate
 		              <- election.candidates){ <dd>
 		                <span class="label label-info">@candidate</span>
