@@ -10,7 +10,18 @@ import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import models.daos.ElectionDAOImpl
+import models.daos.ResultFileDAOImpl
+
 import play.api.libs.mailer.{ Email, MailerClient }
+import models.services.Countvotes
+import org.bson.types.ObjectId
+
+
+import countvotes.parsers._
+import countvotes.structures._
+import countvotes.algorithms._
+import countvotes.methods._
+
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -31,11 +42,9 @@ class HomeController @Inject() (
    */
      val electionDAOImpl = new ElectionDAOImpl();
      scheduler.start()
-     Scheduler.CountVotesDaily()
      Scheduler.UpdateTableDaily()
 
   def index = silhouette.UnsecuredAction.async { implicit request =>
-
     Future.successful(Ok(views.html.home(None)))
   }
 

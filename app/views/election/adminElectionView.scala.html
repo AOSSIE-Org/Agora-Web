@@ -25,10 +25,15 @@
 		      <div class="project-section well general-info">
 		        <h3>Description</h3>
 						@if(!election.isStarted){
-		        <a href=/edit/@election.id   class="btn btn-sm btn-default pull-right">Edit Election</a>
-					}
-		        <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
-		        <p>@election.description</p>
+		       	 <a href=/edit/@election.id   class="btn btn-sm btn-default pull-right">Edit Election</a>
+						}
+						@if( (election.isCompleted || election.realtimeResult) && election.isStarted ){
+							<a href=/result/@election.id   class="btn btn-sm btn-default pull-right">Election Result</a>
+						}
+						@if(election.isStarted && !election.isCompleted){
+		       	 <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
+					 }
+						<p>@election.description</p>
 		        <div class="row">
 		          <div class="col-md-4">
 		            <dl class="dl-horizontal">

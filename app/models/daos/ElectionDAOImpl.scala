@@ -70,7 +70,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
     val update = $set("ballot" -> bsonBallot )
     collectionRef.update( o, update )
-    true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
+    true
   }
 
   def getBallots(id: ObjectId): List[Ballot] = {
@@ -190,11 +190,11 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
     //get all the completed and uncount elections
-    def getCompletedElections() :  Option[List[models.Election]] = {
+    def getCompletedElections() :  List[models.Election] = {
         val o: DBObject       = MongoDBObject("isCompleted" -> true , "isCounted" -> false)
         val u                 = collectionRef.find(o)
         val list              = u.toList
-        Option(list.map(doc => grater[Election].asObject(doc)))
+        list.map(doc => grater[Election].asObject(doc))
     }
 
     //Update finished election

@@ -63,9 +63,8 @@ class ElectionController @Inject()(
   val resultFileDAOImpl = new ResultFileDAOImpl()
   val mailerService = new MailerService(mailerClient)
 
-  def result = Action { implicit request =>
-
-    Ok.sendFile(resultFileDAOImpl.getResult())
+  def result(id : String) = Action { implicit request =>
+    Ok.sendFile(resultFileDAOImpl.getResult(id))
   }
 
 
@@ -127,9 +126,6 @@ class ElectionController @Inject()(
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
     val election = electionDAOImpl.view(objectId).head
-    if(election.realtimeResult){
-      //countVotes
-    }
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
@@ -236,9 +232,14 @@ if(election.isStarted){
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
     val ballotData = request.body
     val objectId = new ObjectId(ballotData.id)
-    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
-      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
-      electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)
+    var election = electionDAOImpl.view(objectId).head
+    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))){
+      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))
+      if(electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)){
+        if(election.realtimeResult){
+          resultFileDAOImpl.saveResult(electionDAOImpl.getBallots(objectId),election.votingAlgo,election.candidates,election.id)
+        }
+      }
       Redirect(routes.ElectionController.redirectVoter()).flashing("success" -> Messages("thank.voting"))
     }
     else{

@@ -23,7 +23,7 @@ GET         /signIn                           controllers.SignInController.view
 GET         /home                             controllers.HomeController.indexAuthorized
 
 GET         /profile                          controllers.HomeController.profile
-GET         /result                           controllers.ElectionController.result
+GET         /result/:id                       controllers.ElectionController.result(id)
 
 GET         /profile                          controllers.HomeController.profile
 
