@@ -7,7 +7,6 @@
 GET         /                                 controllers.HomeController.index
 
 GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
-GET         /user/vote/:id                    controllers.ElectionController.voteUser(id)
 
 GET         /user/createElection              controllers.ElectionController.createUserView
 GET         /guest/createElection             controllers.ElectionController.createGuestView
@@ -31,7 +30,10 @@ GET         /guest/election/:id               controllers.ElectionController.vie
 GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
 POST        /guest/vote                       controllers.ElectionController.vote()
 
+POST        /user/election/invite/            controllers.ElectionController.addVoter()
 
+GET         /vote/                            controllers.ElectionController.redirectVoter()
+POST        /upload/                          controllers.ElectionController.upload()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)

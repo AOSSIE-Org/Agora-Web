@@ -1,0 +1,96 @@
+@(user: Option[models.User] , elections : List[models.Election])(implicit request: RequestHeader, messages: Messages)
+
+@import java.text.ParseException
+@import java.text.SimpleDateFormat; var dt1 = new SimpleDateFormat("yyyy-MM-dd");
+@import java.util.Date
+@import java.time.LocalDate
+@import java.time.format.DateTimeFormatter; var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+@import helper._
+@import b3.vertical.fieldConstructor // Declares a vertical field constructor as default
+
+@import java.math.BigInteger; var i = 0;
+
+@main(Messages("home.title"), user) {
+
+	@for(election <- elections) {
+		<div class="container-fluid primary-content">
+		  <div class="primary-content-heading clearfix">
+		    <h2>@election.name</h2>
+		    <hr style="border:1px solid #fff">
+		  </div>
+		  <div class="row">
+
+		    <div class="col-md-12">
+		      <div class="project-section well general-info">
+		        <h3>Description</h3>
+		        <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
+		        <p>@election.description</p>
+		        <div class="row">
+		          <div class="col-md-4">
+		            <dl class="dl-horizontal">
+		              <dt>Date:</dt>
+		              <dd>@dt1.format(election.start) - @dt1.format(election.end)</dd>
+		              <dd></dd>
+		              <dt>Duration:</dt>
+		              <dd>@{LocalDate.parse(dt1.format(election.end), formatter).toEpochDay() - LocalDate.parse(dt1.format(election.start), formatter).toEpochDay()}<span class="text-muted"><small>(@{LocalDate.parse(dt1.format(election.end), formatter).toEpochDay()- LocalDate.parse(dt1.format(new Date()), formatter).toEpochDay()} days remaining))</small></span></dd>
+		              <dt>Created By:</dt>
+		              <dd>@election.creatorName</dd>
+		              <dt>Status:</dt>
+		              <dd><span class="label label-warning">INACTIVE</span></dd>
+		              <dt>Candidates:</dt> @for(candidate
+		              <- election.candidates){ <dd>
+		                <span class="label label-info">@candidate</span>
+		                </dd>
+		                }
+		            </dl>
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+@if(election.voterListVisibility==true){
+			<div class="panel panel-default">
+					<div class="container"><h2>Voter Details</h2></div>
+					<div class="panel-body">
+
+													<div class="tab-content">
+															<div class="tab-pane active" id="home">
+																	<div class="table-responsive">
+																			<table class="table table-hover">
+																					<thead>
+																							<tr>
+																									<th>#</th>
+																									<th>Voter name</th>
+																							</tr>
+																					</thead>
+																					<tbody id="items">
+																						@for((doc, index) <- election.voterList.zipWithIndex) {
+
+																							<tr>
+
+																									<td>@{index+1}</td>
+																									<td>@doc.name</td>
+
+
+																							</tr>
+
+																						}
+																					</tbody>
+																			</table>
+																	</div>
+
+									</div>
+							</div>
+						</div>
+					</div>
+				}
+
+			@if(election.ballotVisibility=="Public"){
+				<button type="button" class="btn btn-info btn-lg">View Ballot</button>
+			}
+			<script type='text/javascript' src='@routes.Assets.at("/javascripts/fileUpload.js")'></script>
+
+  	</div>
+
+  }
+}

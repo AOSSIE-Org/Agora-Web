@@ -1,0 +1,12 @@
+@(user: Option[models.User])(implicit request: RequestHeader, messages: Messages)
+
+
+@main(Messages("vote.page"), user) {
+    <div class="container">
+        <div class="container text-center">
+            <!-- <h1>Thank You For Voting</h1> -->
+
+            <a href="/" class="btn btn-default btn-success"> Home</a>
+        </div>
+    </div>
+}

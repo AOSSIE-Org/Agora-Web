@@ -3,11 +3,18 @@
 
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
+could.not.verify = Could not verify with your verification code! Please check your email and try again!
+maximum.election = you have reached a limit for creating election.
 
+
+thank.voting = Your vote has been recorded.
+add.voter = Voter has been added successfully
+error.voter = Voter already exists
 home.title = Agora - Home
-sign.up.title = Agora - Sign Up
 sign.in.title = Agora - Sign In
-
+vote.page = Vote
+file.error = your file is not in recommended format, Recheck your file
+format.voter = Recheck the format
 
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!

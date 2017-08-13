@@ -3,16 +3,44 @@ package controllers
 import java.util.Date
 import javax.inject._
 
-import com.mohiva.play.silhouette.api.Silhouette
+
 import forms._
 import models.Election
+import models.Ballot
+import models.Voter
 import models.daos.ElectionDAOImpl
-import org.bson.types.ObjectId
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc._
+import models.services.MailerService
+import models.PassCodeGenerator
 import utils.auth.DefaultEnv
 
-import scala.concurrent.Future
+import com.mohiva.play.silhouette.api.Silhouette
+import org.bson.types.ObjectId
+
+import akka.stream.IOResult
+import akka.stream.scaladsl._
+import akka.util.ByteString
+
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import play.api.mvc._
+import play.api.libs.mailer.{ Email, MailerClient }
+import play.api.mvc.MultipartFormData.FilePart
+import play.core.parsers.Multipart.FileInfo
+import play.api.libs.streams._
+
+import java.io.File
+import java.nio.file.attribute.PosixFilePermission._
+import java.nio.file.attribute.PosixFilePermissions
+import java.nio.file.{Files, Path}
+import java.util
+import javax.inject._
+
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.FileInputStream
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -22,40 +50,55 @@ import scala.concurrent.Future
 @Singleton
 class ElectionController @Inject()(
   val messagesApi: MessagesApi,
-  silhouette: Silhouette[DefaultEnv]
+  silhouette: Silhouette[DefaultEnv],
+  mailerClient: MailerClient,
+  ec: ExecutionContext
 ) extends Controller with I18nSupport {
+
   val electionDAOImpl = new ElectionDAOImpl()
+  val mailerService = new MailerService(mailerClient)
+
 
   def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>
     def electionData = request.body
-    val election = new Election(
-      new ObjectId,
-      electionData.name,
-      electionData.description,
-      electionData.creatorName,
-      electionData.creatorEmail,
-      electionData.startingDate,
-      electionData.endingDate,
-      electionData.isRealTime,
-      electionData.votingAlgo,
-      electionData.candidates.split(",").toList,
-      electionData.isPublic,
-      electionData.isInvite,
-      isCompleted = false,
-      createdTime = new Date(),
-      adminLink = "",
-      inviteLink = "",
-      ballot = List.empty[String]
-    )
-    electionDAOImpl.save(election)
-    Future.successful(
-      Ok(
-        views.html.profile(
-          Option(request.identity),
-          electionDAOImpl.userElectionList(request.identity.email)
+    if(electionDAOImpl.userElectionListCount(Option(electionData.creatorEmail))<3){
+      val election = new Election(
+        new ObjectId,
+        electionData.name,
+        electionData.description,
+        electionData.creatorName,
+        electionData.creatorEmail,
+        electionData.startingDate,
+        electionData.endingDate,
+        electionData.isRealTime,
+        electionData.votingAlgo,
+        electionData.candidates.split(",").toList,
+        electionData.ballotVisibility,
+        electionData.voterListVisibility,
+        electionData.isInvite,
+        isCompleted = false,
+        isStarted = false,
+        createdTime = new Date(),
+        adminLink = "",
+        inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
+        ballot = List.empty[Ballot],
+        voterList = List.empty[Voter],
+        isCounted = false
+      )
+      electionDAOImpl.save(election)
+      Future.successful(
+        Ok(
+          views.html.profile(
+            Option(request.identity),
+            electionDAOImpl.userElectionList(request.identity.email)
+          )
         )
       )
-    )
+    }else{
+      Future.successful(
+        Redirect(routes.HomeController.profile).flashing("error" -> Messages("maximum.election"))
+      )
+    }
   }
 
   def createGuestView = silhouette.UnsecuredAction.async { implicit request =>
@@ -68,45 +111,237 @@ class ElectionController @Inject()(
 
   def viewElection(id: String) = silhouette.UnsecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    Future.successful(Ok(views.html.election.election(None, electionDAOImpl.view(objectId))))
+    Future.successful(Ok(views.html.election.userElectionView(None, electionDAOImpl.view(objectId))))
   }
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    Future.successful(
-      Ok(views.html.election.election(Option(request.identity), electionDAOImpl.view(objectId)))
-    )
+    val election = electionDAOImpl.view(objectId).head
+    if(election.realtimeResult){
+      //countVotes
+    }
+    if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
+      Future.successful(
+        Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
+      )
+    }
+    else{
+      Future.successful(
+        Ok(views.html.election.userElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
+      )
+    }
   }
 
-  def voteGuest(id: String) = silhouette.UnsecuredAction.async { implicit request =>
+  def voteGuest(id: String) = Action { implicit request =>
     val objectId = new ObjectId(id)
-    Future.successful(
+    val election = electionDAOImpl.view(objectId).head
+if(election.isStarted){
+    election.votingAlgo match {
+      case "Range Voting" =>{
+          Ok(
+            views.html.ballot.scored(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
+      | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin"
+      | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
       Ok(
-        views.html.ballot.preferential(
-          None,
-          Option(electionDAOImpl.viewCandidate(objectId)),
-          Option(id)
+          views.html.ballot.preferential(
+            None,
+            Option(electionDAOImpl.viewCandidate(objectId)),
+            Option(id),
+            Option(election.name),
+            Option(election.description)
+
         )
       )
-    )
-  }
+      }
 
-  def voteUser(id: String) = silhouette.SecuredAction.async { implicit request =>
-    val objectId = new ObjectId(id)
-    Future.successful(
-      Ok(
-        views.html.ballot.ranked(
-          Option(request.identity),
-          Option(electionDAOImpl.viewCandidate(objectId: ObjectId)),
-          Option(id)
+      case "Approval" | "Proportional Approval voting" | "Satisfaction Approval voting" | "Sequential Proportional Approval voting"  => {
+        Ok(
+            views.html.ballot.approval(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
         )
-      )
-    )
+      }
+      case "Majority" => {
+        Ok(
+            views.html.ballot.singleCandidate(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Ranked Pairs" => {
+        Ok(
+            views.html.ballot.ranked(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case "Cumulative voting" => {
+        Ok(
+            views.html.ballot.scored(
+              None,
+              Option(electionDAOImpl.viewCandidate(objectId)),
+              Option(id),
+              Option(election.name),
+              Option(election.description)
+
+          )
+        )
+      }
+      case _ => {
+      Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
+      }
+      }
+
+    }
+    else{
+      Redirect(routes.ElectionController.redirectVoter()).flashing("error" -> Messages("Election is not yet started"))
+    }
   }
 
-  def vote = silhouette.UnsecuredAction.async(parse.form(BallotForm.form)) { implicit request =>
+  def vote = Action (parse.form(BallotForm.form)) { implicit request =>
     val ballotData = request.body
-    electionDAOImpl.vote(new ObjectId(ballotData.id), ballotData.ballotInput)
-    Future.successful(Ok(views.html.home(None)))
+    val objectId = new ObjectId(ballotData.id)
+    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))){
+      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(electionDAOImpl.getInviteCode(objectId),ballotData.passCode))
+      electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)
+      Redirect(routes.ElectionController.redirectVoter()).flashing("success" -> Messages("thank.voting"))
+    }
+    else{
+      Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("could.not.verify"))
+    }
+  }
+
+  def addVoter() = silhouette.SecuredAction.async( parse.form(VoterForm.form) ) { implicit request =>
+    def voterData = request.body
+    try{
+    val voter = new Voter(voterData.email.split(",")(0),voterData.email.split(",")(1))
+    val objectId = new ObjectId(voterData.id)
+    val con = electionDAOImpl.addVoter(objectId , voter)
+    if(con){
+      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email))
+      Future.successful(
+        Ok
+          (
+            views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
+          )
+      )
+    }
+    else{
+    Future.successful(
+      Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("error.voter"))
+    )
+    }
+  }
+  catch {
+    case e: Exception => {
+      Future.successful(
+        Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("format.voter"))
+      )
+    }
+  }
+}
+
+  def redirectVoter = Action { implicit request =>
+    {
+      Ok(views.html.election.redirectVoting(None))
+    }
+  }
+
+  type FilePartHandler[A] = FileInfo => Accumulator[ByteString, FilePart[A]]
+
+  /**
+   * Uses a custom FilePartHandler to return a type of "File" rather than
+   * using Play's TemporaryFile class.
+   */
+  private def handleFilePartAsFile: FilePartHandler[File] = {
+    case FileInfo(partName, filename, contentType) =>
+      val attr = PosixFilePermissions.asFileAttribute(util.EnumSet.of(OWNER_READ, OWNER_WRITE))
+      val path: Path = Files.createTempFile("multipartBody", "tempFile", attr)
+      val file = path.toFile
+      val fileSink: Sink[ByteString, Future[IOResult]] = FileIO.toPath(path)
+      val accumulator: Accumulator[ByteString, IOResult] = Accumulator(fileSink)
+      accumulator.map {
+        case IOResult(count, status) =>
+          FilePart(partName, filename, contentType, file)
+      }
+  }
+
+  def addVoter( email : String , id : String) : Boolean = {
+    val objectId = new ObjectId(id)
+    val voter = new Voter(email.split(",")(0),email.split(",")(1))
+    val con = electionDAOImpl.addVoter(objectId ,voter)
+    if(con){
+      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email))
+    }
+    con
+  }
+
+  /**
+   * A generic operation on the temporary file that deletes the temp file after completion.
+   */
+  private def operateOnTempFile(file: File) = {
+    val size = Files.size(file.toPath)
+    Files.deleteIfExists(file.toPath)
+    size
+  }
+
+  /**
+   * Uploads a multipart file as a POST request.
+   * @return
+   */
+  def upload = silhouette.SecuredAction.async(parse.multipartFormData(handleFilePartAsFile)) { implicit request =>
+    val id : String = request.body.dataParts.get("id").head.mkString
+    try{
+      val fileOption = request.body.file("emailFile").map {
+        case FilePart(key, filename, contentType, file) =>
+        val inStream = new FileInputStream(file)
+        val reader = new BufferedReader(new InputStreamReader(inStream));
+        var  line : String = reader.readLine();
+        while(line != null && line != ""){
+              addVoter(line,id)
+              line = reader.readLine();
+        }
+        val data = operateOnTempFile(file)
+
+      }
+      Future.successful(
+        Ok
+          (
+            views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view( new ObjectId(id)))
+          )
+      )
+    }
+  catch {
+    case e:  Exception =>
+        Future.successful(
+          Redirect(routes.ElectionController.viewElectionSecured(id)).flashing("error" -> Messages("file.error"))
+        )
+
+    }
   }
 }

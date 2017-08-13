@@ -1,0 +1,154 @@
+@(user: Option[models.User] , elections : List[models.Election])(implicit request: RequestHeader, messages: Messages)
+
+@import java.text.ParseException
+@import java.text.SimpleDateFormat; var dt1 = new SimpleDateFormat("yyyy-MM-dd");
+@import java.util.Date
+@import java.time.LocalDate
+@import java.time.format.DateTimeFormatter; var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+@import helper._
+@import b3.vertical.fieldConstructor // Declares a vertical field constructor as default
+
+@import java.math.BigInteger; var i = 0;
+
+@main(Messages("home.title"), user) {
+
+	@for(election <- elections) {
+		<div class="container-fluid primary-content">
+
+		  <div class="primary-content-heading clearfix">
+		    <h2>@election.name</h2>
+		    <hr style="border:1px solid #fff">
+		  </div>
+		  <div class="row">
+
+		    <div class="col-md-12">
+		      <div class="project-section well general-info">
+		        <h3>Description</h3>
+		        <a href=# class="btn btn-sm btn-default pull-right">Edit Election</a>
+		        <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
+		        <p>@election.description</p>
+		        <div class="row">
+		          <div class="col-md-4">
+		            <dl class="dl-horizontal">
+		              <dt>Date:</dt>
+		              <dd>@dt1.format(election.start) - @dt1.format(election.end)</dd>
+		              <dd></dd>
+		              <dt>Duration:</dt>
+		              <dd>@{LocalDate.parse(dt1.format(election.end), formatter).toEpochDay() - LocalDate.parse(dt1.format(election.start), formatter).toEpochDay()}<span class="text-muted"><small>(@{LocalDate.parse(dt1.format(election.end), formatter).toEpochDay()- LocalDate.parse(dt1.format(new Date()), formatter).toEpochDay()} days remaining))</small></span></dd>
+		              <dt>Created By:</dt>
+		              <dd>@election.creatorName</dd>
+		              <dt>Status:</dt>
+		              <dd><span class="label label-warning">INACTIVE</span></dd>
+		              <dt>Candidates:</dt> @for(candidate
+		              <- election.candidates){ <dd>
+		                <span class="label label-info">@candidate</span>
+		                </dd>
+		                }
+		            </dl>
+		          </div>
+		        </div>
+					  <div class="row">
+
+						</div>
+
+		      </div>
+					<div class="panel panel-default">
+							<div class="container"><h2>Voter Details</h2></div>
+							<div class="panel-body">
+
+					                    <div class="tab-content">
+					                        <div class="tab-pane active" id="home">
+					                            <div class="table-responsive">
+					                                <table class="table table-hover">
+					                                    <thead>
+					                                        <tr>
+					                                            <th>#</th>
+					                                            <th>Voter name</th>
+					                                            <th>Email</th>
+					                                        </tr>
+					                                    </thead>
+					                                    <tbody id="items">
+					                                      @for((doc, index) <- election.voterList.zipWithIndex) {
+
+					                                        <tr>
+
+					                                            <td>@{index+1}</td>
+					                                            <td>@doc.name</td>
+					                                            <td>@doc.email</td>
+
+
+					                                        </tr>
+
+					                                    	}
+					                                    </tbody>
+					                                </table>
+					                            </div>
+
+					            </div>
+					        </div>
+								</div>
+							</div>
+
+
+		      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addVoterModal">Add Voters</button>
+					@if(election.ballotVisibility!="Hidden"){
+					<button type="button" class="btn btn-info btn-lg">View Ballot</button>
+					}
+		      <!-- Modal -->
+		      <div id="addVoterModal" class="modal fade" role="dialog">
+		        <div class="modal-dialog">
+		          <div class="modal-content">
+		            <div class="modal-header">
+		              <button type="button" class="close" data-dismiss="modal">&times;</button>
+		              <h4 class="modal-title">Add Voters</h4>
+		            </div>
+		            @b3.form(CSRF(routes.ElectionController.addVoter())) {
+		            <div class="modal-body">
+
+		              <input type="hidden" class="form-control" name="id" value=@election.id>
+		              <div class="form-group">
+		                <label for="InputEmail1">Voter's Email
+											<a class='my-tool-tip' data-toggle="tooltip" data-placement="left"
+												title='Voter should be given in the format "[name],[email]" (e.g. "John Doe,john.doe@@gmail.com"). Without quotation marks'>
+												<i class='glyphicon glyphicon-info-sign'></i>
+										</a></label>
+		                <input type="text" class="form-control" name="email" placeholder="Email" required>
+		              </div>
+		              <button class="btn btn-success pull-right" type="submit">Submit</button>
+		            </div>
+
+		            <br>
+		            <div class="centered">
+		              <h4>Or</h4></div>
+		            } @b3.form(CSRF(routes.ElectionController.upload()), 'enctype -> "multipart/form-data") {
+		            <div class="modal-body">
+		              <div class="form-group">
+		                <label for="InputEmail1">Upload emails as a text file:
+											<a class='my-tool-tip' data-toggle="tooltip" data-placement="left"
+												title='Voters should be separated by line-breaks. Each voter should be given in the format "[name],[email]" (e.g. "John Doe,john.doe@@gmail.com"). Without quotation marks'>
+												<i class='glyphicon glyphicon-info-sign'></i>
+										</a></label>
+		                <input class="form-control" type="file" accept="text/plain" id="emailFile" name="emailFile" required>
+		                <input type="hidden" class="form-control" name="id" value=@election.id id="id">
+
+		              </div>
+		            </div>
+		            <div class="modal-footer">
+		              <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Close</button>
+		              <button class="btn btn-success pull-right" type="submit">Submit</button>
+		            </div>
+		            }
+
+		          </div>
+
+		        </div>
+		      </div>
+
+		    </div>
+		  </div>
+			<script type='text/javascript' src='@routes.Assets.at("/javascripts/fileUpload.js")'></script>
+
+  	</div>
+
+  }
+}

@@ -15,7 +15,7 @@ import org.bson.types.ObjectId
  * @param realtimeResult Specify whether show the results in real time or not
  * @param votingAlgo The voting alogorithm for the election
  * @param candidates The canditate list for the election
- * @param isPublic Specify Whether the election is public or not
+ * @param ballotVisibility Specify  the ballot visibility level
  * @param isInvite Specify Whether the election is invitable or not
  */
 case class Election(
@@ -29,11 +29,15 @@ case class Election(
   realtimeResult: Boolean,
   votingAlgo: String,
   candidates: List[String],
-  isPublic: Boolean,
+  ballotVisibility: String,
+  voterListVisibility : Boolean,
   isInvite: Boolean,
   isCompleted: Boolean,
+  isStarted : Boolean,
   createdTime: Date,
   adminLink: String,
-  inviteLink: String,
-  ballot: List[String]
+  inviteCode: String,
+  ballot: List[Ballot],
+  voterList : List[Voter],
+  isCounted : Boolean
 )

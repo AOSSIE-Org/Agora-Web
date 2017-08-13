@@ -10,7 +10,7 @@
 <html lang="en">
     <head>
         @* Here's where we render the page title `String`. *@
-        <title>Agora Front End</title>
+        <title>@title</title>
         <meta charset="utf-8">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
@@ -32,6 +32,7 @@
 
 
     <body>
+      @if(title!="Vote"){
       <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -61,7 +62,7 @@
             <ul class="nav navbar-nav navbar-right">
             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <span class="user-avatar pull-left" style="margin-right:8px; margin-top:-5px;">
-                                        <img src="@u.avatarURL" class="img-responsive img-circle" title="John Doe" alt="John Doe" width="30px" height="30px">
+                                        <img src="@u.avatarURL" class="img-responsive img-circle" title=@u.firstName width="30px" height="30px">
                                     </span>
                                     <span class="user-name">
                                         @u.fullName
@@ -101,6 +102,7 @@
     </div>
     </div>
     </nav>
+  }
         <main class="container">
             <div class="starter-template row">
                 @request.flash.get("error").map { msg =>
@@ -121,9 +123,10 @@
                         <strong>@Messages("success")</strong> @msg
                     </div>
                 }
-                @content
+
 
             </div>
+            @content
         </main>
 
 
