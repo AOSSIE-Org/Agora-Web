@@ -7,11 +7,11 @@ import javax.inject.Inject
 
 class MailerService @Inject() (mailerClient: MailerClient) {
 
-  def sendEmail(receiverEmail: String , passCode : String) = {
+  def sendEmail(receiver: String , passCode : String) = {
     val email = Email(
       "Simple email",
       "AGORA <aossie@gmail.com>",
-      Seq("Voter TO <"+ receiverEmail + ">") ,
+      Seq("Voter TO <"+ receiver + ">") ,
       // adds attachment
 
       // sends text, HTML or both...
