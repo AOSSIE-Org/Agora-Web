@@ -92,6 +92,7 @@ class ElectionController @Inject()(
         inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
         ballot = List.empty[Ballot],
         voterList = List.empty[Voter],
+        winners = List.empty[String],
         isCounted = false
       )
       electionDAOImpl.save(election)
@@ -140,93 +141,97 @@ class ElectionController @Inject()(
 
   def voteGuest(id: String) = Action { implicit request =>
     val objectId = new ObjectId(id)
+    if(electionDAOImpl.view(objectId).size != 0){
     val election = electionDAOImpl.view(objectId).head
-if(election.isStarted){
-    election.votingAlgo match {
-      case "Range Voting" =>{
+    if(election.isStarted){
+        election.votingAlgo match {
+          case "Range Voting" =>{
+              Ok(
+                views.html.ballot.scored(
+                  None,
+                  Option(electionDAOImpl.viewCandidate(objectId)),
+                  Option(id),
+                  Option(election.name),
+                  Option(election.description)
+
+              )
+            )
+          }
+          case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
+          | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin"
+          | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
           Ok(
-            views.html.ballot.scored(
-              None,
-              Option(electionDAOImpl.viewCandidate(objectId)),
-              Option(id),
-              Option(election.name),
-              Option(election.description)
+              views.html.ballot.preferential(
+                None,
+                Option(electionDAOImpl.viewCandidate(objectId)),
+                Option(id),
+                Option(election.name),
+                Option(election.description)
 
+            )
           )
-        )
-      }
-      case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
-      | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin"
-      | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
-      Ok(
-          views.html.ballot.preferential(
-            None,
-            Option(electionDAOImpl.viewCandidate(objectId)),
-            Option(id),
-            Option(election.name),
-            Option(election.description)
+          }
 
-        )
-      )
-      }
+          case "Approval" | "Proportional Approval voting" | "Satisfaction Approval voting" | "Sequential Proportional Approval voting"  => {
+            Ok(
+                views.html.ballot.approval(
+                  None,
+                  Option(electionDAOImpl.viewCandidate(objectId)),
+                  Option(id),
+                  Option(election.name),
+                  Option(election.description)
 
-      case "Approval" | "Proportional Approval voting" | "Satisfaction Approval voting" | "Sequential Proportional Approval voting"  => {
-        Ok(
-            views.html.ballot.approval(
-              None,
-              Option(electionDAOImpl.viewCandidate(objectId)),
-              Option(id),
-              Option(election.name),
-              Option(election.description)
+              )
+            )
+          }
+          case "Majority" => {
+            Ok(
+                views.html.ballot.singleCandidate(
+                  None,
+                  Option(electionDAOImpl.viewCandidate(objectId)),
+                  Option(id),
+                  Option(election.name),
+                  Option(election.description)
 
-          )
-        )
-      }
-      case "Majority" => {
-        Ok(
-            views.html.ballot.singleCandidate(
-              None,
-              Option(electionDAOImpl.viewCandidate(objectId)),
-              Option(id),
-              Option(election.name),
-              Option(election.description)
+              )
+            )
+          }
+          case "Ranked Pairs" => {
+            Ok(
+                views.html.ballot.ranked(
+                  None,
+                  Option(electionDAOImpl.viewCandidate(objectId)),
+                  Option(id),
+                  Option(election.name),
+                  Option(election.description)
 
-          )
-        )
-      }
-      case "Ranked Pairs" => {
-        Ok(
-            views.html.ballot.ranked(
-              None,
-              Option(electionDAOImpl.viewCandidate(objectId)),
-              Option(id),
-              Option(election.name),
-              Option(election.description)
+              )
+            )
+          }
+          case "Cumulative voting" => {
+            Ok(
+                views.html.ballot.scored(
+                  None,
+                  Option(electionDAOImpl.viewCandidate(objectId)),
+                  Option(id),
+                  Option(election.name),
+                  Option(election.description)
 
-          )
-        )
-      }
-      case "Cumulative voting" => {
-        Ok(
-            views.html.ballot.scored(
-              None,
-              Option(electionDAOImpl.viewCandidate(objectId)),
-              Option(id),
-              Option(election.name),
-              Option(election.description)
+              )
+            )
+          }
+          case _ => {
+          Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
+          }
+          }
 
-          )
-        )
+        }
+        else{
+          Redirect(routes.ElectionController.redirectVoter()).flashing("error" -> Messages("Election is not yet started"))
+        }
+      }else{
+        Redirect(routes.ElectionController.redirectVoter()).flashing("error" -> Messages("invalid.id"))
       }
-      case _ => {
-      Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
-      }
-      }
-
-    }
-    else{
-      Redirect(routes.ElectionController.redirectVoter()).flashing("error" -> Messages("Election is not yet started"))
-    }
   }
 
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
@@ -419,6 +424,7 @@ if(election.isStarted){
         inviteCode = oldElection.inviteCode,
         ballot = oldElection.ballot,
         voterList = oldElection.voterList,
+        winners = oldElection.winners,
         isCounted = false
       )
       if(electionDAOImpl.update(election)){

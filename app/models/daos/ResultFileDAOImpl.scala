@@ -13,13 +13,15 @@ import org.bson.types.ObjectId
 class ResultFileDAOImpl() {
     val gridfs = GridFS(MongoDBConnection.getResultConnection)
     def saveResult(ballots : List[Ballot], algorithm : String, candidates: List[String], objectId : ObjectId) = {
-      val logo = Countvotes.countvotesMethod(ballots,algorithm,candidates,objectId)
+      val result = Countvotes.countvotesMethod(ballots,algorithm,candidates,objectId)
+      // val logo1 = Countvotes.getWeightedBallotsWithRanked(ballots)
       var id = objectId.toString
-      gridfs.remove(id);
-      gridfs(logo) { fh =>
-        fh.filename = id
-        fh.contentType = "text/plain"
-      }
+      // println(logo)
+      // gridfs.remove(id);
+      // gridfs(logo) { fh =>
+      //   fh.filename = id
+      //   fh.contentType = "text/plain"
+      // }
     }
 
     def getResult(id : String ) : File = {

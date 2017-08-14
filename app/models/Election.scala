@@ -39,5 +39,6 @@ case class Election(
   inviteCode: String,
   ballot: List[Ballot],
   voterList : List[Voter],
+  winners : List[String],
   isCounted : Boolean
 )
