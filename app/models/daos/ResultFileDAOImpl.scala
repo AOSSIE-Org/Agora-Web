@@ -14,6 +14,7 @@ class ResultFileDAOImpl() {
     val gridfs = GridFS(MongoDBConnection.getResultConnection)
     def saveResult(ballots : List[Ballot], algorithm : String, candidates: List[String], objectId : ObjectId) = {
       val result = Countvotes.countvotesMethod(ballots,algorithm,candidates,objectId)
+      println(result)
       // val logo1 = Countvotes.getWeightedBallotsWithRanked(ballots)
       var id = objectId.toString
       // println(logo)

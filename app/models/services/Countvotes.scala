@@ -23,7 +23,7 @@ object  Countvotes {
 
   def parseCandidates( ballot : String ) : List[Candidate] = {
       var candidatesList = ListBuffer[Candidate]()
-      val ballotToList = ballot.split(">")
+      val ballotToList = ballot.split(",|>")
       for(candidate <- ballotToList){
         candidatesList+=new Candidate(candidate)
       }
@@ -98,9 +98,16 @@ object  Countvotes {
       | "Meek STV"
       | "Oklahoma Method"
       | "Scottish STV" | "Proportional Approval voting"
-      | "Satisfaction Approval voting"
-      | "Sequential Proportional Approval voting" | "Ranked Pairs" | "Cumulative voting" => {
+      | "Ranked Pairs" | "Cumulative voting" => {
         null
+      }
+      case "Satisfaction Approval voting" => {
+        val h = SatisfactionApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+        return h
+      }
+      case "Sequential Proportional Approval voting" => {
+        val h = SequentialProportionalApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+        return h
       }
       case "Top Cycle" => {
         val h = SmithSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
