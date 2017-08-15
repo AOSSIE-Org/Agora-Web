@@ -259,7 +259,7 @@ class ElectionController @Inject()(
     val objectId = new ObjectId(voterData.id)
     val con = electionDAOImpl.addVoter(objectId , voter)
     if(con){
-      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email))
+      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email),voterData.id)
       Future.successful(
         Ok
           (
@@ -312,7 +312,7 @@ class ElectionController @Inject()(
     val voter = new Voter(email.split(",")(0),email.split(",")(1))
     val con = electionDAOImpl.addVoter(objectId ,voter)
     if(con){
-      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email))
+      mailerService.sendEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId),voter.email),id)
     }
     con
   }
