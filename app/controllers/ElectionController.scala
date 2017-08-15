@@ -126,7 +126,9 @@ class ElectionController @Inject()(
 
   def viewElectionSecured(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    val election = electionDAOImpl.view(objectId).head
+    val electionList = electionDAOImpl.view(objectId)
+    if(electionList.size>0){
+    val election = electionList.head
     if(request.identity.email==electionDAOImpl.getCreatorEmail(objectId)){
       Future.successful(
         Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
@@ -138,93 +140,97 @@ class ElectionController @Inject()(
       )
     }
   }
+  else{
+    Future.successful(
+      Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
+    )
+  }
+}
 
   def voteGuest(id: String) = Action { implicit request =>
     val objectId = new ObjectId(id)
     if(electionDAOImpl.view(objectId).size != 0){
-    val election = electionDAOImpl.view(objectId).head
-    if(election.isStarted){
-        election.votingAlgo match {
-          case "Range Voting" =>{
+      val election = electionDAOImpl.view(objectId).head
+      if(election.isStarted){
+          election.votingAlgo match {
+            case "Range Voting" =>{
+                Ok(
+                  views.html.ballot.scored(
+                    None,
+                    Option(electionDAOImpl.viewCandidate(objectId)),
+                    Option(id),
+                    Option(election.name),
+                    Option(election.description)
+
+                )
+              )
+            }
+            case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
+            | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin"
+            | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
               Ok(
-                views.html.ballot.scored(
-                  None,
-                  Option(electionDAOImpl.viewCandidate(objectId)),
-                  Option(id),
-                  Option(election.name),
-                  Option(election.description)
+                  views.html.ballot.preferential(
+                    None,
+                    Option(electionDAOImpl.viewCandidate(objectId)),
+                    Option(id),
+                    Option(election.name),
+                    Option(election.description)
 
+                )
               )
-            )
-          }
-          case "Instant Runoff 2-round" | "Nanson" | "Borda" | "Kemeny-Young" | "Schulze" | "Copeland" | "SMC" |  "Random Ballot" | "Coomb’s"
-          | "Contingent Method" | "Minimax Condorcet" | "Top Cycle" | "Uncovered Set" | "Warren STV" | "Meek STV" | "Oklahoma Method" | "Baldwin"
-          | "Exhaustive ballot" | "Exhaustive ballot with dropoff" | "Scottish STV" | "Preferential block voting" | "Contingent Method" => {
-          Ok(
-              views.html.ballot.preferential(
-                None,
-                Option(electionDAOImpl.viewCandidate(objectId)),
-                Option(id),
-                Option(election.name),
-                Option(election.description)
+            }
+            case "Approval" | "Proportional Approval voting" | "Satisfaction Approval voting" | "Sequential Proportional Approval voting"  => {
+              Ok(
+                  views.html.ballot.approval(
+                    None,
+                    Option(electionDAOImpl.viewCandidate(objectId)),
+                    Option(id),
+                    Option(election.name),
+                    Option(election.description)
 
-            )
-          )
-          }
-
-          case "Approval" | "Proportional Approval voting" | "Satisfaction Approval voting" | "Sequential Proportional Approval voting"  => {
-            Ok(
-                views.html.ballot.approval(
-                  None,
-                  Option(electionDAOImpl.viewCandidate(objectId)),
-                  Option(id),
-                  Option(election.name),
-                  Option(election.description)
-
+                )
               )
-            )
-          }
-          case "Majority" => {
-            Ok(
-                views.html.ballot.singleCandidate(
-                  None,
-                  Option(electionDAOImpl.viewCandidate(objectId)),
-                  Option(id),
-                  Option(election.name),
-                  Option(election.description)
+            }
+            case "Majority" => {
+              Ok(
+                  views.html.ballot.singleCandidate(
+                    None,
+                    Option(electionDAOImpl.viewCandidate(objectId)),
+                    Option(id),
+                    Option(election.name),
+                    Option(election.description)
 
+                )
               )
-            )
-          }
-          case "Ranked Pairs" => {
-            Ok(
-                views.html.ballot.ranked(
-                  None,
-                  Option(electionDAOImpl.viewCandidate(objectId)),
-                  Option(id),
-                  Option(election.name),
-                  Option(election.description)
+            }
+            case "Ranked Pairs" => {
+              Ok(
+                  views.html.ballot.ranked(
+                    None,
+                    Option(electionDAOImpl.viewCandidate(objectId)),
+                    Option(id),
+                    Option(election.name),
+                    Option(election.description)
 
+                )
               )
-            )
-          }
-          case "Cumulative voting" => {
-            Ok(
-                views.html.ballot.scored(
-                  None,
-                  Option(electionDAOImpl.viewCandidate(objectId)),
-                  Option(id),
-                  Option(election.name),
-                  Option(election.description)
+            }
+            case "Cumulative voting" => {
+              Ok(
+                  views.html.ballot.scored(
+                    None,
+                    Option(electionDAOImpl.viewCandidate(objectId)),
+                    Option(id),
+                    Option(election.name),
+                    Option(election.description)
 
+                )
               )
-            )
+            }
+            case _ => {
+              Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
+            }
           }
-          case _ => {
-          Redirect(routes.HomeController.index()).flashing("error" -> Messages("Your link is invalid"))
-          }
-          }
-
         }
         else{
           Redirect(routes.ElectionController.redirectVoter()).flashing("error" -> Messages("Election is not yet started"))
@@ -237,18 +243,24 @@ class ElectionController @Inject()(
   def vote = Action (parse.form(BallotForm.form)) { implicit request =>
     val ballotData = request.body
     val objectId = new ObjectId(ballotData.id)
-    var election = electionDAOImpl.view(objectId).head
-    if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))){
-      val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))
-      if(electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)){
-        if(election.realtimeResult){
-          resultFileDAOImpl.saveResult(electionDAOImpl.getBallots(objectId),election.votingAlgo,election.candidates,election.id)
+    val electionList = electionDAOImpl.view(objectId)
+    if(electionList.size>0){
+      var election = electionList.head
+      if(electionDAOImpl.removeVoter(objectId ,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))){
+        val ballot  =  new Ballot(ballotData.ballotInput,PassCodeGenerator.decrypt(election.inviteCode,ballotData.passCode))
+        if(electionDAOImpl.vote(new ObjectId(ballotData.id), ballot)){
+          if(election.realtimeResult){
+            resultFileDAOImpl.saveResult(electionDAOImpl.getBallots(objectId),election.votingAlgo,election.candidates,election.id)
+          }
         }
+        Redirect(routes.ElectionController.redirectVoter()).flashing("success" -> Messages("thank.voting"))
       }
-      Redirect(routes.ElectionController.redirectVoter()).flashing("success" -> Messages("thank.voting"))
+      else{
+        Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("could.not.verify"))
+      }
     }
     else{
-      Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("could.not.verify"))
+      Redirect(routes.ElectionController.voteGuest(ballotData.id)).flashing("error" -> Messages("invalid.id"))
     }
   }
 
@@ -386,59 +398,74 @@ class ElectionController @Inject()(
 
   def updateElection(id: String) = silhouette.SecuredAction.async { implicit request =>
     val objectId = new ObjectId(id)
-    val election = electionDAOImpl.view(objectId).head
-    if(!election.isStarted && request.identity.email.get == election.creatorEmail ){
-      Future.successful(
-        Ok(views.html.election.editElection(Option(request.identity),election))
-      )
-    }else{
-      Future.successful(
-        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
-      )
+    val electionList = electionDAOImpl.view(objectId)
+    if(electionList.size>0){
+      val election = electionList.head
+      if(!election.isStarted && request.identity.email.get == election.creatorEmail ){
+        Future.successful(
+          Ok(views.html.election.editElection(Option(request.identity),election))
+        )
+      }else{
+        Future.successful(
+          Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+        )
 
+      }
+    }
+    else{
+      Future.successful(
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
+      )
     }
   }
 
   def update = silhouette.SecuredAction.async(parse.form(EditElectionForm.form)) { implicit request =>
     def electionData = request.body
     val objectId = new ObjectId(electionData.id)
-    val oldElection = electionDAOImpl.view(objectId).head
-    val election = new Election(
-        objectId,
-        electionData.name,
-        electionData.description,
-        electionData.creatorName,
-        electionData.creatorEmail,
-        electionData.startingDate,
-        electionData.endingDate,
-        electionData.isRealTime,
-        electionData.votingAlgo,
-        electionData.candidates.split(",").toList,
-        electionData.ballotVisibility,
-        electionData.voterListVisibility,
-        electionData.isInvite,
-        isCompleted = false,
-        isStarted = false,
-        createdTime = oldElection.createdTime,
-        adminLink = oldElection.adminLink,
-        inviteCode = oldElection.inviteCode,
-        ballot = oldElection.ballot,
-        voterList = oldElection.voterList,
-        winners = oldElection.winners,
-        isCounted = false
-      )
-      if(electionDAOImpl.update(election)){
-      Future.successful(
-        Ok(
-          views.html.profile(
-            Option(request.identity),
-            electionDAOImpl.userElectionList(request.identity.email)
+    val electionList = electionDAOImpl.view(objectId)
+    if(electionList.size>0){
+      val oldElection = electionList.head
+      val election = new Election(
+          objectId,
+          electionData.name,
+          electionData.description,
+          electionData.creatorName,
+          electionData.creatorEmail,
+          electionData.startingDate,
+          electionData.endingDate,
+          electionData.isRealTime,
+          electionData.votingAlgo,
+          electionData.candidates.split(",").toList,
+          electionData.ballotVisibility,
+          electionData.voterListVisibility,
+          electionData.isInvite,
+          isCompleted = false,
+          isStarted = false,
+          createdTime = oldElection.createdTime,
+          adminLink = oldElection.adminLink,
+          inviteCode = oldElection.inviteCode,
+          ballot = oldElection.ballot,
+          voterList = oldElection.voterList,
+          winners = oldElection.winners,
+          isCounted = false
+        )
+        if(electionDAOImpl.update(election)){
+        Future.successful(
+          Ok(
+            views.html.profile(
+              Option(request.identity),
+              electionDAOImpl.userElectionList(request.identity.email)
+            )
           )
         )
-      )
+      }else{
+        Future.successful(
+          Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+        )
+      }
     }else{
       Future.successful(
-        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("dont.access"))
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
       )
     }
   }
