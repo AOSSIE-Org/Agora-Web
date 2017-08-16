@@ -96,10 +96,13 @@ object  Countvotes {
       case "Range Voting" | "Schulze" | "SMC"
       | "Warren STV"
       | "Meek STV"
-      | "Oklahoma Method"
       | "Scottish STV" | "Proportional Approval voting"
       | "Ranked Pairs" | "Cumulative voting" => {
         null
+      }
+      case "Oklahoma Method" => {
+        val h = OklahomaMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+        return h
       }
       case "Satisfaction Approval voting" => {
         val h = SatisfactionApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
@@ -164,8 +167,6 @@ object  Countvotes {
       case "Nanson" => {
         val h = NansonMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
         return h
-
-        // println(h(0).getClass.getSimpleName)
       }
       case "Instant Runoff 2-round" => {
         val h = InstantRunoff2Round.winners(Election.weightedElectionToACTElection(election),candidate,1)
