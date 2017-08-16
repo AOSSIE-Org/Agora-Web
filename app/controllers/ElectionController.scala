@@ -8,6 +8,7 @@ import forms._
 import models.Election
 import models.Ballot
 import models.Voter
+import models.Winner
 import models.daos.ElectionDAOImpl
 import models.daos.ResultFileDAOImpl
 import models.services.MailerService
@@ -92,7 +93,7 @@ class ElectionController @Inject()(
         inviteCode = s"${Random.alphanumeric take 10 mkString("")}",
         ballot = List.empty[Ballot],
         voterList = List.empty[Voter],
-        winners = List.empty[String],
+        winners = List.empty[Winner],
         isCounted = false
       )
       electionDAOImpl.save(election)

@@ -3,11 +3,14 @@ package models.daos
 import com.mongodb.casbah.Imports.{ DBObject, _ }
 import com.mongodb.casbah.commons.conversions.scala.RegisterConversionHelpers
 import com.novus.salat._
-import models.{ Election, MongoDBConnection , Ballot , Voter}
+import models.{ Election, MongoDBConnection , Ballot , Voter , Winner}
 import org.bson.types.ObjectId
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
+
+
+
 
 class ElectionDAOImpl() extends ElectionDAO {
 
@@ -128,7 +131,7 @@ class ElectionDAOImpl() extends ElectionDAO {
       if (filteredElections.nonEmpty) {
         filteredElections.head.inviteCode
       } else {
-        null // FIXME: replace null with None
+        null
       }
   }
 
@@ -139,7 +142,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     if (filteredElections.nonEmpty) {
       Option(filteredElections.head.creatorEmail)
     } else {
-      None // FIXME: replace null with None
+      None
     }
   }
 
@@ -186,7 +189,7 @@ class ElectionDAOImpl() extends ElectionDAO {
         val o: DBObject       = MongoDBObject("isStarted" -> false)
         val u                 = collectionRef.find(o)
         val list              = u.toList
-      list.map(doc => grater[Election].asObject(doc))
+        list.map(doc => grater[Election].asObject(doc))
     }
 
     //get all the completed and uncount elections
@@ -253,4 +256,23 @@ class ElectionDAOImpl() extends ElectionDAO {
         false
       }
     }
+    def getWinners(id : ObjectId) : List[Winner] = {
+      val o: DBObject       = MongoDBObject("id" -> id)
+      val list              = collectionRef.findOne(o).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      if (filteredElections.nonEmpty) {
+        filteredElections.head.winners
+      } else {
+         List.empty[Winner]
+      }
+    }
+
+    def updateWinner(result : List[Winner], id : ObjectId) = {
+      val o: DBObject       = MongoDBObject("id" -> id)
+      val list              = collectionRef.findOne(o).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      val update = $set("winners" -> result.map(doc => grater[Winner].asDBObject(doc)))
+      collectionRef.update( o, update )
+    }
+
 }
