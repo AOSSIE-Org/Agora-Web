@@ -72,8 +72,15 @@ class ElectionDAOImpl() extends ElectionDAO {
     val c = ballotList.toList ::: getBallots(id)
     val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
     val update = $set("ballot" -> bsonBallot )
-    collectionRef.update( o, update )
-    true
+    try{
+      val updateResult =collectionRef.update( o, update ,false,false,WriteConcern.Safe)
+      true
+    }
+    catch {
+      case e: Exception => {
+        false
+      }
+    }
   }
 
   def getBallots(id: ObjectId): List[Ballot] = {
@@ -201,23 +208,18 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
     //Update finished election
-    def updateCompleteElection(id : ObjectId) : Boolean = {
+    def updateCompleteElection(id : ObjectId) = {
       val o: DBObject = MongoDBObject("id" -> id)
       val update = $set("isCompleted" -> true )
       val updateResult = collectionRef.update( o, update )
-      println(updateResult)
-      true
     }
 
     //Update finished election
-    def updateActiveElection(id : ObjectId) : Boolean = {
+    def updateActiveElection(id : ObjectId) = {
       val o: DBObject = MongoDBObject("id" -> id)
       val update = $set("isStarted" -> true )
       val updateResult = collectionRef.update( o, update )
-      true
     }
-
-
 
     //get the all unfinished elections
     def getActiveElection() : List[models.Election] = {
@@ -244,6 +246,7 @@ class ElectionDAOImpl() extends ElectionDAO {
         None
       }
     }
+
     def update(election : Election) : Boolean = {
       val bsonElection = grater[Election].asDBObject(election)
       val query = MongoDBObject("id" -> election.id)
@@ -257,6 +260,7 @@ class ElectionDAOImpl() extends ElectionDAO {
         false
       }
     }
+
     def getWinners(id : ObjectId) : List[Winner] = {
       val o: DBObject       = MongoDBObject("id" -> id)
       val list              = collectionRef.findOne(o).toList
@@ -270,7 +274,6 @@ class ElectionDAOImpl() extends ElectionDAO {
 
     def updateWinner(result : List[Winner], id : ObjectId) = {
       val o: DBObject       = MongoDBObject("id" -> id)
-      println(result)
       val list              = collectionRef.findOne(o).toList
       val filteredElections = list.map(doc => grater[Election].asObject(doc))
       val update = $set("winners" -> result.map(doc => grater[Winner].asDBObject(doc)))
