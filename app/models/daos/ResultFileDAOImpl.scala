@@ -18,14 +18,19 @@ import scala.collection.mutable.ListBuffer
 class ResultFileDAOImpl() {
     val electionDAOImpl = new ElectionDAOImpl()
     val gridfs = GridFS(MongoDBConnection.getResultConnection)
+
     def saveResult(ballots : List[Ballot], algorithm : String, candidates: List[String], objectId : ObjectId) = {
       val result = Countvotes.countvotesMethod(ballots,algorithm,candidates,objectId)
-      println(result)
-      var winnerList = new ListBuffer[Winner]();
-      for ((candidate, rational ) <- result){
-          winnerList += new Winner( candidate,new Score(rational.numerator.intValue , rational.denominator.intValue ))
+      if(result.size!=0){
+        var winnerList = new ListBuffer[Winner]();
+        for ((candidate, rational ) <- result){
+            winnerList += new Winner( candidate,new Score(rational.numerator.intValue , rational.denominator.intValue ))
+        }
+        electionDAOImpl.updateWinner(winnerList.toList, objectId);
       }
-      electionDAOImpl.updateWinner(winnerList.toList, objectId);
+      else{
+        electionDAOImpl.updateIsCounted(objectId)
+      }
     }
 
     def getResult(id : String ) : File = {

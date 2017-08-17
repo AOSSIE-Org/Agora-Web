@@ -30,15 +30,14 @@ object  Countvotes {
       candidatesList.toList
   }
 
-  def parseCandidatesWithIndifference(ballot : String) : List[(Candidate,Int,Int)]= {
+  def parseCandidatesWithIndifference(ballot : String) : List[(Candidate,Int)]= {
     var rank = 1
-    var score = 0
     var ballotVar = ballot
-    var candidatesList = ListBuffer[(Candidate,Int,Int)]()
+    var candidatesList = ListBuffer[(Candidate,Int)]()
     val list = ballot.split("\\=|>")
     for(candidate <- list){
       ballotVar = ballotVar.replaceFirst(candidate, "")
-      val cand = (new Candidate(candidate),rank,score)
+      val cand = (new Candidate(candidate),rank)
       candidatesList += cand
       if(ballotVar.size>0){
         if(ballotVar.charAt(0)=='>'){
@@ -79,110 +78,115 @@ object  Countvotes {
 
 
   def countvotesMethod( ballots : List[Ballot], algorithm : String, candidates: List[String], id : ObjectId) : List[(Candidate, Rational)] = {
-    val election = getWeightedBallots(ballots)
-    val candidate = parseCandidates(candidates)
-    /**
-    Algorithms which are not menitioned in the doc
-      EVACS
-      EVACSnoLP
-      EVACSDWD
-      Senate
-      Simple
-      Egalitarian
-      HybridPluralityPreferentialBlockVoting
-    **/
+    if(ballots.size!=0){
+      val election = getWeightedBallots(ballots)
+      val candidate = parseCandidates(candidates)
+      /**
+      Algorithms which are not menitioned in the doc
+        EVACS
+        EVACSnoLP
+        EVACSDWD
+        Senate
+        Simple
+        Egalitarian
+        HybridPluralityPreferentialBlockVoting
+      **/
 
-    algorithm match {
-      case "Range Voting" | "Schulze" | "SMC"
-      | "Warren STV"
-      | "Meek STV"
-      | "Scottish STV" | "Proportional Approval voting"
-      | "Ranked Pairs" | "Cumulative voting" => {
-        null
+      algorithm match {
+        case "Range Voting" | "Schulze" | "SMC"
+        | "Warren STV"
+        | "Meek STV"
+        | "Scottish STV" | "Proportional Approval voting"
+        | "Ranked Pairs" | "Cumulative voting" => {
+          List.empty[(Candidate, Rational)]
+        }
+        case "Oklahoma Method" => {
+          val h = OklahomaMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Satisfaction Approval voting" => {
+          val h = SatisfactionApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Sequential Proportional Approval voting" => {
+          val h = SequentialProportionalApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Top Cycle" => {
+          val h = SmithSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Approval" => {
+          val h = ApprovalRule.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Exhaustive ballot" => {
+          val h = InstantExhaustiveBallot.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Baldwin" => {
+          val h = BaldwinMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Preferential block voting" => {
+          val h = PreferentialBlockVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Exhaustive ballot with dropoff" => {
+          val h = InstantExhaustiveDropOffRule.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Uncovered Set" => {
+          val h = UncoveredSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Copeland" => {
+          val h = CopelandMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Minimax Condorcet" => {
+          val h = MinimaxCondorcetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Random Ballot" => {
+          val h = RandomBallotMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Majority" => {
+          val h = MajorityRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Borda" => {
+          val h = BordaRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Kemeny-Young" => {
+          val h = KemenyYoungMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Nanson" => {
+          val h = NansonMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Instant Runoff 2-round" => {
+          val h = InstantRunoff2Round.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Contingent Method" => {
+          val h = ContingentMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case "Coomb’s" => {
+          val h = CoombRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          return h
+        }
+        case _ => {
+          List.empty[(Candidate, Rational)]
+        }
       }
-      case "Oklahoma Method" => {
-        val h = OklahomaMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Satisfaction Approval voting" => {
-        val h = SatisfactionApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Sequential Proportional Approval voting" => {
-        val h = SequentialProportionalApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Top Cycle" => {
-        val h = SmithSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Approval" => {
-        val h = ApprovalRule.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Exhaustive ballot" => {
-        val h = InstantExhaustiveBallot.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Baldwin" => {
-        val h = BaldwinMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Preferential block voting" => {
-        val h = PreferentialBlockVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Exhaustive ballot with dropoff" => {
-        val h = InstantExhaustiveDropOffRule.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Uncovered Set" => {
-        val h = UncoveredSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Copeland" => {
-        val h = CopelandMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Minimax Condorcet" => {
-        val h = MinimaxCondorcetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Random Ballot" => {
-        val h = RandomBallotMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Majority" => {
-        val h = MajorityRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Borda" => {
-        val h = BordaRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Kemeny-Young" => {
-        val h = KemenyYoungMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Nanson" => {
-        val h = NansonMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Instant Runoff 2-round" => {
-        val h = InstantRunoff2Round.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Contingent Method" => {
-        val h = ContingentMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case "Coomb’s" => {
-        val h = CoombRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        return h
-      }
-      case _ => {
-        null
-      }
+    }
+    else{
+      List.empty[(Candidate, Rational)]
     }
   }
 }
