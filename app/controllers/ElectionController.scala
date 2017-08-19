@@ -133,18 +133,18 @@ class ElectionController @Inject()(
       case Some(authToken) => userService.retrieve(authToken.userID).flatMap {
         case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
           userService.save(user).map { _ =>
-            Redirect(routes.SignInController.submit(user.email.get,id)).flashing("success" -> Messages("account.activated"))
+            Redirect(routes.SignInController.submit(user.email.get,id))
           }
-        case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
+        case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.link")))
       }
-      case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
+      case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.link")))
     }
   }
 
   def send(email: String , id : String) = silhouette.UnsecuredAction.async { implicit request =>
     val decodedEmail = URLDecoder.decode(email, "UTF-8")
     val loginInfo = LoginInfo(CredentialsProvider.ID, decodedEmail)
-    val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("activation.email.sent", decodedEmail))
+    val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("Check your mail"))
     userService.retrieve(loginInfo).flatMap {
       case Some(user) =>
         authTokenService.create(user.userID).map { authToken =>
@@ -153,7 +153,6 @@ class ElectionController @Inject()(
           result
         }
       case None =>
-
         val user = User(
               userID = UUID.randomUUID(),
               loginInfo = loginInfo,
