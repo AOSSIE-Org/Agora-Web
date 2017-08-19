@@ -28,8 +28,7 @@ class MailerService @Inject() (mailerClient: MailerClient , val messagesApi: Mes
       subject = "Adminlink",
       from = "AGORA <aossie@gmail.com>",
       to = Seq(decodedEmail),
-      // bodyText = Some(views.txt.emails.activateAccount(user, url).body),
-      bodyHtml = Some(s"<html><body><p>Hello user,</p><p>@Html(Please follow <a href=$url>this link</a> to confirm and activate your new account.)</p></body></html>")
+      bodyHtml = Some(s"<html><body><p>Hello user,</p><p>Please follow <a href=$url>this link</a> to confirm and activate your new account.</p></body></html>")
     )
     mailerClient.send(email)
 
