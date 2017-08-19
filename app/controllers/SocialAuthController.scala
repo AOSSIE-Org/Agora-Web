@@ -37,6 +37,7 @@ class SocialAuthController @Inject()(
         p.authenticate().flatMap {
           case Left(result) => Future.successful(result)
           case Right(authInfo) =>
+            println(authInfo)
             for {
               profile       <- p.retrieveProfile(authInfo)
               user          <- userService.save(profile)

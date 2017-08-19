@@ -16,7 +16,7 @@ object Scheduler {
 
   def UpdateTableDaily() {
     val job = newJob(classOf[UpdateTable]).build()
-    val trigger = newTrigger().withSchedule(cronSchedule("0/20 * * * * ?")).build()
+    val trigger = newTrigger().withSchedule(cronSchedule("0 0 12 * * ?")).build()
     scheduler.scheduleJob(job, trigger)
   }
 

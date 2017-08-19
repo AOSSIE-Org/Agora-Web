@@ -21,12 +21,19 @@ GET         /vote/                            controllers.ElectionController.red
 GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
 GET         /user/createElection              controllers.ElectionController.createUserView
 GET         /guest/createElection             controllers.ElectionController.createGuestView
-POST        /createElection                   controllers.ElectionController.create
 
+
+POST        /createElection                   controllers.ElectionController.create
+POST        /guest/createElection             controllers.ElectionController.createGuest
 POST        /upload/                          controllers.ElectionController.upload()
 POST        /update/                          controllers.ElectionController.update()
 POST        /guest/vote                       controllers.ElectionController.vote()
 POST        /user/election/invite/            controllers.ElectionController.addVoter()
+GET         /signIn/:email/:id                controllers.SignInController.submit(email,id)
+
+
+GET         /account/email/:email/:id         controllers.ElectionController.send(email: String,id)
+GET         /account/activate/:token/:id      controllers.ElectionController.activate(token: java.util.UUID,id)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)
