@@ -32,7 +32,7 @@
 
 
     <body>
-      @if(title!="Vote" && title!="Ballot"){
+      @if(title!="Vote" && title!="Ballot" ){
       <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -56,17 +56,24 @@
             @user.map { u =>
 
         @if(u != null) {
+
             <ul class="nav navbar-nav">
                 <li><a href="/user/createElection">Add Election</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                              @if(u.firstName!=None){
                                     <span class="user-avatar pull-left" style="margin-right:8px; margin-top:-5px;">
                                         <img src="@u.avatarURL" class="img-responsive img-circle" title=@u.firstName width="30px" height="30px">
                                     </span>
                                     <span class="user-name">
                                         @u.fullName
                                     </span>
+                                  }else{
+                                    <span class="user-name">
+                                        User menu
+                                    </span>
+                                  }
                                     <b class="caret"></b></a>
                                     <ul class="dropdown-menu">
                                             <div class="navbar-content">
@@ -80,7 +87,7 @@
 
 
 
-    </ul>
+            </ul>
     } else{
         <ul class="nav navbar-nav">
             <li><a href="/guest/createElection">Add Election</a></li>
