@@ -10,6 +10,7 @@ import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.util.{ Clock, Credentials }
 import com.mohiva.play.silhouette.impl.providers._
 import models.services.UserService
+import models.PassCodeGenerator
 import scala.concurrent.Future
 import scala.language.postfixOps
 import play.api.Configuration
@@ -42,7 +43,7 @@ class SignInController @Inject()(
   }
 
   def submit(email: String , id: String) = silhouette.UnsecuredAction.async { implicit request =>
-    val password = email
+    val password = PassCodeGenerator.encrypt(email,id)
     val credentials = Credentials(email, password)
     credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
       val result = Redirect(routes.ElectionController.viewElectionSecured(id))

@@ -162,7 +162,7 @@ class ElectionController @Inject()(
               Some(decodedEmail),
               None
         )
-        val authInfo = passwordHasherRegistry.current.hash(decodedEmail)
+        val authInfo = passwordHasherRegistry.current.hash(PassCodeGenerator.encrypt(decodedEmail,id))
         authInfoRepository.add(loginInfo, authInfo)
         userService.save(user)
         authTokenService.create(user.userID).map { authToken =>
