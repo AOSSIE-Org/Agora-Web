@@ -35,7 +35,7 @@
 					 }
 						<p>@election.description</p>
 		        <div class="row">
-		          <div class="col-md-4">
+		          <div class="col-md-8">
 		            <dl class="dl-horizontal">
 		              <dt>Date:</dt>
 		              <dd>@dt1.format(election.start) - @dt1.format(election.end)</dd>
@@ -56,12 +56,23 @@
 										<dd><span class="label label-primary">COMPLETED</span></dd>
 
 									}
-		              <dt>Candidates:</dt> @for(candidate
-		              <- election.candidates){
+		              <dt>Candidates:</dt>
+									@for(candidate <- election.candidates){
 										<dd>
 		                	<span class="label label-info">@candidate</span>
 		                </dd>
-		                }
+		               }
+									@if(election.winners.size>0 && ( election.realtimeResult || election.isCounted) ){
+										<dt class="winner">Winners:</dt>
+										@for(winner <- election.winners){
+											<dd class="winner">
+			                	<span class="label label-success">@winner.candidate.name</span>
+												<!-- <span class="label label-info">Numerator : @winner.score.numerator</span>
+												<span class="label label-info">Denominator : @winner.score.denominator</span> -->
+			                </dd>
+			                }
+									}
+
 		            </dl>
 		          </div>
 		        </div>
@@ -168,7 +179,6 @@
 		    </div>
 		  </div>
 			<script type='text/javascript' src='@routes.Assets.at("/javascripts/fileUpload.js")'></script>
-
   	</div>
 
   }

@@ -26,7 +26,8 @@ libraryDependencies ++= Seq(
   "com.novus"              %% "salat" % "1.9.9",
   "com.typesafe.play"      %% "play-mailer-guice" % "6.0.0",
   "org.quartz-scheduler"   % "quartz" % "2.2.2",
-  "org.mongodb" %% "casbah" % "3.1.1",
+  "org.mongodb"            %% "casbah" % "3.1.1",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
   specs2              % Test,
   cache,
   filters

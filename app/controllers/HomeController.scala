@@ -11,6 +11,7 @@ import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import models.daos.ElectionDAOImpl
 import models.daos.ResultFileDAOImpl
+import models.services.Countvotes
 
 import play.api.libs.mailer.{ Email, MailerClient }
 import models.services.Countvotes
