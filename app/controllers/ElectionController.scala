@@ -570,4 +570,26 @@ class ElectionController @Inject()(
       )
     }
   }
+
+
+  def deleteElection() = silhouette.SecuredAction.async(parse.form(DeleteForm.form)) { implicit request =>
+    def electionData = request.body
+    val objectId = new ObjectId(electionData.id)
+    val result = electionDAOImpl.delete(objectId)
+    if(result!=None){
+      Future.successful(
+        Ok(
+          views.html.profile(
+            Option(request.identity),
+            electionDAOImpl.userElectionList(request.identity.email)
+          )
+        )
+      )
+    }
+    else{
+      Future.successful(
+        Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
+      )
+    }
+  }
 }

@@ -10,8 +10,16 @@
 }
 
 .input-number{
-    width: 92%;
     display: inline-block;
+}
+
+.span-input{
+  float: right;
+  margin-top: 25px;
+}
+
+.input-number-div{
+    overflow: hidden;
 }
 
 .vote {
