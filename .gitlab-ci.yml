@@ -25,4 +25,4 @@ deploy:
     - apt-get install rubygems ruby-dev -y
     - gem install dpl
     # Deploy to Heroku
-    - dpl --provider=heroku --app=fathomless-taiga-85734 --api-key=$HEROKU_API_KEY
+    - dpl --provider=heroku --app=agora-web-aossie --api-key=$HEROKU_API_KEY
