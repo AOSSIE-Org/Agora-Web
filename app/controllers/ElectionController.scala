@@ -88,8 +88,9 @@ class ElectionController @Inject()(
   def create = silhouette.SecuredAction.async(parse.form(ElectionForm.form)) { implicit request =>
     def electionData = request.body
     if(electionDAOImpl.userElectionListCount(Option(electionData.creatorEmail))<3){
+      val objectId = new ObjectId()
       val election = new Election(
-        new ObjectId,
+        objectId,
         electionData.name,
         electionData.description,
         electionData.creatorName,
@@ -116,10 +117,7 @@ class ElectionController @Inject()(
       electionDAOImpl.save(election)
       Future.successful(
         Ok(
-          views.html.profile(
-            Option(request.identity),
-            electionDAOImpl.userElectionList(request.identity.email)
-          )
+          views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
         )
       )
     }else{
@@ -202,7 +200,7 @@ class ElectionController @Inject()(
         winners = List.empty[Winner],
         isCounted = false,
         noVacancies = electionData.noVacancies
-        
+
       )
       electionDAOImpl.save(election)
 
@@ -558,10 +556,7 @@ class ElectionController @Inject()(
         if(electionDAOImpl.update(election)){
         Future.successful(
           Ok(
-            views.html.profile(
-              Option(request.identity),
-              electionDAOImpl.userElectionList(request.identity.email)
-            )
+            views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
           )
         )
       }else{
