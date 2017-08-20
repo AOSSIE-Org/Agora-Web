@@ -373,18 +373,27 @@ class ElectionController @Inject()(
     val voter = new Voter(voterData.email.split(",")(0),voterData.email.split(",")(1))
     val objectId = new ObjectId(voterData.id)
     val con = electionDAOImpl.addVoter(objectId , voter)
-    if(con){
-      mailerService.sendPassCodeEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),voterData.id)
+    val electionList = electionDAOImpl.view(objectId)
+    if(electionList.size>0){
+      if(con){
+        val link = routes.ElectionController.voteGuest(voterData.id).absoluteURL()
+        mailerService.sendPassCodeEmail(voter.email,voter.name,electionList.head.creatorName,electionList.head.creatorEmail,electionList.head.name,link,electionList.head.description, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),voterData.id)
+        Future.successful(
+          Ok
+            (
+              views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
+            )
+        )
+      }
+      else{
       Future.successful(
-        Ok
-          (
-            views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
-          )
+        Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("error.voter"))
       )
     }
-    else{
+  }
+  else{
     Future.successful(
-      Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("error.voter"))
+      Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
     )
     }
   }
@@ -422,12 +431,15 @@ class ElectionController @Inject()(
       }
   }
 
-  def addVoter( email : String , id : String) : Boolean = {
+  def addVoter( email : String , id : String , link: String) : Boolean = {
     val objectId = new ObjectId(id)
     val voter = new Voter(email.split(",")(0),email.split(",")(1))
     val con = electionDAOImpl.addVoter(objectId ,voter)
-    if(con){
-      mailerService.sendPassCodeEmail(voter.email, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),id)
+    val electionList = electionDAOImpl.view(objectId)
+    if(electionList.size>0){
+      if(con){
+        mailerService.sendPassCodeEmail(voter.email,voter.name,electionList.head.creatorName,electionList.head.creatorEmail,electionList.head.name,link,electionList.head.description, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),id)
+      }
     }
     con
   }
@@ -453,8 +465,9 @@ class ElectionController @Inject()(
         val inStream = new FileInputStream(file)
         val reader = new BufferedReader(new InputStreamReader(inStream));
         var  line : String = reader.readLine();
+        val link = routes.ElectionController.voteGuest(id).absoluteURL()
         while(line != null && line != ""){
-              addVoter(line,id)
+              addVoter(line,id,link)
               line = reader.readLine();
         }
         val data = operateOnTempFile(file)
