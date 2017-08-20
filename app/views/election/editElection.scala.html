@@ -97,18 +97,26 @@
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Voting Algorithm</label>
-              <select value='@election.votingAlgo' class="selectpicker form-control" name="votingAlgo">
-                @for(value <- algo){
-                  <option value='@value'>@value</option>
+              <select class="selectpicker form-control" name="votingAlgo">
+                @for(algoValue <- algo){
+                  @if(algoValue == election.votingAlgo){
+                    <option value='@algoValue' selected>@algoValue</option>
+                  }else{
+                    <option value='@algoValue' >@algoValue</option>
+                  }
                 }
               </select>
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Realtime Result</label>
-              <select value='@election.realtimeResult' class="selectpicker form-control" name="realtimeResult">
-                @for(value <- booleanResult){
-                  <option value='@value'>@value</option>
-              }
+              <select  class="selectpicker form-control" name="realtimeResult">
+                @for(booleanValue <- booleanResult){
+                  @if(booleanValue == election.realtimeResult.toString){
+                    <option value='@booleanValue' selected>@booleanValue</option>
+                  }else{
+                    <option value='@booleanValue' >@booleanValue</option>
+                  }
+                }
               </select>
             </div>
             <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
@@ -120,17 +128,25 @@
           <div class="col-md-12">
             <div class="form-group">
               <label for="exampleInputEmail1">Ballot visibility</label>
-              <select value='@election.ballotVisibility' class="selectpicker form-control" name="ballotVisibility">
-                @for(value <- ballotVisibility){
-                  <option value=@value>@value</option>
-              }
+              <select  class="selectpicker form-control" name="ballotVisibility">
+                @for(visibilityLevel <- ballotVisibility){
+                  @if(visibilityLevel == election.ballotVisibility){
+                    <option value='@visibilityLevel' selected>@visibilityLevel</option>
+                  }else{
+                    <option value='@visibilityLevel' >@visibilityLevel</option>
+                  }
+                }
               </select>
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Invite Voters</label>
               <select value='@election.isInvite' class="selectpicker form-control" name="isInvite">
-                @for(value <- booleanResult){
-                  <option value='@value'>@value</option>
+                @for(booleanValue <- booleanResult){
+                  @if(booleanValue == election.isInvite.toString){
+                    <option value='@booleanValue' selected>@booleanValue</option>
+                  }else{
+                    <option value='@booleanValue' >@booleanValue</option>
+                  }
                 }
               </select>
             </div>
@@ -138,8 +154,13 @@
               <label for="exampleInputEmail1">Voter list visibility</label>
               <select value='@election.voterListVisibility' class="selectpicker form-control" name="voterListVisibility">
                 @for(value <- voterVisibility.keySet){
-                  <option value=@voterVisibility(value)>@value</option>
-                }
+                  @if(voterVisibility(value) == election.voterListVisibility.toString){
+                    <option value=@voterVisibility(value) selected>@value</option>
+                  }else{
+                      <option value='@voterVisibility(value)' >@value</option>
+                    }
+                  }
+
               </select>
             </div>
             @if(user != None) {
