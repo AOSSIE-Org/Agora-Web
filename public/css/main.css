@@ -9,6 +9,11 @@
   /*background-color: #ffff33;*/
 }
 
+.input-number{
+    width: 92%;
+    display: inline-block;
+}
+
 .vote {
   margin-top: 4px;
   margin-bottom: 4px;

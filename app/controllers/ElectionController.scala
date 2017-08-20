@@ -110,7 +110,8 @@ class ElectionController @Inject()(
         ballot = List.empty[Ballot],
         voterList = List.empty[Voter],
         winners = List.empty[Winner],
-        isCounted = false
+        isCounted = false,
+        noVacancies = electionData.noVacancies
       )
       electionDAOImpl.save(election)
       Future.successful(
@@ -199,7 +200,9 @@ class ElectionController @Inject()(
         ballot = List.empty[Ballot],
         voterList = List.empty[Voter],
         winners = List.empty[Winner],
-        isCounted = false
+        isCounted = false,
+        noVacancies = electionData.noVacancies
+        
       )
       electionDAOImpl.save(election)
 
@@ -549,7 +552,8 @@ class ElectionController @Inject()(
           ballot = oldElection.ballot,
           voterList = oldElection.voterList,
           winners = oldElection.winners,
-          isCounted = false
+          isCounted = false,
+          noVacancies = electionData.noVacancies
         )
         if(electionDAOImpl.update(election)){
         Future.successful(

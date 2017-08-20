@@ -95,6 +95,23 @@
               <input type="text" value=@str class="form-control taginput" name="candidates" data-role="tagsinput" required />
             </div>
             <div class="form-group">
+              <label for="exampleInputEmail1">Number of vacancies</label>
+                <div>
+                    <input type="text" name="noVacancies" class="form-control input-number" value=@election.noVacancies min="1" max="10">
+                      <span class="span-input">
+                        <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
+                          <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                      </span>
+                      <span class="span-input">
+                        <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
+                          <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+                      </span>
+                    </input>
+                </div>
+              </div>
+            <div class="form-group">
               <label for="exampleInputEmail1">Voting Algorithm</label>
               <select class="selectpicker form-control" name="votingAlgo">
                 @for(algoValue <- algo){
@@ -178,5 +195,6 @@
 <br>
 <br>
 <script type='text/javascript' src='@routes.Assets.at("/javascripts/editElection.js")'> </script>
+<script type='text/javascript' src='@routes.Assets.at("/javascripts/addEdit.js")'> </script>
 </div>
 }
