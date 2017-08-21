@@ -478,3 +478,86 @@ lable {
 #sortable{
   min-height: 18em;
 }
+
+
+.algoRadio-group {
+	margin: 15px 0;
+}
+
+/*.algoRadio ~ .algoRadio {
+	margin-top: 15px;
+}*/
+
+.algoRadio input[type="radio"]:empty {
+	display: none;
+}
+
+.algoRadio input[type="radio"] ~ label:before {
+	font-family: FontAwesome;
+	content: '\f096';
+	position: absolute;
+	top: 50%;
+	margin-top: -11px;
+	left: 15px;
+	font-size: 16px;
+}
+
+.algoRadio input[type="radio"]:checked ~ label:before{
+	content: '\f046';
+}
+
+.algoRadio input[type="radio"] ~ label {
+	position: relative;
+	cursor: pointer;
+	width: 100%;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #f2f2f2;
+}
+
+.algoRadio input[type="radio"] ~ label:focus,
+.algoRadio input[type="radio"] ~ label:hover {
+	box-shadow: 0px 0px 3px #333;
+}
+
+.algoRadio input[type="radio"]:checked ~ label {
+	color: #fafafa;
+}
+
+.algoRadio input[type="radio"]:checked ~ label {
+	background-color: #f2f2f2;
+}
+
+.algoRadio.algoRadio-default input[type="radio"]:checked ~ label {
+	color: #333;
+}
+.algoRadio.algoRadio-success input[type="radio"]:checked ~ label {
+	background-color: #5cb85c;
+}
+
+.algoRadio input[type="radio"]:empty ~ label span {
+	display: inline-block;
+}
+
+.algoRadio input[type="radio"]:empty ~ label span.algoRadio-title {
+	font-size: 14px;
+	font-weight: 700;
+	margin: 5px 5px 5px 50px;
+  min-width: 40%;
+}
+
+.algoRadio input[type="radio"]:empty ~ label span.algoRadio-description {
+	font-weight: normal;
+	font-style: italic;
+	color: #999;
+	margin: 5px 5px 5px 50px;
+  min-width: 40%;
+}
+
+.algoRadio input[type="radio"]:empty:checked ~ label span.algoRadio-description {
+	color: #fafafa;
+}
+
+.algoRadio.algoRadio-default input[type="radio"]:empty:checked ~ label span.algoRadio-description {
+	color: #999;
+}

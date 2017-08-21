@@ -18,6 +18,29 @@
 
 @ballotVisibility = @{List("Public","Visible","Hidden")}
 
+
+@wikiPages = @{ Map("Borda" -> "https://en.wikipedia.org/wiki/Borda_count", "Contingent Method" -> "https://en.wikipedia.org/wiki/Contingent_election",
+                    "Coomb’s" -> "https://en.wikipedia.org/wiki/Coombs%27_method", "Copeland" -> "https://en.wikipedia.org/wiki/Copeland",
+                    "Cumulative voting" -> "https://en.wikipedia.org/wiki/Cumulative_voting", "Exhaustive ballot" -> "https://en.wikipedia.org/wiki/Exhaustive_ballot",
+                    "Exhaustive ballot with dropoff" -> "https://en.wikipedia.org/wiki/Exhaustive_ballot","Kemeny-Young" -> "https://en.wikipedia.org/wiki/Kemeny%E2%80%93Young_method",
+                    "Meek STV" -> "https://en.wikipedia.org/wiki/Counting_single_transferable_votes#Meek", "Minimax Condorcet" -> "https://en.wikipedia.org/wiki/Minimax_Condorcet",
+                    "Oklahoma Method" -> "https://en.wikipedia.org/wiki/Oklahoma_primary_electoral_system","Preferential block voting" -> "https://en.wikipedia.org/wiki/Preferential_block_voting",
+                    "Proportional Approval voting" -> "https://en.wikipedia.org/wiki/Proportional_approval_voting", "Random Ballot" -> "https://en.wikipedia.org/wiki/Random_ballot",
+                    "Range Voting" -> "https://en.wikipedia.org/wiki/Range_voting", "Ranked Pairs" -> "https://en.wikipedia.org/wiki/Ranked_pairs",
+                    "Satisfaction Approval voting" -> "https://en.wikipedia.org/wiki/Satisfaction_approval_voting", "Schulze" -> "https://en.wikipedia.org/wiki/Schulze_method",
+                    "Sequential Proportional Approval voting" -> "https://en.wikipedia.org/wiki/Sequential_proportional_approval_voting",
+                    "Top Cycle" -> "https://en.wikipedia.org/wiki/Smith_set", "Uncovered Set" -> "https://en.wikipedia.org/wiki/Landau_set",
+                    "Warren STV" -> "https://en.wikipedia.org/wiki/Counting_single_transferable_votes#Warren",
+                    "Approval" -> "#",
+                    "Baldwin" -> "#",
+                    "Egalitarian" -> "#",
+                    "Instant Runoff 2-round" -> "#",
+                    "Majority" -> "#",
+                    "Nanson" -> "#",
+                    "Scottish STV" -> "#",
+                    "SMC" -> "#"
+                    )}
+
 @main(Messages("home.title"), user) {
   <div class="container">
     <div class="container centered">
@@ -41,10 +64,12 @@
               <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled>3</a>
               <p>Privacy</p>
             </div>
-            <div class="stepwizard-step">
-              <a href="#step-4" type="button" class="btn btn-default btn-circle" disabled>4</a>
-              <p>Creator details</p>
-            </div>
+            @if(user==None){
+              <div class="stepwizard-step">
+                <a href="#step-4" type="button" class="btn btn-default btn-circle" disabled>4</a>
+                <p>Creator details</p>
+              </div>
+            }
           </div>
         </div>
         @if(user==None){
@@ -97,19 +122,26 @@
                 </div>
               <div class="form-group">
                 <label for="exampleInputEmail1">Voting Algorithm</label>
-                <select class="selectpicker form-control" name="votingAlgo">
                   @for(value <- algo){
-                    <option value='@value'>@value</option>
+                    <div class="algoRadio algoRadio-success">
+    						      <input type="radio" id="@value" name="votingAlgo" value=@value>
+    						      <label for="@value">
+    							      <span class="algoRadio-title">@value</span>
+    							      <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"> If you want to know more about this algorithm click this.</a></span>
+    						      </label>
+    					      </div>
                   }
-                </select>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1">Realtime Result</label>
-                <select class="selectpicker form-control" name="realtimeResult">
                   @for(value <- booleanResult){
-                    <option value='@value'>@value</option>
+                    <div class="algoRadio algoRadio-success">
+    						      <input type="radio" id="realtimeResult@value" name="realtimeResult" value=@value>
+    						      <label for="realtimeResult@value">
+    							      <span class="algoRadio-title">@value</span>
+    						      </label>
+    					      </div>
                   }
-                </select>
               </div>
               <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
             </div>
@@ -120,27 +152,36 @@
             <div class="col-md-12">
               <div class="form-group">
                 <label for="exampleInputEmail1">Ballot visibility</label>
-                <select class="selectpicker form-control" name="ballotVisibility">
                   @for(value <- ballotVisibility){
-                    <option value=@value>@value</option>
+                    <div class="algoRadio algoRadio-success">
+    						      <input type="radio" id="ballotVisibility@value" name="ballotVisibility" value=@value>
+    						      <label for="ballotVisibility@value">
+    							      <span class="algoRadio-title">@value</span>
+    						      </label>
+    					      </div>
                   }
-                </select>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1">Invite Voters</label>
-                <select class="selectpicker form-control" name="isInvite">
                   @for(value <- booleanResult){
-                    <option value='@value'>@value</option>
+                    <div class="algoRadio algoRadio-success">
+    						      <input type="radio" id="isInvite@value" name="isInvite" value=@value>
+    						      <label for="isInvite@value">
+    							      <span class="algoRadio-title">@value</span>
+    						      </label>
+    					      </div>
                   }
-                </select>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1">Voter list visibility</label>
-                <select class="selectpicker form-control" name="voterListVisibility">
                   @for(value <- voterVisibility.keySet){
-                    <option value=@voterVisibility(value)>@value</option>
+                    <div class="algoRadio algoRadio-success">
+    						      <input type="radio" id="voterListVisibility@value" name="voterListVisibility" value=@voterVisibility(value)>
+    						      <label for="voterListVisibility@value">
+    							      <span class="algoRadio-title">@value</span>
+    						      </label>
+    					      </div>
                   }
-                </select>
               </div>
               <button class="btn btn-primary nextBtn btn-lg pull-right" type="button">Next</button>
             </div>
@@ -213,19 +254,26 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Algorithm</label>
-                  <select class="selectpicker form-control" name="votingAlgo">
-                    @for(value <- algo){
-                      <option value='@value'>@value</option>
-                    }
-                  </select>
+                  @for(value <- algo){
+                    <div class="algoRadio algoRadio-success">
+    						      <input type="radio" id="@value" name="votingAlgo" value=@value>
+    						      <label for="@value">
+    							      <span class="algoRadio-title">@value</span>
+    							      <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"> If you want to know more about this algorithm click this.</a></span>
+    						      </label>
+    					      </div>
+                  }
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Realtime Result</label>
-                  <select class="selectpicker form-control" name="realtimeResult">
                     @for(value <- booleanResult){
-                      <option value='@value'>@value</option>
+                      <div class="algoRadio algoRadio-success">
+      						      <input type="radio" id="realtimeResult@value" name="realtimeResult" value=@value>
+      						      <label for="realtimeResult@value">
+      							      <span class="algoRadio-title">@value</span>
+      						      </label>
+      					      </div>
                     }
-                  </select>
                 </div>
                 <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
               </div>
@@ -236,27 +284,39 @@
               <div class="col-md-12">
                 <div class="form-group">
                   <label for="exampleInputEmail1">Ballot visibility</label>
-                  <select class="selectpicker form-control" name="ballotVisibility">
+
                     @for(value <- ballotVisibility){
-                      <option value=@value>@value</option>
+
+                      <div class="algoRadio algoRadio-success">
+      						      <input type="radio" id="ballotVisibility@value" name="ballotVisibility" value=@value>
+      						      <label for="ballotVisibility@value">
+      							      <span class="algoRadio-title">@value</span>
+      						      </label>
+      					      </div>
                     }
-                  </select>
+
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Invite Voters</label>
-                  <select class="selectpicker form-control" name="isInvite">
                     @for(value <- booleanResult){
-                      <option value='@value'>@value</option>
+                      <div class="algoRadio algoRadio-success">
+      						      <input type="radio" id="isInvite@value" name="isInvite" value=@value>
+      						      <label for="isInvite@value">
+      							      <span class="algoRadio-title">@value</span>
+      						      </label>
+      					      </div>
                     }
-                  </select>
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voter list visibility</label>
-                  <select class="selectpicker form-control" name="voterListVisibility">
                     @for(value <- voterVisibility.keySet){
-                      <option value=@voterVisibility(value)>@value</option>
+                      <div class="algoRadio algoRadio-success">
+      						      <input type="radio" id="voterListVisibility@value" name="voterListVisibility" value=@voterVisibility(value)>
+      						      <label for="voterListVisibility@value">
+      							      <span class="algoRadio-title">@value</span>
+      						      </label>
+      					      </div>
                     }
-                  </select>
                 </div>
                 <input type="hidden" class="form-control" name="creatorEmail" value=@user.get.email>
                 <input type="hidden" class="form-control" name="creatorName" value=@user.get.name>
