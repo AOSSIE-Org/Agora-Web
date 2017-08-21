@@ -76,21 +76,21 @@ object  Countvotes {
   }
 
 
+  /**
+  Algorithms which are not menitioned in the doc
+    EVACS
+    EVACSnoLP
+    EVACSDWD
+    Senate
+    Simple
+    Egalitarian
+    HybridPluralityPreferentialBlockVoting
+  **/
 
   def countvotesMethod( ballots : List[Ballot], algorithm : String, candidates: List[String], id : ObjectId) : List[(Candidate, Rational)] = {
     if(ballots.size!=0){
       val election = getWeightedBallots(ballots)
       val candidate = parseCandidates(candidates)
-      /**
-      Algorithms which are not menitioned in the doc
-        EVACS
-        EVACSnoLP
-        EVACSDWD
-        Senate
-        Simple
-        Egalitarian
-        HybridPluralityPreferentialBlockVoting
-      **/
 
       algorithm match {
         case "Range Voting" | "Schulze" | "SMC"
