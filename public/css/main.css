@@ -284,7 +284,7 @@ lable {
 
 #candidateList {
   float: left;
-  width: 218px;
+  width: 95%;
   min-height: 12em;
 }
 .candidateList.custom-state-active {
@@ -292,7 +292,7 @@ lable {
 }
 .candidateList li {
   float: left;
-  width: 215px;
+  width: 95%;
   margin: 0 0.4em 0.4em 0;
   text-align: center;
 }
@@ -308,7 +308,7 @@ lable {
 
 #ballotL {
   float: right;
-  width: 221px;
+  width: 95%;
   min-height: 18em;
   padding: 1%;
 }
@@ -387,9 +387,6 @@ lable {
   list-style-type: none;
   margin: 0;
   float: left;
-  /*margin-right: 10px;*/
-  /*background: #eee;*/
-  /*padding: 5px;*/
   width: 143px;
   min-height: 30px
 }
@@ -463,8 +460,6 @@ lable {
   position: relative;
   top: -7px;
 }
-
-
 
 .election-progress {
   margin-top: 20px;
