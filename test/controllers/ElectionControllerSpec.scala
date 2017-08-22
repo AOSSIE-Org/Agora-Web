@@ -117,15 +117,72 @@ class ElectionControllerSpec extends PlaySpecification with Mockito {
         contentAsString(unauthorizedResult) must contain("Sign In")
       }
     }
-    "return 200 if user is authorized" in new Context {
+    "redirect to profile page if user is authorized but id is not found" in new Context {
       new WithApplication(application) {
         val Some(result) = route(app, FakeRequest(routes.ElectionController.viewElectionSecured({new ObjectId()}.toString))
           .withAuthenticator[DefaultEnv](identity.loginInfo)
         )
-        status(result) must beEqualTo(OK)
+        status(result) must be equalTo SEE_OTHER
+        val redirectURL = redirectLocation(result).getOrElse("")
+        redirectURL must contain(routes.HomeController.profile().toString)
+        val Some(authorizedResult) = route(app, FakeRequest(GET, redirectURL)
+        .withAuthenticator[DefaultEnv](identity.loginInfo))
+        status(authorizedResult) must be equalTo OK
+        contentType(authorizedResult) must beSome("text/html")
+        contentAsString(authorizedResult) must contain("Election Details")
       }
     }
+    // "return 200 if user is authorized and id is valid" in new Context {
+    //   new WithApplication(application) {
+    //     val Some(result) = route(app, FakeRequest(routes.ElectionController.viewElectionSecured({new ObjectId()}.toString))
+    //       .withAuthenticator[DefaultEnv](identity.loginInfo)
+    //     )
+    //     status(result) must beEqualTo(OK)
+    //   }
+    // }
   }
+
+  "The `voteGuest` action" should {
+    "redirect to redirectVoting page if id is invalid while user is unauthorized" in new Context {
+      new WithApplication(application) {
+        val Some(redirectResult) = route(app, FakeRequest(routes.ElectionController.voteGuest({new ObjectId()}.toString))
+          .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid"))
+        )
+        status(redirectResult) must be equalTo SEE_OTHER
+        val redirectURL = redirectLocation(redirectResult).getOrElse("")
+        redirectURL must contain(routes.ElectionController.redirectVoter().toString)
+        val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL))
+        status(unauthorizedResult) must be equalTo OK
+        contentType(unauthorizedResult) must beSome("text/html")
+        contentAsString(unauthorizedResult) must contain("Home")
+      }
+    }
+    "redirect to redirectVoting page if user is authorized but id is not found" in new Context {
+      new WithApplication(application) {
+        val Some(redirectResult) = route(app, FakeRequest(routes.ElectionController.voteGuest({new ObjectId()}.toString))
+          .withAuthenticator[DefaultEnv](identity.loginInfo)
+        )
+        status(redirectResult) must be equalTo SEE_OTHER
+        val redirectURL = redirectLocation(redirectResult).getOrElse("")
+        redirectURL must contain(routes.ElectionController.redirectVoter().toString)
+        val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL))
+        status(unauthorizedResult) must be equalTo OK
+        contentType(unauthorizedResult) must beSome("text/html")
+        contentAsString(unauthorizedResult) must contain("Home")
+      }
+    }
+    // "return 200 if id is valid" in new Context {
+    //   new WithApplication(application) {
+    //     val Some(result) = route(app, FakeRequest(routes.ElectionController.viewElectionSecured({new ObjectId()}.toString))
+    //       .withAuthenticator[DefaultEnv](identity.loginInfo)
+    //     )
+    //     status(result) must beEqualTo(OK)
+    //   }
+    // }
+  }
+
+
+
 
   /**
    * The context.
