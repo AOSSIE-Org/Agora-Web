@@ -3,39 +3,38 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-# An example controller showing a sample home page
 GET         /                                 controllers.HomeController.index
-
-GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
-
-GET         /user/createElection              controllers.ElectionController.createUserView
-GET         /guest/createElection             controllers.ElectionController.createGuestView
-
-POST        /createElection                   controllers.ElectionController.create
-
-
 GET         /signOut                          controllers.HomeController.signOut
-GET         /authenticate/:provider           controllers.SocialAuthController.authenticate(provider)
+GET         /profile                          controllers.HomeController.profile
+GET         /home                             controllers.HomeController.indexAuthorized
+GET         /profile                          controllers.HomeController.profile
 
 GET         /signIn                           controllers.SignInController.view
 
+GET         /authenticate/:provider           controllers.SocialAuthController.authenticate(provider)
 
-GET         /home                             controllers.HomeController.indexAuthorized
-
-GET         /profile                          controllers.HomeController.profile
 GET         /result/:id                       controllers.ElectionController.result(id)
-
-GET         /profile                          controllers.HomeController.profile
-
 GET         /guest/election/:id               controllers.ElectionController.viewElection(id)
 GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
-POST        /guest/vote                       controllers.ElectionController.vote()
 GET         /ballot/:id                       controllers.ElectionController.viewBallot(id)
-POST        /user/election/invite/            controllers.ElectionController.addVoter()
-
 GET         /vote/                            controllers.ElectionController.redirectVoter()
+GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
+GET         /user/createElection              controllers.ElectionController.createUserView
+GET         /guest/createElection             controllers.ElectionController.createGuestView
+
+
+POST        /createElection                   controllers.ElectionController.create
+POST        /guest/createElection             controllers.ElectionController.createGuest
 POST        /upload/                          controllers.ElectionController.upload()
 POST        /update/                          controllers.ElectionController.update()
+POST        /guest/vote                       controllers.ElectionController.vote()
+POST        /user/election/invite/            controllers.ElectionController.addVoter()
+GET         /signIn/:email/:id                controllers.SignInController.submit(email,id)
+POST        /guest/delete/                    controllers.ElectionController.deleteElection()
+
+GET         /account/email/:email/:id         controllers.ElectionController.send(email: String,id)
+GET         /account/activate/:token/:id      controllers.ElectionController.activate(token: java.util.UUID,id)
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)
-GET         /edit/:id                       controllers.ElectionController.updateElection(id)
+GET         /edit/:id                         controllers.ElectionController.updateElection(id)

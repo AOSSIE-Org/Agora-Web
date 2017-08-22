@@ -18,7 +18,7 @@ file.error = your file is not in the recommended format, Recheck your file
 format.voter = Recheck the format
 dont.access = you don't have permission to access
 invalid.id = No record of this item
-
+activate.account.title = Silhouette - Activate Account
 
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
@@ -36,6 +36,7 @@ sign.out = Sign out
 
 or.use.social =  Use your existing account on one of the following services to sign in:
 
+invalid.credentials = Invalid credentials!
 
 
 

@@ -49,7 +49,7 @@ $( function() {
         $selected.push($item.children().text());
         // $selected.push("}");
         // console.log($selected);
-        $("#ballotinput").attr("value","{"+$selected.toString()+"}");
+        $("#ballotinput").attr("value",$selected.toString());
       });
     }
 
@@ -72,15 +72,11 @@ $( function() {
       var index = $selected.indexOf($item.children().text());
       if (index > -1) {
         $selected.splice(index, 1);
-}
+      }
 // console.log($selected);
 
       // console.log($($ballot).find("[id^='ballot'].candidateList.ui-helper-reset"));
 
-      $("#ballotinput").attr("value","{"+$selected.toString()+"}");
-
-
-
+      $("#ballotinput").attr("value",$selected.toString());
   }
-
 })

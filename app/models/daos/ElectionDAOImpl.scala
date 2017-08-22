@@ -3,11 +3,14 @@ package models.daos
 import com.mongodb.casbah.Imports.{ DBObject, _ }
 import com.mongodb.casbah.commons.conversions.scala.RegisterConversionHelpers
 import com.novus.salat._
-import models.{ Election, MongoDBConnection , Ballot , Voter}
+import models.{ Election, MongoDBConnection , Ballot , Voter , Winner}
 import org.bson.types.ObjectId
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
+
+
+
 
 class ElectionDAOImpl() extends ElectionDAO {
 
@@ -37,6 +40,12 @@ class ElectionDAOImpl() extends ElectionDAO {
     list.map(doc => grater[Election].asObject(doc))
   }
 
+  def delete(id: ObjectId) : Option[DBObject] = {
+    val o: DBObject       = MongoDBObject("id" -> id)
+    val result = collectionRef.findAndRemove(o)
+    result
+  }
+
   def userElectionList(email: Option[String]): List[models.Election] = {
     val o: DBObject       = MongoDBObject("creatorEmail" -> email)
     val u                 = collectionRef.find(o)
@@ -58,7 +67,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     if (filteredElections.nonEmpty) {
       filteredElections.head.candidates
     } else {
-      null // FIXME: replace null with None
+      List.empty[String]
     }
   }
 
@@ -69,8 +78,15 @@ class ElectionDAOImpl() extends ElectionDAO {
     val c = ballotList.toList ::: getBallots(id)
     val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
     val update = $set("ballot" -> bsonBallot )
-    collectionRef.update( o, update )
-    true
+    try{
+      val updateResult =collectionRef.update( o, update ,false,false,WriteConcern.Safe)
+      true
+    }
+    catch {
+      case e: Exception => {
+        false
+      }
+    }
   }
 
   def getBallots(id: ObjectId): List[Ballot] = {
@@ -81,7 +97,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     if (filteredElections.nonEmpty) {
       filteredElections.head.ballot
     } else {
-      null // FIXME: replace null with None
+      List.empty[Ballot]
     }
   }
 
@@ -93,7 +109,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     if (filteredElections.nonEmpty) {
       filteredElections.head.voterList
     } else {
-      null // FIXME: replace null with None
+      List.empty[Voter]
     }
   }
 
@@ -121,14 +137,14 @@ class ElectionDAOImpl() extends ElectionDAO {
       }
   }
 
-  def getInviteCode(id: ObjectId): String = {
+  def getInviteCode(id: ObjectId): Option[String] = {
       val o: DBObject       = MongoDBObject("id" -> id)
       val list              = collectionRef.findOne(o).toList
       val filteredElections = list.map(doc => grater[Election].asObject(doc))
       if (filteredElections.nonEmpty) {
-        filteredElections.head.inviteCode
+        Option(filteredElections.head.inviteCode)
       } else {
-        null // FIXME: replace null with None
+        None
       }
   }
 
@@ -139,7 +155,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     if (filteredElections.nonEmpty) {
       Option(filteredElections.head.creatorEmail)
     } else {
-      None // FIXME: replace null with None
+      None
     }
   }
 
@@ -186,7 +202,7 @@ class ElectionDAOImpl() extends ElectionDAO {
         val o: DBObject       = MongoDBObject("isStarted" -> false)
         val u                 = collectionRef.find(o)
         val list              = u.toList
-      list.map(doc => grater[Election].asObject(doc))
+        list.map(doc => grater[Election].asObject(doc))
     }
 
     //get all the completed and uncount elections
@@ -198,22 +214,18 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
     //Update finished election
-    def updateCompleteElection(id : ObjectId) : Boolean = {
+    def updateCompleteElection(id : ObjectId) = {
       val o: DBObject = MongoDBObject("id" -> id)
       val update = $set("isCompleted" -> true )
-      collectionRef.update( o, update )
-      true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
+      val updateResult = collectionRef.update( o, update )
     }
 
     //Update finished election
-    def updateActiveElection(id : ObjectId) : Boolean = {
+    def updateActiveElection(id : ObjectId) = {
       val o: DBObject = MongoDBObject("id" -> id)
       val update = $set("isStarted" -> true )
-      collectionRef.update( o, update )
-      true // FIXME: Seems like this method can return only true. Why its return type is not a Unit?
+      val updateResult = collectionRef.update( o, update )
     }
-
-
 
     //get the all unfinished elections
     def getActiveElection() : List[models.Election] = {
@@ -240,6 +252,7 @@ class ElectionDAOImpl() extends ElectionDAO {
         None
       }
     }
+
     def update(election : Election) : Boolean = {
       val bsonElection = grater[Election].asDBObject(election)
       val query = MongoDBObject("id" -> election.id)
@@ -253,4 +266,34 @@ class ElectionDAOImpl() extends ElectionDAO {
         false
       }
     }
+
+    def getWinners(id : ObjectId) : List[Winner] = {
+      val o: DBObject       = MongoDBObject("id" -> id)
+      val list              = collectionRef.findOne(o).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      if (filteredElections.nonEmpty) {
+        filteredElections.head.winners
+      } else {
+         List.empty[Winner]
+      }
+    }
+
+    def updateWinner(result : List[Winner], id : ObjectId) = {
+      val o: DBObject       = MongoDBObject("id" -> id)
+      val list              = collectionRef.findOne(o).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      val update = $set("winners" -> result.map(doc => grater[Winner].asDBObject(doc)))
+      collectionRef.update( o, update )
+      val updateisCounted = $set("isCounted" -> true)
+      collectionRef.update( o, updateisCounted )
+    }
+
+    def updateIsCounted( id : ObjectId) = {
+      val o: DBObject       = MongoDBObject("id" -> id)
+      val list              = collectionRef.findOne(o).toList
+      val filteredElections = list.map(doc => grater[Election].asObject(doc))
+      val update = $set("isCounted" -> true)
+      collectionRef.update( o, update )
+    }
+
 }

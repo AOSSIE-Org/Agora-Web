@@ -5,13 +5,12 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
-@algo = @{List("Range Voting","Instant Runoff 2-round","Egalitarian","Majority","Borda","Approval","Nanson",
-                "Kemeny-Young","Schulze","Copeland","SMC","Ranked Pairs","Random Ballot","Coomb’s","Contingent Method",
-                "Minimax Condorcet","Top Cycle","Uncovered Set","Warren STV","Meek STV","Oklahoma Method",
-                "Sequential Proportional Approval voting","Proportional Approval voting","Satisfaction Approval voting",
-                "Baldwin","Exhaustive ballot","Exhaustive ballot with dropoff","Scottish STV","Cumulative voting",
-                "Preferential block voting","Contingent Method")
-}
+@algo = @{List("Approval","Baldwin","Borda","Contingent Method","Coomb’s","Copeland","Cumulative voting","Egalitarian","Exhaustive ballot",  "Exhaustive ballot with dropoff",
+                "Instant Runoff 2-round","Kemeny-Young","Majority","Meek STV","Minimax Condorcet","Nanson","Oklahoma Method",
+                "Preferential block voting","Proportional Approval voting","Random Ballot","Range Voting","Ranked Pairs",
+                "Satisfaction Approval voting","Schulze","Scottish STV",
+                "Sequential Proportional Approval voting","SMC","Top Cycle","Uncovered Set","Warren STV")
+         }
 
 @booleanResult = @{List("false","true")}
 
@@ -96,19 +95,44 @@
               <input type="text" value=@str class="form-control taginput" name="candidates" data-role="tagsinput" required />
             </div>
             <div class="form-group">
+              <label for="exampleInputEmail1">Number of vacancies</label>
+                <div>
+                    <input type="text" name="noVacancies" class="form-control input-number" value=@election.noVacancies min="1" max="10">
+                      <span class="span-input">
+                        <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
+                          <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                      </span>
+                      <span class="span-input">
+                        <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
+                          <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+                      </span>
+                    </input>
+                </div>
+              </div>
+            <div class="form-group">
               <label for="exampleInputEmail1">Voting Algorithm</label>
-              <select value='@election.votingAlgo' class="selectpicker form-control" name="votingAlgo">
-                @for(value <- algo){
-                  <option value='@value'>@value</option>
+              <select class="selectpicker form-control" name="votingAlgo">
+                @for(algoValue <- algo){
+                  @if(algoValue == election.votingAlgo){
+                    <option value='@algoValue' selected>@algoValue</option>
+                  }else{
+                    <option value='@algoValue' >@algoValue</option>
+                  }
                 }
               </select>
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Realtime Result</label>
-              <select value='@election.realtimeResult' class="selectpicker form-control" name="realtimeResult">
-                @for(value <- booleanResult){
-                  <option value='@value'>@value</option>
-              }
+              <select  class="selectpicker form-control" name="realtimeResult">
+                @for(booleanValue <- booleanResult){
+                  @if(booleanValue == election.realtimeResult.toString){
+                    <option value='@booleanValue' selected>@booleanValue</option>
+                  }else{
+                    <option value='@booleanValue' >@booleanValue</option>
+                  }
+                }
               </select>
             </div>
             <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
@@ -120,17 +144,25 @@
           <div class="col-md-12">
             <div class="form-group">
               <label for="exampleInputEmail1">Ballot visibility</label>
-              <select value='@election.ballotVisibility' class="selectpicker form-control" name="ballotVisibility">
-                @for(value <- ballotVisibility){
-                  <option value=@value>@value</option>
-              }
+              <select  class="selectpicker form-control" name="ballotVisibility">
+                @for(visibilityLevel <- ballotVisibility){
+                  @if(visibilityLevel == election.ballotVisibility){
+                    <option value='@visibilityLevel' selected>@visibilityLevel</option>
+                  }else{
+                    <option value='@visibilityLevel' >@visibilityLevel</option>
+                  }
+                }
               </select>
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Invite Voters</label>
               <select value='@election.isInvite' class="selectpicker form-control" name="isInvite">
-                @for(value <- booleanResult){
-                  <option value='@value'>@value</option>
+                @for(booleanValue <- booleanResult){
+                  @if(booleanValue == election.isInvite.toString){
+                    <option value='@booleanValue' selected>@booleanValue</option>
+                  }else{
+                    <option value='@booleanValue' >@booleanValue</option>
+                  }
                 }
               </select>
             </div>
@@ -138,8 +170,13 @@
               <label for="exampleInputEmail1">Voter list visibility</label>
               <select value='@election.voterListVisibility' class="selectpicker form-control" name="voterListVisibility">
                 @for(value <- voterVisibility.keySet){
-                  <option value=@voterVisibility(value)>@value</option>
-                }
+                  @if(voterVisibility(value) == election.voterListVisibility.toString){
+                    <option value=@voterVisibility(value) selected>@value</option>
+                  }else{
+                      <option value='@voterVisibility(value)' >@value</option>
+                    }
+                  }
+
               </select>
             </div>
             @if(user != None) {
@@ -158,5 +195,6 @@
 <br>
 <br>
 <script type='text/javascript' src='@routes.Assets.at("/javascripts/editElection.js")'> </script>
+<script type='text/javascript' src='@routes.Assets.at("/javascripts/addEdit.js")'> </script>
 </div>
 }

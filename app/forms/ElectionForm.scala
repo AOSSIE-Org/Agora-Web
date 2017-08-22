@@ -22,7 +22,8 @@ object ElectionForm {
     endingDate: Date,
     isInvite: Boolean,
     isRealTime: Boolean,
-    votingAlgo: String
+    votingAlgo: String,
+    noVacancies : Int
   )
 
   /**
@@ -41,7 +42,8 @@ object ElectionForm {
       "end"                 -> date("MM/dd/yyyy"),
       "isInvite"            -> boolean,
       "realtimeResult"      -> boolean,
-      "votingAlgo"          -> nonEmptyText
+      "votingAlgo"          -> nonEmptyText,
+      "noVacancies"         -> number
     )(ElectionData.apply)(ElectionData.unapply)
   )
 }

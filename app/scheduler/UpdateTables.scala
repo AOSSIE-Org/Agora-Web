@@ -29,9 +29,8 @@ class UpdateTable extends Job {
 
     val completedElections = electionDAOImpl.getCompletedElections()
     for (election <- completedElections) {
-      resultFileDAOImpl.saveResult(election.ballot,"EVACS",election.candidates,election.id)
+      resultFileDAOImpl.saveResult(election.ballot,election.votingAlgo,election.candidates,election.id)
     }
-
   }
 
 }
