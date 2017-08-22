@@ -1,45 +1,145 @@
 package controllers
 
-import org.scalatestplus.play._
-import play.api.test._
-import play.api.test.Helpers._
+import java.util.UUID
+
+import com.google.inject.AbstractModule
+import com.mohiva.play.silhouette.api.{ Environment, LoginInfo }
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
+import com.mohiva.play.silhouette.test._
+import models.User
+import net.codingwell.scalaguice.ScalaModule
+import org.specs2.mock.Mockito
+import org.specs2.specification.Scope
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
+import utils.auth.DefaultEnv
 
 /**
- * Add your spec here.
- * You can mock out a whole application including requests, plugins etc.
- *
- * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
+ * Test case for the [[controllers.HomeController]] class.
  */
-class HomeControllerSpec extends PlaySpec with OneAppPerTest {
+class HomeControllerSpec extends PlaySpecification with Mockito {
+  sequential
 
-  "HomeController GET" should {
+  "The `index` action" should {
+    "return 200 if user is unauthorized" in new Context {
+      new WithApplication(application) {
+        val Some(redirectResult) = route(app, FakeRequest(routes.HomeController.index())
+          .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid"))
+        )
+        status(redirectResult) must beEqualTo(OK)
+      }
+    }
+    "redirect to login page if user is authorized" in new Context {
+      new WithApplication(application) {
+        val Some(redirectResult) = route(app, FakeRequest(routes.HomeController.index())
+          .withAuthenticator[DefaultEnv](identity.loginInfo)
+        )
+        status(redirectResult) must be equalTo SEE_OTHER
+        val redirectURL = redirectLocation(redirectResult).getOrElse("")
+        redirectURL must contain(routes.HomeController.indexAuthorized().toString)
+        val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL)
+        .withAuthenticator[DefaultEnv](identity.loginInfo)
+        )
+        status(unauthorizedResult) must be equalTo OK
+        contentType(unauthorizedResult) must beSome("text/html")
+        contentAsString(unauthorizedResult) must contain("Welcome, you are now signed in!")
+      }
+    }
+  }
 
-    "render the index page from a new instance of controller" in {
-      val controller = new HomeController
-      val home = controller.index().apply(FakeRequest())
+  "The `indexAuthorized` action" should {
+    "redirect to login page if user is unauthorized" in new Context {
+      new WithApplication(application) {
+        val Some(redirectResult) = route(app, FakeRequest(routes.HomeController.indexAuthorized())
+          .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid"))
+        )
+        status(redirectResult) must be equalTo SEE_OTHER
+        val redirectURL = redirectLocation(redirectResult).getOrElse("")
+        redirectURL must contain(routes.SignInController.view().toString)
+        val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL))
+        status(unauthorizedResult) must be equalTo OK
+        contentType(unauthorizedResult) must beSome("text/html")
+        contentAsString(unauthorizedResult) must contain("Sign In")
+      }
+    }
+    "return 200 if user is authorized" in new Context {
+      new WithApplication(application) {
+        val Some(result) = route(app, FakeRequest(routes.HomeController.indexAuthorized())
+          .withAuthenticator[DefaultEnv](identity.loginInfo)
+        )
+        status(result) must beEqualTo(OK)
+      }
+    }
+  }
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+  "The `profile` action" should {
+      "redirect to login page if user is unauthorized" in new Context {
+        new WithApplication(application) {
+          val Some(redirectResult) = route(app, FakeRequest(routes.HomeController.profile())
+            .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid"))
+          )
+
+          status(redirectResult) must be equalTo SEE_OTHER
+
+          val redirectURL = redirectLocation(redirectResult).getOrElse("")
+          redirectURL must contain(routes.SignInController.view().toString)
+
+          val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL))
+
+          status(unauthorizedResult) must be equalTo OK
+          contentType(unauthorizedResult) must beSome("text/html")
+          contentAsString(unauthorizedResult) must contain("Sign In")
+        }
+      }
+
+      "return 200 if user is authorized" in new Context {
+        new WithApplication(application) {
+          val Some(result) = route(app, FakeRequest(routes.HomeController.profile())
+            .withAuthenticator[DefaultEnv](identity.loginInfo)
+          )
+          status(result) must beEqualTo(OK)
+        }
+      }
     }
 
-    "render the index page from the application" in {
-      val controller = app.injector.instanceOf[HomeController]
-      val home = controller.index().apply(FakeRequest())
+  /**
+   * The context.
+   */
+  trait Context extends Scope {
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+    /**
+     * A fake Guice module.
+     */
+    class FakeModule extends AbstractModule with ScalaModule {
+      def configure() = {
+        bind[Environment[DefaultEnv]].toInstance(env)
+      }
     }
 
-    "render the index page from the router" in {
-      // Need to specify Host header to get through AllowedHostsFilter
-      val request = FakeRequest(GET, "/").withHeaders("Host" -> "localhost")
-      val home = route(app, request).get
+    /**
+     * An identity.
+     */
+    val identity = User(
+      userID = UUID.randomUUID(),
+      loginInfo = LoginInfo("facebook", "user@facebook.com"),
+      firstName = None,
+      lastName = None,
+      fullName = None,
+      email = None,
+      avatarURL = None
+    )
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
-    }
+    /**
+     * A Silhouette fake environment.
+     */
+    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(identity.loginInfo -> identity))
+
+    /**
+     * The application.
+     */
+    lazy val application = new GuiceApplicationBuilder()
+      .overrides(new FakeModule)
+      .build()
   }
 }
