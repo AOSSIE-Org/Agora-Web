@@ -45,7 +45,7 @@ To install the frontend please do the following:
         google.clientSecret = ${?GOOGLE_CLIENT_SECRET}
         twitter.consumerKey=${?TWITTER_CONSUMER_KEY}
         twitter.consumerSecret=${?TWITTER_CONSUMER_SECRET}
-
+        ```
     4. Change the redirect URL in `ShilhouetteLocal.conf` to your localhost `localhost:9000`.
     5. include the `ShilhouetteLocal.conf` into the `Shilhouette.conf`.
 
@@ -56,6 +56,7 @@ To install the frontend please do the following:
 
     ```
     mongodb.default.uri = ${?MONGODB_URI}
+    ```
 
 6. Add `applicationLocal.conf` , `ShilhouetteLocal.conf` to the `.gitignore` file.
 
