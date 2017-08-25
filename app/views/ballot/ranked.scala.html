@@ -4,43 +4,31 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 @election.vote(user , id , name , description) {
-
-
-
-    <div class="container">
-        <div id="ballot-0" class="container">
-            <div class="container">
-                <div class="col-md-4"></div>
-                <div class="centered col-md-4" id="candidateDiv">
-
-
-                      <p>Candidate list:</p>
-                      @if(candidates!=None){
-                          @for(candidate <- candidates.get){
-                      <div class="col-md-12 scored centered">
-                          <div class="col-md-4  ">
-                            <label class="scored" for="sel1">@candidate</label>
-                          </div>
-                          <div class="col-md-8">
-                              <select class="form-control input-sm" id=@candidate>
-                                @for(index <- 0 until candidates.get.size){
-                                    <option value=@{index+1}>@{index+1}</option>
-                                }
-                              </select>
-                                  <script type='text/javascript' src='@routes.Assets.at("/javascripts/ranked.js")'> </script>
-                          </div>
-                    </div>
-                  }
-                }
-
-
-
-
+  <div class="container">
+    <div id="ballot-0" class="container">
+      <div class="container">
+        <div class="col-md-4"></div>
+        <div class="centered col-md-4" id="candidateDiv">
+          <p>Candidate list:</p>
+          @if(candidates!=None){
+            @for(candidate <- candidates.get){
+              <div class="col-md-12 scored centered">
+                <div class="col-md-4  ">
+                  <label class="scored" for="sel1">@candidate</label>
                 </div>
-
-
-            </div>
+                <div class="col-md-8">
+                  <select class="form-control input-sm" id=@candidate>
+                    @for(index <- 0 until candidates.get.size){
+                      <option value=@{index+1}>@{index+1}</option>
+                    }
+                  </select>
+                  <script type='text/javascript' src='@routes.Assets.at("/javascripts/ranked.js")'> </script>
+                </div>
+              </div>
+            }
+          }
         </div>
+      </div>
+    </div>
   </div>
-
 }
