@@ -33,7 +33,7 @@ To install the frontend please do the following:
 2. Clone this repo with `https://gitlab.com/aossie/Agora-Web`
   - **Note:** *If you just want to use the project, cloning is the best option. However, if you wish to contribute to the project, you will need to fork the project first, and then clone your `Agora-Web` fork and make your contributions via a branch on your fork.*
 3. Install and configure [MongoDB](https://www.mongodb.com/)
-4. Agora web is using Outh2 for the authentication to run the project.For authentication we are using [Shilhouette](https://www.silhouette.rocks/) library. Before run the application we have to configure the `Shilhouette.conf`.
+4. Agora web is using Oauth2 for the authentication to run the project.For authentication we are using [Shilhouette](https://www.silhouette.rocks/) library. Before run the application we have to configure the `Shilhouette.conf`.
     1. Make a copy of the `Shilhouette.conf` and rename it to `ShilhouetteLocal.conf`.
     2. Create new applications in [Facebook](https://developers.facebook.com/), [Twitter](https://dev.twitter.com/) and [Google](https://console.cloud.google.com/)
     3. Fill the following values in `ShilhouetteLocal.conf` by the relevant values from your applications.
@@ -51,7 +51,7 @@ To install the frontend please do the following:
 
         ```
         include "silhouetteLocal.conf"
-5. Same as above make a copy of `application.conf` and rename it to `applicationLocal.conf`.Change the following variable as your MOngoDB URI and include the
+5. Same as above make a copy of `application.conf` and rename it to `applicationLocal.conf`. Change the following variable as your MongoDB URI and include the
 `applicationLocal.conf` into the `application.conf`.
 
     ```
@@ -68,12 +68,12 @@ To install the frontend please do the following:
 To start the frontend please do the following:
 
 - Start the server by running `sbt run` in the repo folder.
-- Go to [http://localhost:9000/](http://localhost:9000/) in a browser. Use your one of your social account to login to the system.
-    - **Note:** *Changing any source code while the server is running willautomatically recompile and hot-reload the application on the next HTTP request.*
+- Go to [http://localhost:9000/](http://localhost:9000/) in a browser. Use one of your social account to login to the system.
+    - **Note:** *Changing any source code while the server is running will automatically recompile and hot-reload the application on the next HTTP request.*
 
 ### Troubleshooting your local environment
 
-Always make sure to `git pull` and get the latest from master. [Google](https://www.google.com) and [Stackoverflow](https://stackoverflow.com/) are your friends. You can find answer for almost all type of technical problems. But if you run into problems you can't resolve,feel free to open an issue.
+Always make sure to `git pull` and get the latest from master. [Google](https://www.google.com) and [Stackoverflow](https://stackoverflow.com/) are your friends. You can find answer for almost all types of technical problems. But if you run into problems you can't resolve, feel free to open an issue.
 
 ### Running Tests
 
