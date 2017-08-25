@@ -3,33 +3,32 @@
 
 @main(Messages("ballot.page"), user) {
   <div class="container"></div>
-  <div class="container">
-    <h1>Ballots details</h1>
-    <div class="tab-content">
-      <div class="tab-pane active" id="home">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
+    <div class="container">
+      <h1>Ballots details</h1>
+      <div class="tab-content">
+        <div class="tab-pane active" id="home">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
                   <th>#</th>
                   <th>Ballot</th>
-              </tr>
-            </thead>
-            <tbody id="items">
-            @for((ballot, index) <- ballots.zipWithIndex) {
-              <tr>
-                  <td>@{index+1}</td>
-                  <td>@ballot.voteBallot</td>
-              </tr>
-
-            }
-          </tbody>
-        </table>
+                </tr>
+              </thead>
+              <tbody id="items">
+                @for((ballot, index) <- ballots.zipWithIndex) {
+                  <tr>
+                    <td>@{index+1}</td>
+                    <td>@ballot.voteBallot</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+    <div class="container text-center">
+      <a href="/" class="btn btn-default btn-success"> Home</a>
     </div>
   </div>
-  <div class="container text-center">
-    <a href="/" class="btn btn-default btn-success"> Home</a>
-  </div>
-</div>
 }
