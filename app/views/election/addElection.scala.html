@@ -5,13 +5,12 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
-@algo = @{List("Range Voting","Instant Runoff 2-round","Egalitarian","Majority","Borda","Approval","Nanson",
-                "Kemeny-Young","Schulze","Copeland","SMC","Ranked Pairs","Random Ballot","Coomb’s","Contingent Method",
-                "Minimax Condorcet","Top Cycle","Uncovered Set","Warren STV","Meek STV","Oklahoma Method",
-                "Sequential Proportional Approval voting","Proportional Approval voting","Satisfaction Approval voting",
-                "Baldwin","Exhaustive ballot","Exhaustive ballot with dropoff","Scottish STV","Cumulative voting",
-                "Preferential block voting","Contingent Method")
-}
+@algo = @{List("Approval","Baldwin","Borda","Contingent Method","Coomb’s","Copeland","Cumulative voting","Egalitarian","Exhaustive ballot",  "Exhaustive ballot with dropoff",
+                "Instant Runoff 2-round","Kemeny-Young","Majority","Meek STV","Minimax Condorcet","Nanson","Oklahoma Method",
+                "Preferential block voting","Proportional Approval voting","Random Ballot","Range Voting","Ranked Pairs",
+                "Satisfaction Approval voting","Schulze","Scottish STV",
+                "Sequential Proportional Approval voting","SMC","Top Cycle","Uncovered Set","Warren STV")
+         }
 
 @booleanResult = @{List("false","true")}
 
@@ -84,6 +83,22 @@
                 <label for="exampleInputEmail1">Candidates</label>
                 <input type="text" class="form-control taginput" name="candidates" data-role="tagsinput" required />
               </div>
+              <div class="form-group">
+                <label for="exampleInputEmail1">Number of vacancies</label>
+                <span class="span-input">
+                  <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
+                    <span class="glyphicon glyphicon-minus"></span>
+                  </button>
+                </span>
+                <span class="span-input">
+                  <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </span>
+                  <div class="input-number-div">
+                      <input type="text" name="noVacancies" class="form-control input-number" value="1" min="1" max="10">
+                  </div>
+                </div>
               <div class="form-group">
                 <label for="exampleInputEmail1">Voting Algorithm</label>
                 <select class="selectpicker form-control" name="votingAlgo">
@@ -171,6 +186,22 @@
                 <input type="text" class="form-control taginput" name="candidates" data-role="tagsinput" required />
               </div>
               <div class="form-group">
+                <label for="exampleInputEmail1">Number of vacancies</label>
+                <span class="span-input">
+                  <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
+                    <span class="glyphicon glyphicon-minus"></span>
+                  </button>
+                </span>
+                <span class="span-input">
+                  <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </span>
+                  <div class="input-number-div">
+                      <input type="text" name="noVacancies" class="form-control input-number" value="1" min="1" max="10">
+                  </div>
+                </div>
+              <div class="form-group">
                 <label for="exampleInputEmail1">Voting Algorithm</label>
                 <select class="selectpicker form-control" name="votingAlgo">
                   @for(value <- algo){
@@ -233,5 +264,7 @@
   <br>
   <br>
   <script type='text/javascript' src='@routes.Assets.at("/javascripts/addElection.js")'> </script>
+  <script type='text/javascript' src='@routes.Assets.at("/javascripts/addEdit.js")'> </script>
+
 </div>
 }

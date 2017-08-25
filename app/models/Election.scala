@@ -51,5 +51,6 @@ case class Election(
   ballot: List[Ballot],
   voterList : List[Voter],
   winners : List[Winner],
-  isCounted : Boolean
+  isCounted : Boolean,
+  noVacancies : Int   
 )

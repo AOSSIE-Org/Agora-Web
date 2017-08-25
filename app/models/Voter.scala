@@ -3,6 +3,6 @@ package models
 
 case class Voter
 (
-  name :String,
+  name : String,
   email : String
 )

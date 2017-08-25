@@ -40,6 +40,12 @@ class ElectionDAOImpl() extends ElectionDAO {
     list.map(doc => grater[Election].asObject(doc))
   }
 
+  def delete(id: ObjectId) : Option[DBObject] = {
+    val o: DBObject       = MongoDBObject("id" -> id)
+    val result = collectionRef.findAndRemove(o)
+    result
+  }
+
   def userElectionList(email: Option[String]): List[models.Election] = {
     val o: DBObject       = MongoDBObject("creatorEmail" -> email)
     val u                 = collectionRef.find(o)

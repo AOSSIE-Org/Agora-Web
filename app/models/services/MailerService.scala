@@ -10,15 +10,14 @@ import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 
 class MailerService @Inject() (mailerClient: MailerClient , val messagesApi: MessagesApi) {
 
-  def sendPassCodeEmail(receiver: String , passCode : String , id : String) = {
+  def sendPassCodeEmail(receiver: String ,receiverName: String, creatorName: String, creatorEmail: String , electionName: String, linl: String, electionDescription: String, passCode : String , id : String) = {
     val link = s"https://agora-web-aossie.herokuapp.com/guest/vote/$id"
     val email = Email(
       "Simple email",
       "AGORA <aossie@gmail.com>",
       Seq("Voter TO <"+ receiver + ">") ,
       bodyText = Some("Invitation For Election"),
-      bodyHtml = Some(s"""<html><body><p><b>Passcode :</b> $passCode  </p>
-        <p> <b>Voting Link :</b> $link </p> <br /> <p> You have to enter above passcode in order to validate your identity before voting</p></body></html>""")
+      bodyHtml = Some(s"<html><body><p>Hello $receiverName,</p><p>$creatorName $creatorEmail is inviting you to vote in the following election:</p><p>$electionName</p><p>$electionDescription</p><p>To vote, click on the link below and type the passcode when prompted:</p><p>Voting Link: <a href=$link>$link</a></p><p>Passcode: $passCode</p><p>Kind regards,The Agora Team </p></body></html>")
     )
     mailerClient.send(email)
   }

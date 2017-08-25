@@ -9,6 +9,19 @@
   /*background-color: #ffff33;*/
 }
 
+.input-number{
+    display: inline-block;
+}
+
+.span-input{
+  float: right;
+  margin-top: 25px;
+}
+
+.input-number-div{
+    overflow: hidden;
+}
+
 .vote {
   margin-top: 4px;
   margin-bottom: 4px;
