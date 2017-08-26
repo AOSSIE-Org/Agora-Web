@@ -102,14 +102,16 @@ See [Environment variables](#environment-variables) Section to learn about `mong
 
  Examples for salat serialization are shown below,
 
- 1. Convert Model into BSON Data
+ 1. Convert Model into BSON Data.
+ 
  ```
- val bsonElection = grater[Election].asDBObject(election)
-```
-2. Retreive Model from BSON Data
-```
-val election = grater[Election].asObject(bsonElection)
-```
+     val bsonElection = grater[Election].asDBObject(election)
+ ```
+2. Retreive Model from BSON Data.
+
+ ```
+    val election = grater[Election].asObject(bsonElection)
+ ```
 
 For more details please check these links,
 1. [Casbah](https://mongodb.github.io/casbah/)
@@ -123,40 +125,40 @@ We used play mailer module to build and send email messages. For our app We want
 
 Configure the play mailer in `application.conf`. 
  ```
- play.mailer {
-  host = "example.com" // (mandatory)
-  port = 25 // (defaults to 25)
-  ssl = no // (defaults to no)
-  tls = no // (defaults to no)
-  tlsRequired = no // (defaults to no)
-  user = null // (optional)
-  password = null // (optional)
-  debug = no // (defaults to no, to take effect you also need to set the log level to "DEBUG" for the application logger)
-  timeout = null // (defaults to 60s in milliseconds)
-  connectiontimeout = null // (defaults to 60s in milliseconds)
-  mock = no // (defaults to no, will only log all the email properties instead of sending an email)
-}
+    play.mailer {
+      host = "example.com" // (mandatory)
+      port = 25 // (defaults to 25)
+      ssl = no // (defaults to no)
+      tls = no // (defaults to no)
+      tlsRequired = no // (defaults to no)
+      user = null // (optional)
+      password = null // (optional)
+      debug = no // (defaults to no, to take effect you also need to set the log level to "DEBUG" for the application logger)
+      timeout = null // (defaults to 60s in milliseconds)
+      connectiontimeout = null // (defaults to 60s in milliseconds)
+      mock = no // (defaults to no, will only log all the email properties instead of sending an email)
+    }
  ```
  Check the [Environment variables](#environment-variables) Section to learn more.
  
  Example Code for sending mail,
 ```
-val email = Email(
-      "Simple email",
-      "Mister FROM <from@email.com>",
-      Seq("Miss TO <to@email.com>"),
-      // adds attachment
-      attachments = Seq(
-        AttachmentFile("attachment.pdf", new File("/some/path/attachment.pdf")),
-        // adds inline attachment from byte array
-        AttachmentData("data.txt", "data".getBytes, "text/plain", Some("Simple data"), Some(EmailAttachment.INLINE)),
-        // adds cid attachment
-        AttachmentFile("image.jpg", new File("/some/path/image.jpg"), contentId = Some(cid))
-      ),
-      // sends text, HTML or both...
-      bodyText = Some("A text message"),
-      bodyHtml = Some(s"""<html><body><p>An <b>html</b> message with cid <img src="cid:$cid"></p></body></html>""")
-    )
+    val email = Email(
+          "Simple email",
+          "Mister FROM <from@email.com>",
+          Seq("Miss TO <to@email.com>"),
+          // adds attachment
+          attachments = Seq(
+            AttachmentFile("attachment.pdf", new File("/some/path/attachment.pdf")),
+            // adds inline attachment from byte array
+            AttachmentData("data.txt", "data".getBytes, "text/plain", Some("Simple data"), Some(EmailAttachment.INLINE)),
+            // adds cid attachment
+            AttachmentFile("image.jpg", new File("/some/path/image.jpg"), contentId = Some(cid))
+          ),
+          // sends text, HTML or both...
+          bodyText = Some("A text message"),
+          bodyHtml = Some(s"""<html><body><p>An <b>html</b> message with cid <img src="cid:$cid"></p></body></html>""")
+        )
 ```
 
 Example codes are taken from [Play-Mailer](https://github.com/playframework/play-mailer) examples.
@@ -173,12 +175,13 @@ We are using the algorithms from the [Agora](https://gitlab.com/aossie/Agora) Li
 1. Check is the Ballot view available in the `app/views/ballot` directory
 2. If yes skip this step, else create a ballot view accroding to the voting process.
 3. Add new algorithm into the `algo` list in the `addElection.scala.html` and `editElection.scala.html`. 
-4. Then define a case statement in the models.services.Countvotes.countvotesMethod method to handle the new algorithm. Example code,
-```
-case "new algorithm name" => {
-    val result = new_algorithm_name.winners(Election.weightedElectionToACTElection(elecion),candidate,1)
-    return result
-        }
+4. Then define a case statement in the models.services.Countvotes.countvotesMethod method to handle the new algorithm. Example code.
+
+ ```
+    case "new algorithm name" => {
+        val result = new_algorithm_name.winners(Election.weightedElectionToACTElection(elecion),candidate,1)
+        return result
+    }
 ```
 
 # Demo
