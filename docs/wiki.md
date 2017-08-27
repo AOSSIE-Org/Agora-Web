@@ -107,7 +107,7 @@ See [Environment variables](#environment-variables) Section to learn about `mong
  ```
      val bsonElection = grater[Election].asDBObject(election)
  ```
-2. Retreive Model from BSON Data.
+2. Retrieve Model from BSON Data.
 
  ```
     val election = grater[Election].asObject(bsonElection)
@@ -173,7 +173,7 @@ For more details please check these links,
 
 We are using the algorithms from the [Agora](https://gitlab.com/aossie/Agora) Library. In project `models.services.Countvotes` object provide the functions for counting votes for the election. To add a new Algorithm into the system  please do the following:
 1. Check is the Ballot view available in the `app/views/ballot` directory
-2. If yes skip this step, else create a ballot view accroding to the voting process.
+2. If yes skip this step, else create a ballot view according to the voting process.
 3. Add new algorithm into the `algo` list in the `addElection.scala.html` and `editElection.scala.html`. 
 4. Then define a case statement in the models.services.Countvotes.countvotesMethod method to handle the new algorithm. Example code.
 
