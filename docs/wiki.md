@@ -91,12 +91,12 @@ We use [Casbah](http://mongodb.github.io/casbah/3.1/) to connect the MongoDB.We 
  We created a Object called MongoDBConnection to Connect with the Database. We control different database connection using the object. 
 Example Code,
  ```
- def getConnection: MongoCollection = {
-    val mongoUri    =  MongoClientURI(ConfigFactory.load().getString("mongodb.default.uri"))
-    val mongoClient = MongoClient(mongoUri)
-    val db          = mongoClient("Database Name")
-    db("electionData")
-  }
+     def getConnection: MongoCollection = {
+        val mongoUri    =  MongoClientURI(ConfigFactory.load().getString("mongodb.default.uri"))
+        val mongoClient = MongoClient(mongoUri)
+        val db          = mongoClient("Database Name")
+        db("electionData")
+      }
  ```
 See [Environment variables](#environment-variables) Section to learn about `mongoUri`.
 
