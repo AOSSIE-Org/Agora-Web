@@ -54,64 +54,64 @@ I would like to thank every AOSSIE member, especially my mentors, Bruno Woltzenl
 
 ### Merge Requests 
 1. [ Merge request !1](https://gitlab.com/aossie/Agora-Web/merge_requests/1) - Initialize the project for agora-web - Status: *Merged*
-* Created fresh web project using play framework 2.5 seeds templates and included sample user interfaces.
+    *  Created fresh web project using play framework 2.5 seeds templates and included sample user interfaces.
 
 2. [Merge request !2](https://gitlab.com/aossie/Agora-Web/merge_requests/2) - Webjar added to the project - Status: *Closed*
-* Removed the css file from the project and configure project using webjar. 
-Removed the gradle configuration file.
+    *  Removed the css file from the project and configure project using webjar. 
+    *  Removed the gradle configuration file.
 
 3. [Merge request !3](https://gitlab.com/aossie/Agora-Web/merge_requests/3) - Start to Create back end for add election functionality - Status: *Merged*
-* Created a model class - Election 
-* Created a Controller for Election 
-* Created a view form using form helper.
-* Created a model class - User
-* User authentication
-* Create election function
+    *  Created a model class - Election 
+    *  Created a Controller for Election 
+    *  Created a view form using form helper.
+    *  Created a model class - User
+    *  User authentication
+    *  Create election function
 
 4. [Merge request !4](https://gitlab.com/aossie/Agora-Web/merge_requests/4) - Election view - Status: *Closed*
-* Connected with remote database
-* Create election in database
-* Added the election data to profile 
-* Start to develop the view of the single election.
+    *  Connected with remote database
+    *  Create election in database
+    *  Added the election data to profile 
+    *  Start to develop the view of the single election.
 
 5. [Merge request !5](https://gitlab.com/aossie/Agora-Web/merge_requests/5) - Design voting interface - Status: *Closed*
-* Starting to develop ballot interface for the algorithms.
+    * Starting to develop ballot interface for the algorithms.
 
 6. [Merge request !6](https://gitlab.com/aossie/Agora-Web/merge_requests/6) - Developing the view for the election and user profile - Status: *Merged*
-* Interface for election
-* Interface for user
+    *  Interface for election
+    *  Interface for user
 
 7. [Merge request !7](https://gitlab.com/aossie/Agora-Web/merge_requests/7) - Developing interface for each ballot - Status: *Merged*
-* CreateSingle candidate ballot interface
-* Create approval Ballot interface
-* Create scored Ballot interface
-* Create new add election interface
-* Create preferential with indifference ballot interface
+    * CreateSingle candidate ballot interface
+    * Create approval Ballot interface
+    * Create scored Ballot interface
+    * Create new add election interface
+    * Create preferential with indifference ballot interface
 
 9. [Merge request !9](https://gitlab.com/aossie/Agora-Web/merge_requests/9) - Sending pass code for voter - Status: *Merged*
-* Create add voter function
-* Created the sending passcode to voter function. 
-* passcode verification parr
-* Implement the visibility level for ballot, result and voter
+    * Create add voter function
+    * Created the sending passcode to voter function. 
+    * passcode verification parr
+    * Implement the visibility level for ballot, result and voter
 
 10. [Merge request !10](https://gitlab.com/aossie/Agora-Web/merge_requests/10) - Counting votes - Status: *Merged*
-* created the methods to add result text into the database and receive it.
-* Redesign the Create election view
-* Implement the Count election function
-* Implement the election sheduling in the system 
+    * created the methods to add result text into the database and receive it.
+    * Redesign the Create election view
+    * Implement the Count election function
+    * Implement the election sheduling in the system 
 
 11. [Merge request !11](https://gitlab.com/aossie/Agora-Web/merge_requests/11) - Guest admin link - Status: *Merged*
-* Fix the guest election creation and admin link part
+    * Fix the guest election creation and admin link part
 
 12. [Merge request !12](https://gitlab.com/aossie/Agora-Web/merge_requests/12) - Fix the edit election and add the number of vacancies - Status: *Merged*
-* Fix various bugs in the system. 
+    * Fix various bugs in the system. 
 
 13. [Merge request !13](https://gitlab.com/aossie/Agora-Web/merge_requests/13) - Show the voted elections in the user profile - Status: *Open*
-* Redesign the user profile view
+    * Redesign the user profile view
 
 14. [Merge request !14](https://gitlab.com/aossie/Agora-Web/merge_requests/14) - Edit the add election interface and refactor code - Status: *Merged*
-* Add wiki pages for algorithms
-* Change the dropdowns to Radio buttons
+    * Add wiki pages for algorithms
+    * Change the dropdowns to Radio buttons
 
 15. [Merge request !15](https://gitlab.com/aossie/Agora-Web/merge_requests/15) - Update Readme file - Status: *Merged*
- * Create the Readme file.
+    * Create the Readme file.
