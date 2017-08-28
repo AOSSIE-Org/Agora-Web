@@ -30,9 +30,8 @@
           </div>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-        <!-- Simple post content example. -->
           <div class="panel panel-default">
-            <div class="container"><h2>Election Details</h2></div>
+            <div class="container"><h2>Created Elections</h2></div>
               <div class="panel-body">
                 <div class="tab-content">
                   <div class="tab-pane active" id="home">
@@ -52,11 +51,16 @@
                           @for((doc, index) <- list.zipWithIndex) {
                             <tr>
                               <td>@{index+1}</td>
-                              <td>  <a href=/user/election/@doc.id>@doc.name</a></td>
-                              <td>@doc.isCompleted</td>
+                              <td>@doc.name</td>
+                              @if(doc.isCompleted){
+                                <td>Completed</td>
+                              }else{
+                                <td>Underway</td>
+                              }
+
                               <td>@doc.votingAlgo</td>
                               <td>@doc.end</td>
-                              <td>Table Cell</td>
+                              <td><a href=/user/election/@doc.id>Link</a></td>
                             </tr>
                           }
                         </tbody>
@@ -68,9 +72,8 @@
             </div>
           </div>
           <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-          <!-- Simple post content example. -->
             <div class="panel panel-default">
-              <div class="container"><h2>Participation in elections details</h2></div>
+              <div class="container"><h2>Participations in Elections</h2></div>
                 <div class="panel-body">
                   <div class="tab-content">
                     <div class="tab-pane active" id="home">
@@ -83,18 +86,22 @@
                               <th>Status </th>
                               <th>Voting Algorithm</th>
                               <th>Ends On</th>
-                              <th>Admin Link</th>
+                              <th>Link</th>
                             </tr>
                           </thead>
                           <tbody id="items">
                             @for((doc, index) <- votedList.zipWithIndex) {
                               <tr>
                                 <td>@{index+1}</td>
-                                <td>  <a href=/user/election/@doc.id>@doc.name</a></td>
-                                <td>@doc.isCompleted</td>
+                                <td>@doc.name</td>
+                                @if(doc.isCompleted){
+                                  <td>Completed</td>
+                                }else{
+                                  <td>Underway</td>
+                                }
                                 <td>@doc.votingAlgo</td>
                                 <td>@doc.end</td>
-                                <td>Table Cell</td>
+                                <td><a href=/user/election/@doc.id>Link</a></td>
                               </tr>
                             }
                           </tbody>

@@ -28,9 +28,6 @@
 		       	 <a href=/edit/@election.id   class="btn btn-sm btn-default pull-right">Edit Election</a>
 						  <a type="button" class="btn btn-sm btn-default pull-right" data-toggle="modal" data-target="#deleteElectionModel">Delete Election</a>
 						}
-						@if( (election.isCompleted || election.realtimeResult) && election.isStarted ){
-							<a href=/result/@election.id   class="btn btn-sm btn-default pull-right">Election Result</a>
-						}
 						@if(election.isStarted && !election.isCompleted){
 		       	 <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
 					 }
