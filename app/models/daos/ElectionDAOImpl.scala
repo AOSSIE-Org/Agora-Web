@@ -9,6 +9,7 @@ import org.bson.types.ObjectId
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
+import scala.util.control.Breaks._
 
 
 
@@ -33,7 +34,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     Future.successful(election)
   }
 
-  def view(id: ObjectId): List[models.Election] = {
+  def view(id: ObjectId): List[Election] = {
     val o: DBObject       = MongoDBObject("id" -> id)
     val u                 = collectionRef.findOne(o)
     val list              = u.toList
@@ -46,7 +47,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     result
   }
 
-  def userElectionList(email: Option[String]): List[models.Election] = {
+  def userElectionList(email: Option[String]): List[Election] = {
     val o: DBObject       = MongoDBObject("creatorEmail" -> email)
     val u                 = collectionRef.find(o)
     val list              = u.toList
@@ -198,7 +199,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
     //get all the inactive elections
-    def getInactiveElections() :  List[models.Election] = {
+    def getInactiveElections() :  List[Election] = {
         val o: DBObject       = MongoDBObject("isStarted" -> false)
         val u                 = collectionRef.find(o)
         val list              = u.toList
@@ -206,7 +207,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
     //get all the completed and uncount elections
-    def getCompletedElections() :  List[models.Election] = {
+    def getCompletedElections() :  List[Election] = {
         val o: DBObject       = MongoDBObject("isCompleted" -> true , "isCounted" -> false)
         val u                 = collectionRef.find(o)
         val list              = u.toList
@@ -228,14 +229,14 @@ class ElectionDAOImpl() extends ElectionDAO {
     }
 
     //get the all unfinished elections
-    def getActiveElection() : List[models.Election] = {
+    def getActiveElection() : List[Election] = {
       val o: DBObject       = MongoDBObject("isStarted" -> true , "isCompleted" -> false)
       val u                 = collectionRef.find(o)
       val list              = u.toList
       list.map(doc => grater[Election].asObject(doc))
     }
 
-    def getActiveElectionWithRealTimeResult() : List[models.Election] = {
+    def getActiveElectionWithRealTimeResult() : List[Election] = {
       val o: DBObject       = MongoDBObject("isStarted" -> true , "isCompleted" -> false , "realtimeResult" -> true)
       val u                 = collectionRef.find(o)
       val list              = u.toList
@@ -296,4 +297,22 @@ class ElectionDAOImpl() extends ElectionDAO {
       collectionRef.update( o, update )
     }
 
+    def userVotedElectionList(email : Option[String]) : List[Election] = {
+      var votedList      = ListBuffer[Election]()
+      val o: DBObject       = MongoDBObject("isStarted" -> true)
+      val u                 = collectionRef.find(o)
+      val list              = u.toList
+      val electionList= list.map(doc => grater[Election].asObject(doc))
+      for(election <- electionList){
+        breakable {
+          for(ballot <- election.ballot){
+            if(ballot.voterEmail == email.get){
+              votedList += election
+              break
+            }
+          }
+        }
+      }
+      votedList.toList
+    }
 }

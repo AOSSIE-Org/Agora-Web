@@ -1,79 +1,117 @@
-@(user: Option[models.User] , list: List[models.Election] )(implicit request: RequestHeader, messages: Messages)
+@(user: Option[models.User] , list: List[models.Election], votedList : List[models.Election] )(implicit request: RequestHeader, messages: Messages)
 
 @import java.math.BigInteger; var i = 0;
 
 @main(Messages("home.title"), user) {
-<div class="mainbody container-fluid">
+  <div class="mainbody container-fluid">
     <div class="row">
-        <div style="padding-top:50px;"> </div>
+      <div style="padding-top:50px;"> </div>
         <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="media">
-                        <div align="center">
-                            <img class="thumbnail img-responsive" src="@user.get.avatarURL" width="300px" height="300px">
-                        </div>
-                        <h3>@user.get.fullName</h3>
-                        <div class="media-body">
-                            <hr>
-                            <h3><strong>Bio</strong></h3>
-                            <p>Bio about the user</p>
-                            <hr>
-                            <h3><strong>Location</strong></h3>
-                            <p>Earth</p>
-                            <hr>
-                            <h3><strong>Email</strong></h3>
-                            <p>@user.get.email</p>
-                        </div>
-                    </div>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="media">
+                <div align="center">
+                  <img class="thumbnail img-responsive" src="@user.get.avatarURL" width="300px" height="300px">
                 </div>
+                <h3>@user.get.fullName</h3>
+                <div class="media-body">
+                  <hr>
+                  <h3><strong>Bio</strong></h3>
+                  <p>Bio about the user</p>
+                  <hr>
+                  <h3><strong>Location</strong></h3>
+                  <p>Earth</p>
+                  <hr>
+                  <h3><strong>Email</strong></h3>
+                  <p>@user.get.email</p>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="container"><h2>Created Elections</h2></div>
+              <div class="panel-body">
+                <div class="tab-content">
+                  <div class="tab-pane active" id="home">
+                    <div class="table-responsive">
+                      <table class="table table-hover">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Election name</th>
+                            <th>Status </th>
+                            <th>Voting Algorithm</th>
+                            <th>Ends On</th>
+                            <th>Admin Link</th>
+                          </tr>
+                        </thead>
+                        <tbody id="items">
+                          @for((doc, index) <- list.zipWithIndex) {
+                            <tr>
+                              <td>@{index+1}</td>
+                              <td>@doc.name</td>
+                              @if(doc.isCompleted){
+                                <td>Completed</td>
+                              }else{
+                                <td>Underway</td>
+                              }
 
-
-                <!-- Simple post content example. -->
-            <div class="panel panel-default">
-                <div class="container"><h2>Election Details</h2></div>
-                <div class="panel-body">
-
-
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="home">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Election name</th>
-                                            <th>Status </th>
-                                            <th>Voting Algorithm</th>
-                                            <th>Ends On</th>
-                                            <th>Admin Link</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="items">
-                                      @for((doc, index) <- list.zipWithIndex) {
-
-                                        <tr>
-
-                                            <td>@{index+1}</td>
-                                            <td>  <a href=/user/election/@doc.id>@doc.name</a></td>
-                                            <td>@doc.isCompleted</td>
-                                            <td>@doc.votingAlgo</td>
-                                            <td>@doc.end</td>
-                                            <td>Table Cell</td>
-
-                                        </tr>
-
-                                    	}
-                                    </tbody>
-                                </table>
-                            </div>
-
+                              <td>@doc.votingAlgo</td>
+                              <td>@doc.end</td>
+                              <td><a href=/user/election/@doc.id>Link</a></td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+            <div class="panel panel-default">
+              <div class="container"><h2>Participations in Elections</h2></div>
+                <div class="panel-body">
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="home">
+                      <div class="table-responsive">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th>#</th>
+                              <th>Election name</th>
+                              <th>Status </th>
+                              <th>Voting Algorithm</th>
+                              <th>Ends On</th>
+                              <th>Link</th>
+                            </tr>
+                          </thead>
+                          <tbody id="items">
+                            @for((doc, index) <- votedList.zipWithIndex) {
+                              <tr>
+                                <td>@{index+1}</td>
+                                <td>@doc.name</td>
+                                @if(doc.isCompleted){
+                                  <td>Completed</td>
+                                }else{
+                                  <td>Underway</td>
+                                }
+                                <td>@doc.votingAlgo</td>
+                                <td>@doc.end</td>
+                                <td><a href=/user/election/@doc.id>Link</a></td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-    </div>
-</div>
 }
