@@ -1,4 +1,4 @@
-# Welcome to the Agora Web Wiki. 
+# Welcome to the Agora Web Wiki.
 
 
 _Frontend for [Agora](https://gitlab.com/aossie/Agora/): An Electronic Voting Library implemented in Scala_
@@ -26,8 +26,8 @@ The scope of the project to implement a front end for [Agora](https://gitlab.com
 Before Starting to work with the project You need to configure the environment variables
 for the Project. Here, environment variables are described:
 
-|  Variable 	|  Mandatory 	|   Description	
-|     ---	|      ---	|       ---	
+|  Variable 	|  Mandatory 	|   Description
+|     ---	|      ---	|       ---
 |  APPLICATION_SECRET | Yes |   Secret key for play application	   	
 |  MONGODB_URI        | Yes |   `mongodb://` URI of the MongoDB database
 |  SENDGRID_USERNAME  | Yes | Username [Sendgrid](https://sendgrid.com/) account used to send mails in name of the system.  	   	
@@ -59,9 +59,9 @@ For more info please check these links,
 
 # Authentication
 
-We have used Silhouette for the `Authentication` purpose. 
+We have used Silhouette for the `Authentication` purpose.
 
-> Silhouette is an authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication or custom authentication schemes. 
+> Silhouette is an authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication or custom authentication schemes.
 
 We used [Oauth2](https://oauth.net/2/) framework to get the details from the service providers. Following diagram will explain the authentication scenario.
 
@@ -86,9 +86,9 @@ We use [Casbah](http://mongodb.github.io/casbah/3.1/) to connect the MongoDB.We 
 
 > `Casbah` is a Scala toolkit for MongoDB.
 
->  `Salat` is a bi-directional Scala case class serialization library that leverages MongoDB's DBObject (which uses BSON underneath) as its target format. 
- 
- We created a Object called MongoDBConnection to Connect with the Database. We control different database connection using the object. 
+>  `Salat` is a bi-directional Scala case class serialization library that leverages MongoDB's DBObject (which uses BSON underneath) as its target format.
+
+ We created a Object called MongoDBConnection to Connect with the Database. We control different database connection using the object.
 Example Code,
  ```
      def getConnection: MongoCollection = {
@@ -98,12 +98,13 @@ Example Code,
         db("electionData")
       }
  ```
+
 See [Environment variables](#environment-variables) Section to learn about `mongoUri`.
 
  Examples for salat serialization are shown below,
 
  1. Convert Model into BSON Data.
- 
+
  ```
      val bsonElection = grater[Election].asDBObject(election)
  ```
@@ -123,7 +124,7 @@ We used play mailer module to build and send email messages. For our app We want
 1. Sending invitation and verification code for voter.
 2. Sending admin link to guest users while creating the election
 
-Configure the play mailer in `application.conf`. 
+Configure the play mailer in `application.conf`.
  ```
     play.mailer {
       host = "example.com" // (mandatory)
@@ -140,7 +141,7 @@ Configure the play mailer in `application.conf`.
     }
  ```
  Check the [Environment variables](#environment-variables) Section to learn more.
- 
+
  Example Code for sending mail,
 ```
     val email = Email(
@@ -174,8 +175,9 @@ For more details please check these links,
 We are using the algorithms from the [Agora](https://gitlab.com/aossie/Agora) Library. In project `models.services.Countvotes` object provide the functions for counting votes for the election. To add a new Algorithm into the system  please do the following:
 1. Check is the Ballot view available in the `app/views/ballot` directory
 2. If yes skip this step, else create a ballot view according to the voting process.
-3. Add new algorithm into the `algo` list in the `addElection.scala.html` and `editElection.scala.html`. 
+3. Add new algorithm into the `algo` list in the `addElection.scala.html` and `editElection.scala.html`.
 4. Then define a case statement in the models.services.Countvotes.countvotesMethod method to handle the new algorithm. Example code.
+
 
  ```
     case "new algorithm name" => {
