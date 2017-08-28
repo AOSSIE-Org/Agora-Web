@@ -5,7 +5,6 @@
 - Project : https://gitlab.com/aossie/Agora-Web
 - Live demo of the Project :  https://agora-web-aossie.herokuapp.com
 - Wiki page : [Wiki](docs/wiki.md)
-- Project tag : 
 
 ## Agora Web  
 
