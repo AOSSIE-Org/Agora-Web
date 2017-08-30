@@ -184,7 +184,7 @@ class ElectionControllerSpec extends PlaySpecification with Mockito with CSRFTes
         .withAuthenticator[DefaultEnv](identity.loginInfo))
         status(authorizedResult) must be equalTo OK
         contentType(authorizedResult) must beSome("text/html")
-        contentAsString(authorizedResult) must contain("Election Details")
+        contentAsString(authorizedResult) must contain("Created Elections")
       }
     }
     "return 200 if user is authorized and id is valid" in new Context {
@@ -289,11 +289,6 @@ class ElectionControllerSpec extends PlaySpecification with Mockito with CSRFTes
     }
   }
 }
-
-
-
-
-
 
   /**
    * The context.
