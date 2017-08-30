@@ -5,34 +5,24 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 @election.vote(user,id , name ,description) {
-
   <div class="container">
-        <div class="col-md-3"></div>
-        <div class="centered col-md-6 centered" id="candidateDiv">
-
-
-          <p>Candidate List:</p>
-  @for(candidate <- candidates.get){
-            <div class="col-md-12 scored centered">
-            <div class="col-md-4">
-              <label class="scored" for="sel1">@candidate</label>
+    <div class="col-md-3"></div>
+    <div class="centered col-md-6 centered" id="candidateDiv">
+      <p>Candidate List:</p>
+      @for(candidate <- candidates.get){
+        <div class="col-md-12 scored centered">
+          <div class="col-md-4">
+            <label class="scored" for="sel1">@candidate</label>
+          </div>
+          <div class="col-md-8">
+            <div class="range-slider">
+              <input class="range-slider__range" name=@candidate type="range" value="5" min="0" max="10">
+              <span class="range-slider__value">0</span>
             </div>
-            <div class="col-md-8">
-              <div class="range-slider">
-                <input class="range-slider__range" name=@candidate type="range" value="5" min="0" max="10">
-                <span class="range-slider__value">0</span>
-              </div>
-            </div>
+          </div>
         </div>
-
-
       }
-
-
-
-  </div>
+    </div>
   </div>
   <script type='text/javascript' src='@routes.Assets.at("/javascripts/scored.js")'> </script>
-</form>
-
 }

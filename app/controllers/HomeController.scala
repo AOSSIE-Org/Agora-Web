@@ -64,8 +64,7 @@ class HomeController @Inject() (
       Ok(
         views.html.profile(
           Option(request.identity),
-          electionDAOImpl.userElectionList(request.identity.email),
-          electionDAOImpl.userVotedElectionList(request.identity.email)
+          electionDAOImpl.userElectionList(request.identity.email)
         )
       )
     )

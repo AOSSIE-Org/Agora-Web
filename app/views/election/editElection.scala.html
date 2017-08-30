@@ -18,6 +18,29 @@
 
 @ballotVisibility = @{List("Public","Visible","Hidden")}
 
+@wikiPages = @{ Map("Borda" -> "https://en.wikipedia.org/wiki/Borda_count", "Contingent Method" -> "https://en.wikipedia.org/wiki/Contingent_election",
+                    "Coomb’s" -> "https://en.wikipedia.org/wiki/Coombs%27_method", "Copeland" -> "https://en.wikipedia.org/wiki/Copeland",
+                    "Cumulative voting" -> "https://en.wikipedia.org/wiki/Cumulative_voting", "Exhaustive ballot" -> "https://en.wikipedia.org/wiki/Exhaustive_ballot",
+                    "Exhaustive ballot with dropoff" -> "https://en.wikipedia.org/wiki/Exhaustive_ballot","Kemeny-Young" -> "https://en.wikipedia.org/wiki/Kemeny%E2%80%93Young_method",
+                    "Meek STV" -> "https://en.wikipedia.org/wiki/Counting_single_transferable_votes#Meek", "Minimax Condorcet" -> "https://en.wikipedia.org/wiki/Minimax_Condorcet",
+                    "Oklahoma Method" -> "https://en.wikipedia.org/wiki/Oklahoma_primary_electoral_system","Preferential block voting" -> "https://en.wikipedia.org/wiki/Preferential_block_voting",
+                    "Proportional Approval voting" -> "https://en.wikipedia.org/wiki/Proportional_approval_voting", "Random Ballot" -> "https://en.wikipedia.org/wiki/Random_ballot",
+                    "Range Voting" -> "https://en.wikipedia.org/wiki/Range_voting", "Ranked Pairs" -> "https://en.wikipedia.org/wiki/Ranked_pairs",
+                    "Satisfaction Approval voting" -> "https://en.wikipedia.org/wiki/Satisfaction_approval_voting", "Schulze" -> "https://en.wikipedia.org/wiki/Schulze_method",
+                    "Sequential Proportional Approval voting" -> "https://en.wikipedia.org/wiki/Sequential_proportional_approval_voting",
+                    "Top Cycle" -> "https://en.wikipedia.org/wiki/Smith_set", "Uncovered Set" -> "https://en.wikipedia.org/wiki/Landau_set",
+                    "Warren STV" -> "https://en.wikipedia.org/wiki/Counting_single_transferable_votes#Warren",
+                    "Approval" -> "#",
+                    "Baldwin" -> "#",
+                    "Egalitarian" -> "#",
+                    "Instant Runoff 2-round" -> "#",
+                    "Majority" -> "#",
+                    "Nanson" -> "#",
+                    "Scottish STV" -> "#",
+                    "SMC" -> "#"
+                    )}
+
+
 @import java.lang.String; var str=""
 @import java.text.SimpleDateFormat; val curTimeFormat = new SimpleDateFormat("MM/dd/yyyy")
 
@@ -70,17 +93,7 @@
                   <label for="exampleInputEmail1">End</label>
                   <input class="form-control" value='@curTimeFormat.format(election.end)' id="date" name="end" placeholder="MM/DD/YYY" type="text"/>
                 </div>
-                @if(user == None) {
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Creator Name</label>
-                    <input type="text" class="form-control" value='@election.creatorName' name="creatorName" placeholder="Creator name" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Creator Email</label>
-                    <input type="text" class="form-control" value='@election.creatorEmail' name="creatorEmail" placeholder="Creator email" required>
-                  </div>
-                }
-                  <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
+                <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
                 </div>
             </div>
       </div>
@@ -96,44 +109,61 @@
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Number of vacancies</label>
-                <div>
-                    <input type="text" name="noVacancies" class="form-control input-number" value=@election.noVacancies min="1" max="10">
-                      <span class="span-input">
-                        <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
-                          <span class="glyphicon glyphicon-minus"></span>
-                        </button>
-                      </span>
-                      <span class="span-input">
-                        <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
-                          <span class="glyphicon glyphicon-plus"></span>
-                        </button>
-                      </span>
-                    </input>
-                </div>
+              <span class="span-input">
+                <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
+                  <span class="glyphicon glyphicon-minus"></span>
+                </button>
+              </span>
+              <span class="span-input">
+                <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
+                  <span class="glyphicon glyphicon-plus"></span>
+                </button>
+              </span>
+              <div class="input-number-div">
+                <input type="text" name="noVacancies" class="form-control input-number" value="1" min="1" max="10">
               </div>
+            </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Voting Algorithm</label>
-              <select class="selectpicker form-control" name="votingAlgo">
-                @for(algoValue <- algo){
-                  @if(algoValue == election.votingAlgo){
-                    <option value='@algoValue' selected>@algoValue</option>
+                @for(value <- algo){
+                  @if(value == election.votingAlgo){
+                    <div class="algoRadio algoRadio-success">
+                      <input type="radio" id="@value" name="votingAlgo" value=@value checked>
+                      <label for="@value">
+                        <span class="algoRadio-title">@value</span>
+                        <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"> If you want to know more about this algorithm click this.</a></span>
+                      </label>
+                    </div>
                   }else{
-                    <option value='@algoValue' >@algoValue</option>
+                    <div class="algoRadio algoRadio-success">
+                      <input type="radio" id="@value" name="votingAlgo" value=@value>
+                      <label for="@value">
+                        <span class="algoRadio-title">@value</span>
+                        <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"> If you want to know more about this algorithm click this.</a></span>
+                      </label>
+                    </div>
                   }
                 }
-              </select>
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Realtime Result</label>
-              <select  class="selectpicker form-control" name="realtimeResult">
-                @for(booleanValue <- booleanResult){
-                  @if(booleanValue == election.realtimeResult.toString){
-                    <option value='@booleanValue' selected>@booleanValue</option>
+                @for(value <- booleanResult){
+                  @if(value == election.realtimeResult.toString){
+                    <div class="algoRadio algoRadio-success">
+                      <input type="radio" id="realtimeResult@value" name="realtimeResult" value=@value checked>
+                      <label for="realtimeResult@value">
+                        <span class="algoRadio-title">@value</span>
+                      </label>
+                    </div>
                   }else{
-                    <option value='@booleanValue' >@booleanValue</option>
+                    <div class="algoRadio algoRadio-success">
+                      <input type="radio" id="realtimeResult@value" name="realtimeResult" value=@value>
+                      <label for="realtimeResult@value">
+                        <span class="algoRadio-title">@value</span>
+                      </label>
+                    </div>
                   }
                 }
-              </select>
             </div>
             <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
           </div>
@@ -144,45 +174,66 @@
           <div class="col-md-12">
             <div class="form-group">
               <label for="exampleInputEmail1">Ballot visibility</label>
-              <select  class="selectpicker form-control" name="ballotVisibility">
-                @for(visibilityLevel <- ballotVisibility){
-                  @if(visibilityLevel == election.ballotVisibility){
-                    <option value='@visibilityLevel' selected>@visibilityLevel</option>
-                  }else{
-                    <option value='@visibilityLevel' >@visibilityLevel</option>
-                  }
+              @for(value <- ballotVisibility){
+                @if(value == election.ballotVisibility){
+                  <div class="algoRadio algoRadio-success">
+                    <input type="radio" id="ballotVisibility@value" name="ballotVisibility" value=@value checked>
+                    <label for="ballotVisibility@value">
+                      <span class="algoRadio-title">@value</span>
+                    </label>
+                  </div>
+                }else{
+                  <div class="algoRadio algoRadio-success">
+                    <input type="radio" id="ballotVisibility@value" name="ballotVisibility" value=@value>
+                    <label for="ballotVisibility@value">
+                      <span class="algoRadio-title">@value</span>
+                    </label>
+                  </div>
                 }
-              </select>
+              }
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Invite Voters</label>
-              <select value='@election.isInvite' class="selectpicker form-control" name="isInvite">
-                @for(booleanValue <- booleanResult){
-                  @if(booleanValue == election.isInvite.toString){
-                    <option value='@booleanValue' selected>@booleanValue</option>
-                  }else{
-                    <option value='@booleanValue' >@booleanValue</option>
-                  }
+              @for(value <- booleanResult){
+                @if(value == election.isInvite.toString){
+                  <div class="algoRadio algoRadio-success">
+                    <input type="radio" id="isInvite@value" name="isInvite" value=@value checked>
+                    <label for="isInvite@value">
+                      <span class="algoRadio-title">@value</span>
+                    </label>
+                  </div>
+                }else{
+                  <div class="algoRadio algoRadio-success">
+                    <input type="radio" id="isInvite@value" name="isInvite" value=@value>
+                    <label for="isInvite@value">
+                      <span class="algoRadio-title">@value</span>
+                    </label>
+                  </div>
                 }
-              </select>
+              }
             </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Voter list visibility</label>
-              <select value='@election.voterListVisibility' class="selectpicker form-control" name="voterListVisibility">
-                @for(value <- voterVisibility.keySet){
-                  @if(voterVisibility(value) == election.voterListVisibility.toString){
-                    <option value=@voterVisibility(value) selected>@value</option>
-                  }else{
-                      <option value='@voterVisibility(value)' >@value</option>
-                    }
-                  }
-
-              </select>
+              @for(value <- voterVisibility.keySet){
+                @if(voterVisibility(value) == election.voterListVisibility.toString){
+                  <div class="algoRadio algoRadio-success">
+                    <input type="radio" id="voterListVisibility@value" name="voterListVisibility" value=@voterVisibility(value) checked>
+                    <label for="voterListVisibility@value">
+                      <span class="algoRadio-title">@value</span>
+                    </label>
+                  </div>
+                }else{
+                  <div class="algoRadio algoRadio-success">
+                    <input type="radio" id="voterListVisibility@value" name="voterListVisibility" value=@voterVisibility(value)>
+                    <label for="voterListVisibility@value">
+                      <span class="algoRadio-title">@value</span>
+                    </label>
+                  </div>
+                }
+              }
             </div>
-            @if(user != None) {
               <input type="hidden" value='@election.creatorEmail' class="form-control" name="creatorEmail" value=@user.get.email>
               <input type="hidden" value='@election.creatorName' class="form-control" name="creatorName" value=@user.get.name>
-            }
             <button class="btn btn-success btn-lg pull-right" type="submit">Finish!</button>
           </div>
         </div>

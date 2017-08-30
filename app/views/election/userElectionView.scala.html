@@ -52,7 +52,7 @@
 		                <span class="label label-info">@candidate</span>
 		                </dd>
 		                }
-									@if(election.winners.size>0 && ( election.realtimeResult || election.isCounted)){
+									@if(election.winners.size>0){
 										<dt>Winners:</dt>
 										@for(winner <- election.winners){
 											<dd>
