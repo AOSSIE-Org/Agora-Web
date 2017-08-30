@@ -594,7 +594,8 @@ class ElectionController @Inject()(
         Ok(
           views.html.profile(
             Option(request.identity),
-            electionDAOImpl.userElectionList(request.identity.email)
+            electionDAOImpl.userElectionList(request.identity.email),
+            electionDAOImpl.votedElectionList(request.identity.email)
           )
         )
       )
