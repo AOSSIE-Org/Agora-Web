@@ -28,9 +28,6 @@
 		       	 <a href=/edit/@election.id   class="btn btn-sm btn-default pull-right">Edit Election</a>
 						  <a type="button" class="btn btn-sm btn-default pull-right" data-toggle="modal" data-target="#deleteElectionModel">Delete Election</a>
 						}
-						@if( (election.isCompleted || election.realtimeResult) && election.isStarted ){
-							<a href=/result/@election.id   class="btn btn-sm btn-default pull-right">Election Result</a>
-						}
 						@if(election.isStarted && !election.isCompleted){
 		       	 <a href=/guest/vote/@election.id class="btn btn-sm btn-default pull-right">Vote</a>
 					 }
@@ -73,7 +70,6 @@
 			                </dd>
 			                }
 									}
-
 		            </dl>
 		          </div>
 		        </div>
@@ -85,7 +81,6 @@
 					<div class="panel panel-default">
 							<div class="container"><h2>Voter Details</h2></div>
 							<div class="panel-body">
-
 					                    <div class="tab-content">
 					                        <div class="tab-pane active" id="home">
 					                            <div class="table-responsive">
@@ -99,14 +94,10 @@
 					                                    </thead>
 					                                    <tbody id="items">
 					                                      @for((doc, index) <- election.voterList.zipWithIndex) {
-
 					                                        <tr>
-
 					                                            <td>@{index+1}</td>
 					                                            <td>@doc.name</td>
 					                                            <td>@doc.email</td>
-
-
 					                                        </tr>
 
 					                                    	}

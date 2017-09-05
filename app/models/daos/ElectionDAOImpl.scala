@@ -8,7 +8,7 @@ import org.bson.types.ObjectId
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
-
+import scala.util.control.Breaks._
 
 
 
@@ -295,5 +295,27 @@ class ElectionDAOImpl() extends ElectionDAO {
       val update = $set("isCounted" -> true)
       collectionRef.update( o, update )
     }
+
+    def votedElectionList(email : Option[String]) : List[Election] = {
+      var votedList      = ListBuffer[Election]()
+      val o: DBObject       = MongoDBObject("isStarted" -> true)
+      val u                 = collectionRef.find(o)
+      val list              = u.toList
+      val electionList= list.map(doc => grater[Election].asObject(doc))
+      if(email!=None){
+        for(election <- electionList){
+          breakable {
+            for(ballot <- election.ballot){
+              if(ballot.voterEmail == email.get){
+                votedList += election
+                break
+              }
+            }
+          }
+        }
+      }
+      votedList.toList
+    }
+
 
 }
