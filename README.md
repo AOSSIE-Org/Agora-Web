@@ -33,7 +33,7 @@ To install the frontend, please do the following:
 1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 2. Clone this repo with `https://gitlab.com/aossie/Agora-Web`
   - **Note:** *If you just want to use the project, cloning is the best option. However, if you wish to contribute to the project, you will need to fork the project first, and then clone your `Agora-Web` fork and make your contributions via a branch on your fork.*
-3. Install and configure [MongoDB](https://www.mongodb.com/)
+3. Install and run [MongoDB](https://www.mongodb.com/)
 4. Configure [Silhouette](https://www.silhouette.rocks/) to allow Agora's frontend to do Oauth2 authentication:
     1. Make a copy of `silhouette.conf` and rename it to `silhouetteLocal.conf`.
     2. Create new applications in [Facebook](https://developers.facebook.com/), [Twitter](https://dev.twitter.com/) and [Google](https://console.cloud.google.com/)
@@ -53,8 +53,9 @@ To install the frontend, please do the following:
         ```
         include "silhouetteLocal.conf"
         ```
-5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. Assign your MongoDB URI to the `mongodb.default.uri` field (i.e. `mongodb.default.uri = ${?MONGODB_URI}`) and include `applicationLocal.conf` into `application.conf`.
-6. 
+5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. Assign your MongoDB URI (e.g. `mongodb://localhost`, if you are connecting to a MongoDB server running in your local computer) to the `mongodb.default.uri` field (e.g `mongodb.default.uri = "mongodb://localhost"`) and include `applicationLocal.conf` into `application.conf`.
+
+ 
 
 ### Running the application
 
