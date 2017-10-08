@@ -34,10 +34,10 @@ To install the frontend, please do the following:
 2. Clone this repo with `https://gitlab.com/aossie/Agora-Web`
   - **Note:** *If you just want to use the project, cloning is the best option. However, if you wish to contribute to the project, you will need to fork the project first, and then clone your `Agora-Web` fork and make your contributions via a branch on your fork.*
 3. Install and configure [MongoDB](https://www.mongodb.com/)
-4. Configure [Shilhouette](https://www.silhouette.rocks/) to allow Agora's frontend to do Oauth2 authentication:
-    1. Make a copy of `Shilhouette.conf` and rename it to `ShilhouetteLocal.conf`.
+4. Configure [Silhouette](https://www.silhouette.rocks/) to allow Agora's frontend to do Oauth2 authentication:
+    1. Make a copy of `silhouette.conf` and rename it to `silhouetteLocal.conf`.
     2. Create new applications in [Facebook](https://developers.facebook.com/), [Twitter](https://dev.twitter.com/) and [Google](https://console.cloud.google.com/)
-    3. Fill the following fields in `ShilhouetteLocal.conf` with the ids, keys and secrets from your created applications.
+    3. Fill the following fields in `silhouetteLocal.conf` with the ids, keys and secrets from your created applications.
 
         ```
         facebook.clientID=${?FACEBOOK_CLIENT_ID}
@@ -47,8 +47,8 @@ To install the frontend, please do the following:
         twitter.consumerKey=${?TWITTER_CONSUMER_KEY}
         twitter.consumerSecret=${?TWITTER_CONSUMER_SECRET}
         ```
-    4. Change the redirect URL in `ShilhouetteLocal.conf` to your localhost `localhost:9000`.
-    5. include the `ShilhouetteLocal.conf` into the `Shilhouette.conf`.
+    4. Change the redirect URL in `silhouetteLocal.conf` to your localhost `localhost:9000`.
+    5. include the `silhouetteLocal.conf` into the `silhouette.conf`.
 
         ```
         include "silhouetteLocal.conf"
