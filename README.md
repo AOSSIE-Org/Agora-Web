@@ -53,7 +53,7 @@ To install the frontend, please do the following:
         ```
         include "silhouetteLocal.conf"
         ```
-5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. Assign your MongoDB URI (e.g. `mongodb://localhost`, if you are connecting to a MongoDB server running in your local computer) to the `mongodb.default.uri` field (e.g `mongodb.default.uri = "mongodb://localhost"`) and include `applicationLocal.conf` into `application.conf`.
+5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. Assign your MongoDB URI (e.g. `mongodb://localhost`, if you are connecting to a MongoDB server running in your local computer) to the `mongodb.default.uri` field (e.g `mongodb.default.uri = "mongodb://localhost"`), set your [SendGrid](https://sendgrid.com) username and password, and include `applicationLocal.conf` into `application.conf`.
 
  
 
