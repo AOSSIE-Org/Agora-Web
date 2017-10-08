@@ -54,13 +54,7 @@ To install the frontend, please do the following:
         include "silhouetteLocal.conf"
         ```
 5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. Assign your MongoDB URI to the `mongodb.default.uri` field (i.e. `mongodb.default.uri = ${?MONGODB_URI}`) and include `applicationLocal.conf` into `application.conf`.
-
-6. Add `applicationLocal.conf` , `ShilhouetteLocal.conf` to the `.gitignore` file.
-
-    ```
-    /conf/applicationLocal.conf
-    /conf/silhouetteLocal.conf
-    ```
+6. 
 
 ### Running the application
 
