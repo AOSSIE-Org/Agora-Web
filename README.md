@@ -35,7 +35,7 @@ To install the frontend, please do the following:
   - **Note:** *If you just want to use the project, cloning is the best option. However, if you wish to contribute to the project, you will need to fork the project first, and then clone your `Agora-Web` fork and make your contributions via a branch on your fork.*
 3. Install and configure [MongoDB](https://www.mongodb.com/)
 4. Configure [Shilhouette](https://www.silhouette.rocks/) to allow Agora's frontend to do Oauth2 authentication:
-    1. Make a copy of the `Shilhouette.conf` and rename it to `ShilhouetteLocal.conf`.
+    1. Make a copy of `Shilhouette.conf` and rename it to `ShilhouetteLocal.conf`.
     2. Create new applications in [Facebook](https://developers.facebook.com/), [Twitter](https://dev.twitter.com/) and [Google](https://console.cloud.google.com/)
     3. Fill the following fields in `ShilhouetteLocal.conf` with the ids, keys and secrets from your created applications.
 
