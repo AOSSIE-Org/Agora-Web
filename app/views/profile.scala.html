@@ -16,13 +16,15 @@
               <h3>@user.get.fullName</h3>
               <div class="media-body">
                 <hr>
+                <!--
                 <h3><strong>Bio</strong></h3>
                 <p>Bio about the user</p>
                 <hr>
                 <h3><strong>Location</strong></h3>
                 <p>Earth</p>
                 <hr>
-                <h3><strong>Email</strong></h3>
+                -->
+                <h4><strong>Email</strong></h4>
                 <p>@user.get.email</p>
               </div>
             </div>
@@ -31,7 +33,7 @@
       </div>
       <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
         <div class="panel panel-default">
-          <div class="container"><h2>Created Elections</h2></div>
+          <div class="container"><h2>My Elections</h2></div>
           <div class="panel-body">
             <div class="tab-content">
               <div class="tab-pane active" id="home">
@@ -40,22 +42,20 @@
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Election name</th>
+                        <th>Election</th>
                         <th>Status </th>
                         <th>Voting Algorithm</th>
-                        <th>Ends On</th>
-                        <th>Admin Link</th>
+                        <th>End Date</th>
                       </tr>
                     </thead>
                     <tbody id="items">
-                      @for((doc, index) <- list.zipWithIndex) {
+                      @for((election, index) <- list.zipWithIndex) {
                         <tr>
                           <td>@{index+1}</td>
-                          <td>  <a href=/user/election/@doc.id>@doc.name</a></td>
-                          <td>@doc.isCompleted</td>
-                          <td>@doc.votingAlgo</td>
-                          <td>@doc.end</td>
-                          <td>Table Cell</td>
+                          <td><a href=/user/election/@election.id>@election.name</a></td>
+                          <td>@election.status()</td>
+                          <td>@election.votingAlgo</td>
+                          <td>@election.end</td>
                         </tr>
                       }
                     </tbody>
@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="panel panel-default">
-          <div class="container"><h2>Participation in Elections</h2></div>
+          <div class="container"><h2>My Votes in Elections</h2></div>
             <div class="panel-body">
               <div class="tab-content">
                 <div class="tab-pane active" id="home">
@@ -75,22 +75,20 @@
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>Election name</th>
-                          <th>Status </th>
+                          <th>Election</th>
+                          <th>Status</th>
                           <th>Voting Algorithm</th>
-                          <th>Ends On</th>
-                          <th>Admin Link</th>
+                          <th>End Date</th>
                         </tr>
                       </thead>
                       <tbody id="items">
-                      @for((doc, index) <- votedList.zipWithIndex) {
+                      @for((election, index) <- votedList.zipWithIndex) {
                         <tr>
                           <td>@{index+1}</td>
-                          <td>  <a href=/user/election/@doc.id>@doc.name</a></td>
-                          <td>@doc.isCompleted</td>
-                          <td>@doc.votingAlgo</td>
-                          <td>@doc.end</td>
-                          <td>Table Cell</td>
+                          <td><a href=/user/election/@election.id>@election.name</a></td>
+                          <td>@election.status()</td>
+                          <td>@election.votingAlgo</td>
+                          <td>@election.end</td>
                         </tr>
                       }
                     </tbody>

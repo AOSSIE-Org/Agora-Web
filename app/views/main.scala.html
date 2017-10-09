@@ -42,42 +42,35 @@
                  <span class="icon-bar"></span>
                  <span class="icon-bar"></span>
             </button>
-            @user.map { u =>
-        @if(u == null) {
-            <a class="navbar-brand" href="/">Agora</a>
-            } else {
-        <a class="navbar-brand" href="/home">Agora</a>
-    }
-    }.getOrElse{
-         <a class="navbar-brand" href="/">Agora</a>
-    }
+            <a class="navbar-brand" href="/"><img height="25" src='@routes.Assets.at("/images/agora-300.png")' alt=""></a>
           </div>
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            
             @user.map { u =>
 
         @if(u != null) {
 
             <ul class="nav navbar-nav">
-                <li><a href="/user/createElection">Add Election</a></li>
+                <li><a href="/user/createElection">Create Election</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                              @if(u.firstName!=None){
+                              @if(u.fullName!=None){
                                     <span class="user-avatar pull-left" style="margin-right:8px; margin-top:-5px;">
-                                        <img src="@u.avatarURL" class="img-responsive img-circle" title=@u.firstName width="30px" height="30px">
+                                        <img src="@u.avatarURL" class="img-responsive img-circle" title=@u.fullName width="30px" height="30px">
                                     </span>
                                     <span class="user-name">
                                         @u.fullName
                                     </span>
                                   }else{
                                     <span class="user-name">
-                                        User menu
+                                        User
                                     </span>
                                   }
                                     <b class="caret"></b></a>
                                     <ul class="dropdown-menu">
                                             <div class="navbar-content">
-                                                         <li><a href="/profile" class="btn btn-default btn-block"> My elections</a></li>
+                                                         <li><a href="/profile" class="btn btn-default btn-block"> My Elections</a></li>
                                                          <li><a href="@routes.HomeController.signOut" class="btn btn-default btn-block">Sign Out</a></li>
                                             </div>
                                     </ul>
@@ -89,7 +82,7 @@
             </ul>
     } else{
         <ul class="nav navbar-nav">
-            <li><a href="/guest/createElection">Add Election</a></li>
+            <li><a href="/guest/createElection">Create Election</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
@@ -98,7 +91,7 @@
 
     }.getOrElse {
         <ul class="nav navbar-nav">
-            <li><a href="/guest/createElection">Add Election</a></li>
+            <li><a href="/guest/createElection">Create Election</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
