@@ -123,8 +123,8 @@ class ElectionDAOImpl() extends ElectionDAO {
           }
       }
 
-      if(con){
-        var voterList      = ListBuffer[Voter]()
+      if (con) {
+        val voterList = ListBuffer[Voter]()
         voterList += voter
         val c = voterList.toList ::: getVoterList(id)
         val bsonBallot = c.map(doc => grater[Voter].asDBObject(doc))

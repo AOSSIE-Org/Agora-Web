@@ -11,7 +11,7 @@ import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 class MailerService @Inject() (mailerClient: MailerClient , val messagesApi: MessagesApi) {
 
   def sendPassCodeEmail(receiver: String ,receiverName: String, creatorName: String, creatorEmail: String , electionName: String, linl: String, electionDescription: String, passCode : String , id : String) = {
-    val link = s"https://agora-web-aossie.herokuapp.com/guest/vote/$id"
+    val link = s"http://agoravote.org/guest/vote/$id"
     val email = Email(
       "Simple email",
       "AGORA <aossie@gmail.com>",
