@@ -371,7 +371,6 @@ class ElectionController @Inject()(
     def voterData = request.body
     try{
       val splitVoter = voterData.email.split(",")
-      println(splitVoter)
       val voter = new Voter(splitVoter(0),splitVoter(1))
       val objectId = new ObjectId(voterData.id)
       val con = electionDAOImpl.addVoter(objectId , voter)
@@ -379,9 +378,7 @@ class ElectionController @Inject()(
       if (electionList.size > 0) {
         if (con) {
           val link = routes.ElectionController.voteGuest(voterData.id).absoluteURL()
-          println("hello")
           mailerService.sendPassCodeEmail(voter.email,voter.name,electionList.head.creatorName,electionList.head.creatorEmail,electionList.head.name,link,electionList.head.description, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),voterData.id)
-          println("hi")
           Future.successful(
             Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
           )
@@ -400,7 +397,6 @@ class ElectionController @Inject()(
     }
     catch {
       case e: Exception => {
-        println(e)
         Future.successful(
           Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("format.voter"))
         )
