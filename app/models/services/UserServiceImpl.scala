@@ -12,7 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent.Future
 
 /**
- * Handles actions to users. use hashmap instead of database to show the functionality
+ * Handles actions to users.
  */
 class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
 

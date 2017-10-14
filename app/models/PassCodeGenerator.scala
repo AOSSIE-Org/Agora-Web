@@ -20,7 +20,7 @@ object PassCodeGenerator {
     val cipher: Cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec(key))
     try {
-    new String(cipher.doFinal(Base64.decodeBase64(encryptedValue)))
+      new String(cipher.doFinal(Base64.decodeBase64(encryptedValue)))
     }
     catch {
       case e: Exception => "Wrong code"

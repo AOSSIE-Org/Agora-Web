@@ -10,7 +10,7 @@ import models.Ballot
 import models.Voter
 import models.Winner
 import models.daos.ElectionDAOImpl
-import models.daos.ResultFileDAOImpl
+import models.daos.ResultDAOImpl
 import models.services.MailerService
 import models.PassCodeGenerator
 import utils.auth.DefaultEnv
@@ -77,7 +77,7 @@ class ElectionController @Inject()(
 ) extends Controller with I18nSupport {
 
   val electionDAOImpl = new ElectionDAOImpl()
-  val resultFileDAOImpl = new ResultFileDAOImpl()
+  val resultFileDAOImpl = new ResultDAOImpl()
   val mailerService = new MailerService(mailerClient, messagesApi)
 
   def result(id : String) = Action { implicit request =>
@@ -371,6 +371,7 @@ class ElectionController @Inject()(
     def voterData = request.body
     try{
       val splitVoter = voterData.email.split(",")
+      println(splitVoter)
       val voter = new Voter(splitVoter(0),splitVoter(1))
       val objectId = new ObjectId(voterData.id)
       val con = electionDAOImpl.addVoter(objectId , voter)
@@ -378,7 +379,9 @@ class ElectionController @Inject()(
       if (electionList.size > 0) {
         if (con) {
           val link = routes.ElectionController.voteGuest(voterData.id).absoluteURL()
+          println("hello")
           mailerService.sendPassCodeEmail(voter.email,voter.name,electionList.head.creatorName,electionList.head.creatorEmail,electionList.head.name,link,electionList.head.description, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),voterData.id)
+          println("hi")
           Future.successful(
             Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
           )
@@ -397,6 +400,7 @@ class ElectionController @Inject()(
     }
     catch {
       case e: Exception => {
+        println(e)
         Future.successful(
           Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("format.voter"))
         )

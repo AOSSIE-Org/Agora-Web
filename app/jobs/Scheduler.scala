@@ -5,6 +5,8 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
 
+import AuthTokenCleaner.Clean
+
 /**
  * Schedules the jobs.
  */
@@ -16,8 +18,8 @@ class Scheduler @Inject()(
   QuartzSchedulerExtension(system).schedule(
     "AuthTokenCleaner",
     authTokenCleaner,
-    AuthTokenCleaner.Clean
+    Clean
   )
 
-  authTokenCleaner ! AuthTokenCleaner.Clean
+  authTokenCleaner ! Clean
 }

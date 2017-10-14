@@ -2,7 +2,7 @@ package scheduler
 
 import org.quartz.{ JobExecutionContext, Job }
 import models.daos.ElectionDAOImpl
-import models.daos.ResultFileDAOImpl
+import models.daos.ResultDAOImpl
 import models.Election
 
 import java.util.Date
@@ -10,11 +10,11 @@ import java.util.Date
 class UpdateTable extends Job {
   val todayDate = new Date()
   val electionDAOImpl = new ElectionDAOImpl()
-  val resultFileDAOImpl = new ResultFileDAOImpl()
+  val resultFileDAOImpl = new ResultDAOImpl()
 
   def execute(context: JobExecutionContext) {
-    val inActiveElections = electionDAOImpl.getInactiveElections()
-    for (election <- inActiveElections) {
+    val inactiveElections = electionDAOImpl.getInactiveElections()
+    for (election <- inactiveElections) {
       if (todayDate.after(election.start) || todayDate.equals(election.start)) {
         electionDAOImpl.updateActiveElection(election.id)
       }
