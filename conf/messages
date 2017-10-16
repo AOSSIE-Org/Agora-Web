@@ -34,7 +34,7 @@ full.name = Full name
 sign.in = Sign in
 sign.out = Sign out
 
-or.use.social =  Use your existing account on one of the following services to sign in:
+or.use.social =  Choose your preferred authentication server
 
 invalid.credentials = Invalid credentials!
 

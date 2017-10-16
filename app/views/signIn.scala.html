@@ -6,15 +6,15 @@
 @main(Messages("sign.in.title")) {
     <fieldset class="col-md-7 col-md-offset-3">
         @if(socialProviders.providers.nonEmpty) {
-            <div class="social-providers">
+            <div class="social-providers centered">
                 <br>
                 <Legend>@Messages("or.use.social")</Legend>
-                <div class="centered">
+                
                     <br>
                 @for(p <- socialProviders.providers if p.id != "clef") {
                     <a href="@routes.SocialAuthController.authenticate(p.id)" class="provider @p.id" title="@Messages(p.id)"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" width="64px" height="64px" alt="@Messages(p.id)"></a>
                 }
-                </div>
+                
             </div>
         }
 

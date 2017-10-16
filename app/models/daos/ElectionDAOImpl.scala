@@ -22,7 +22,7 @@ class ElectionDAOImpl() extends ElectionDAO {
   }
 
   /**
-   * Saves a Election.
+   * Saves an Election.
    *
    * @param election The Election to save.
    * @return The saved Election.
@@ -33,7 +33,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     Future.successful(election)
   }
 
-  def view(id: ObjectId): List[models.Election] = {
+  def view(id: ObjectId): List[Election] = {
     val o: DBObject       = MongoDBObject("id" -> id)
     val u                 = collectionRef.findOne(o)
     val list              = u.toList
@@ -46,7 +46,7 @@ class ElectionDAOImpl() extends ElectionDAO {
     result
   }
 
-  def userElectionList(email: Option[String]): List[models.Election] = {
+  def userElectionList(email: Option[String]): List[Election] = {
     val o: DBObject       = MongoDBObject("creatorEmail" -> email)
     val u                 = collectionRef.find(o)
     val list              = u.toList
@@ -73,13 +73,13 @@ class ElectionDAOImpl() extends ElectionDAO {
 
   def vote(id: ObjectId, ballot: Ballot): Boolean = {
     val o: DBObject = MongoDBObject("id" -> id)
-    var ballotList      = ListBuffer[Ballot]()
+    var ballotList = ListBuffer[Ballot]()
     ballotList += ballot
     val c = ballotList.toList ::: getBallots(id)
     val bsonBallot = c.map(doc => grater[Ballot].asDBObject(doc))
     val update = $set("ballot" -> bsonBallot )
     try{
-      val updateResult =collectionRef.update( o, update ,false,false,WriteConcern.Safe)
+      val updateResult = collectionRef.update( o, update ,false,false,WriteConcern.Safe)
       true
     }
     catch {
@@ -123,8 +123,8 @@ class ElectionDAOImpl() extends ElectionDAO {
           }
       }
 
-      if(con){
-        var voterList      = ListBuffer[Voter]()
+      if (con) {
+        val voterList = ListBuffer[Voter]()
         voterList += voter
         val c = voterList.toList ::: getVoterList(id)
         val bsonBallot = c.map(doc => grater[Voter].asDBObject(doc))

@@ -53,4 +53,10 @@ case class Election(
   winners : List[Winner],
   isCounted : Boolean,
   noVacancies : Int   
-)
+) {
+  def status(): String = {
+    if (!isStarted) "Not yet started"
+    else if (isStarted && !isCompleted) "Active"
+    else "Completed"
+  }
+}

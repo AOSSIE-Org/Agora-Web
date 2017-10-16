@@ -6,5 +6,5 @@ target
 /.project
 /.settings
 /RUNNING_PID
-/conf/applicationDev.conf
-/conf/silhouetteDev.conf
+/conf/applicationLocal.conf
+/conf/silhouetteLocal.conf

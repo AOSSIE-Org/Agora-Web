@@ -86,11 +86,11 @@
                   <input type="text" class="form-control"  value='@election.description' name="description" placeholder="Description" required>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for="date">Start</label>
+                  <label class="control-label" for="date">Start Date</label>
                   <input class="form-control" value='@curTimeFormat.format(election.start)' id="date" name="start" placeholder="MM/DD/YYY" type="text"/>
                 </div>
                 <div class="form-group">
-                  <label for="exampleInputEmail1">End</label>
+                  <label for="exampleInputEmail1">End Date</label>
                   <input class="form-control" value='@curTimeFormat.format(election.end)' id="date" name="end" placeholder="MM/DD/YYY" type="text"/>
                 </div>
                 <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
@@ -131,7 +131,7 @@
                       <input type="radio" id="@value" name="votingAlgo" value=@value checked>
                       <label for="@value">
                         <span class="algoRadio-title">@value</span>
-                        <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"> If you want to know more about this algorithm click this.</a></span>
+                        <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"><i class='glyphicon glyphicon-info-sign'></i></a></span>
                       </label>
                     </div>
                   }else{
@@ -139,7 +139,7 @@
                       <input type="radio" id="@value" name="votingAlgo" value=@value>
                       <label for="@value">
                         <span class="algoRadio-title">@value</span>
-                        <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"> If you want to know more about this algorithm click this.</a></span>
+                        <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"><i class='glyphicon glyphicon-info-sign'></i></a></span>
                       </label>
                     </div>
                   }

@@ -10,7 +10,7 @@ import models.Ballot
 import models.Voter
 import models.Winner
 import models.daos.ElectionDAOImpl
-import models.daos.ResultFileDAOImpl
+import models.daos.ResultDAOImpl
 import models.services.MailerService
 import models.PassCodeGenerator
 import utils.auth.DefaultEnv
@@ -77,8 +77,8 @@ class ElectionController @Inject()(
 ) extends Controller with I18nSupport {
 
   val electionDAOImpl = new ElectionDAOImpl()
-  val resultFileDAOImpl = new ResultFileDAOImpl()
-  val mailerService = new MailerService(mailerClient,messagesApi)
+  val resultFileDAOImpl = new ResultDAOImpl()
+  val mailerService = new MailerService(mailerClient, messagesApi)
 
   def result(id : String) = Action { implicit request =>
     Ok.sendFile(resultFileDAOImpl.getResult(id))
@@ -370,41 +370,39 @@ class ElectionController @Inject()(
   def addVoter() = silhouette.SecuredAction.async( parse.form(VoterForm.form) ) { implicit request =>
     def voterData = request.body
     try{
-    val voter = new Voter(voterData.email.split(",")(0),voterData.email.split(",")(1))
-    val objectId = new ObjectId(voterData.id)
-    val con = electionDAOImpl.addVoter(objectId , voter)
-    val electionList = electionDAOImpl.view(objectId)
-    if(electionList.size>0){
-      if(con){
-        val link = routes.ElectionController.voteGuest(voterData.id).absoluteURL()
-        mailerService.sendPassCodeEmail(voter.email,voter.name,electionList.head.creatorName,electionList.head.creatorEmail,electionList.head.name,link,electionList.head.description, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),voterData.id)
-        Future.successful(
-          Ok
-            (
-              views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId))
-            )
-        )
+      val splitVoter = voterData.email.split(",")
+      val voter = new Voter(splitVoter(0),splitVoter(1))
+      val objectId = new ObjectId(voterData.id)
+      val con = electionDAOImpl.addVoter(objectId , voter)
+      val electionList = electionDAOImpl.view(objectId)
+      if (electionList.size > 0) {
+        if (con) {
+          val link = routes.ElectionController.voteGuest(voterData.id).absoluteURL()
+          mailerService.sendPassCodeEmail(voter.email,voter.name,electionList.head.creatorName,electionList.head.creatorEmail,electionList.head.name,link,electionList.head.description, PassCodeGenerator.encrypt(electionDAOImpl.getInviteCode(objectId).get,voter.email),voterData.id)
+          Future.successful(
+            Ok(views.html.election.adminElectionView(Option(request.identity), electionDAOImpl.view(objectId)))
+          )
+        }
+        else{
+          Future.successful(
+            Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("error.voter"))
+          )
+        }
       }
       else{
-      Future.successful(
-        Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("error.voter"))
-      )
+        Future.successful(
+          Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
+        )
+      }
+    }
+    catch {
+      case e: Exception => {
+        Future.successful(
+          Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("format.voter"))
+        )
+      }
     }
   }
-  else{
-    Future.successful(
-      Redirect(routes.HomeController.profile()).flashing("error" -> Messages("invalid.id"))
-    )
-    }
-  }
-  catch {
-    case e: Exception => {
-      Future.successful(
-        Redirect(routes.ElectionController.viewElectionSecured(voterData.id)).flashing("error" -> Messages("format.voter"))
-      )
-    }
-  }
-}
 
   def redirectVoter = Action { implicit request =>
     {
