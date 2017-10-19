@@ -81,18 +81,12 @@
 
             </ul>
     } else{
-        <ul class="nav navbar-nav">
-            <li><a href="/guest/createElection">Create Election</a></li>
-        </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
         </ul>
     }
 
     }.getOrElse {
-        <ul class="nav navbar-nav">
-            <li><a href="/guest/createElection">Create Election</a></li>
-        </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
         </ul>
