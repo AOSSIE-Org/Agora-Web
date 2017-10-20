@@ -115,7 +115,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Algorithm</label>
-                  @for(value <- wikiPages.keyset){
+                  @for(value <- wikiPages.keySet){
                     <div class="algoRadio algoRadio-success">
     						      <input type="radio" id="@value" name="votingAlgo" value=@value>
     						      <label for="@value">
