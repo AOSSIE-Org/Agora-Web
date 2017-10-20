@@ -41,27 +41,4 @@ class SignInController @Inject()(
   def view = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.signIn(socialProviderRegistry)))
   }
-
-  def submit(email: String , id: String) = silhouette.UnsecuredAction.async { implicit request =>
-    val password = PassCodeGenerator.encrypt(email,id)
-    val credentials = Credentials(email, password)
-    credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
-      val result = Redirect(routes.ElectionController.viewElectionSecured(id))
-      userService.retrieve(loginInfo).flatMap {
-        case Some(user) =>
-          silhouette.env.authenticatorService.create(loginInfo).map {
-            case authenticator => authenticator
-          }.flatMap { authenticator =>
-            silhouette.env.eventBus.publish(LoginEvent(user, request))
-            silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-              silhouette.env.authenticatorService.embed(v, result)
-            }
-          }
-        case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
-      }
-    }.recover {
-      case e: ProviderException =>
-        Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.credentials"))
-    }
-  }
 }
