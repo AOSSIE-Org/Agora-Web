@@ -5,13 +5,6 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
-@algo = @{List("Approval","Baldwin","Borda","Contingent Method","Coomb’s","Copeland","Cumulative voting","Egalitarian","Exhaustive ballot",  "Exhaustive ballot with dropoff",
-                "Instant Runoff 2-round","Kemeny-Young","Majority","Meek STV","Minimax Condorcet","Nanson","Oklahoma Method",
-                "Preferential block voting","Proportional Approval voting","Random Ballot","Range Voting","Ranked Pairs",
-                "Satisfaction Approval voting","Schulze","Scottish STV",
-                "Sequential Proportional Approval voting","SMC","Top Cycle","Uncovered Set","Warren STV")
-         }  // FIXME: This could be wikiPages.keys
-
 @booleanResult = @{List("false","true")}
 
 @voterVisibility = @{ Map("Private" -> "false", "Public" -> "true") }
@@ -122,7 +115,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Algorithm</label>
-                  @for(value <- algo){
+                  @for(value <- wikiPages.keyset){
                     <div class="algoRadio algoRadio-success">
     						      <input type="radio" id="@value" name="votingAlgo" value=@value>
     						      <label for="@value">
