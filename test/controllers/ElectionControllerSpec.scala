@@ -35,32 +35,6 @@ class ElectionControllerSpec extends PlaySpecification with Mockito with CSRFTes
   val mockElectionDAO = new ElectionDAOImpl()
   sequential
 
-  "The `createGuestView` action" should {
-    "return 200 if user is unauthorized" in new Context {
-      new WithApplication(application) {
-        val Some(redirectResult) = route(app, FakeRequest(routes.ElectionController.createGuestView())
-          .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid"))
-        )
-        status(redirectResult) must beEqualTo(OK)
-      }
-    }
-    "redirect to login page if user is authorized" in new Context {
-      new WithApplication(application) {
-        val Some(redirectResult) = route(app, FakeRequest(routes.ElectionController.createGuestView())
-          .withAuthenticator[DefaultEnv](identity.loginInfo)
-        )
-        status(redirectResult) must be equalTo SEE_OTHER
-        val redirectURL = redirectLocation(redirectResult).getOrElse("")
-        redirectURL must contain(routes.HomeController.indexAuthorized().toString)
-        val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL)
-        .withAuthenticator[DefaultEnv](identity.loginInfo)
-        )
-        status(unauthorizedResult) must be equalTo OK
-        contentType(unauthorizedResult) must beSome("text/html")
-        contentAsString(unauthorizedResult) must contain("Welcome, you are now signed in!")
-      }
-    }
-  }
 
   "The `createUserView` action" should {
     "redirect to login page if user is unauthorized" in new Context {
@@ -114,48 +88,6 @@ class ElectionControllerSpec extends PlaySpecification with Mockito with CSRFTes
     }
   }
 
-
-  "The `createGuest` action" should {
-    "redirect  if user is unauthorized" in new Context {
-      new WithApplication(application) {
-        val Some(redirectResult) = route(app, addToken(FakeRequest(routes.ElectionController.createGuest()))
-           .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid")).withFormUrlEncodedBody(
-            "name" -> "FooBar", "description" -> "blabala", "creatorName"-> "Thuva",
-            "creatorEmail" -> "test.unit1@gmail.com",
-            "start" -> "03/08/2017" , "end" -> "04/08/2017",
-            "realtimeResult" -> "false",  "votingAlgo" -> "Nanson",
-            "candidates" -> "A,B,C", "ballotVisibility" -> false.toString,
-            "voterListVisibility" -> false.toString, "isInvite" -> false.toString,
-            "noVacancies" -> "4"
-          ))
-          status(redirectResult) must be equalTo SEE_OTHER
-      }
-    }
-    "redirect to index page if user is authorized" in new Context {
-      new WithApplication(application) {
-        val Some(redirectResult) = route(app, addToken(FakeRequest(routes.ElectionController.createGuest()))
-           .withAuthenticator[DefaultEnv](identity.loginInfo).withFormUrlEncodedBody(
-            "name" -> "FooBar", "description" -> "blabala", "creatorName"-> "Thuva",
-            "creatorEmail" -> "test.unit1@gmail.com",
-            "start" -> "03/08/2017" , "end" -> "04/08/2017",
-            "realtimeResult" -> "false",  "votingAlgo" -> "Nanson",
-            "candidates" -> "A,B,C", "ballotVisibility" -> false.toString,
-            "voterListVisibility" -> false.toString, "isInvite" -> false.toString,
-            "noVacancies" -> "4"
-          ))
-          status(redirectResult) must be equalTo SEE_OTHER
-          val redirectURL = redirectLocation(redirectResult).getOrElse("")
-          redirectURL must contain(routes.HomeController.indexAuthorized().toString)
-          val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL)
-          .withAuthenticator[DefaultEnv](identity.loginInfo)
-          )
-          status(unauthorizedResult) must be equalTo OK
-          contentType(unauthorizedResult) must beSome("text/html")
-          contentAsString(unauthorizedResult) must contain("Welcome, you are now signed in!")
-      }
-
-    }
-  }
 
   "The `viewElectionSecured` action" should {
     "redirect to login page if user is unauthorized" in new Context {
