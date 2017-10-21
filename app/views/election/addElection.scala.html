@@ -5,13 +5,6 @@
 @import b3.vertical.fieldConstructor  // Declares a vertical field constructor as default
 
 
-@algo = @{List("Approval","Baldwin","Borda","Contingent Method","Coomb’s","Copeland","Cumulative voting","Egalitarian","Exhaustive ballot",  "Exhaustive ballot with dropoff",
-                "Instant Runoff 2-round","Kemeny-Young","Majority","Meek STV","Minimax Condorcet","Nanson","Oklahoma Method",
-                "Preferential block voting","Proportional Approval voting","Random Ballot","Range Voting","Ranked Pairs",
-                "Satisfaction Approval voting","Schulze","Scottish STV",
-                "Sequential Proportional Approval voting","SMC","Top Cycle","Uncovered Set","Warren STV")
-         }
-
 @booleanResult = @{List("false","true")}
 
 @voterVisibility = @{ Map("Private" -> "false", "Public" -> "true") }
@@ -72,138 +65,6 @@
             }
           </div>
         </div>
-        @if(user==None){
-          @b3.form(CSRF(routes.ElectionController.createGuest())) {
-            <div class="row setup-content" id="step-1">
-              <div class="col-xs-12">
-                <div class="col-md-12">
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Election Name</label>
-                    <input type="text" class="form-control" name="name" placeholder="Election Name" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Description</label>
-                    <input type="text" class="form-control"  name="description" placeholder="Description" required>
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="date">Start</label>
-                    <input class="form-control" id="date" name="start" placeholder="MM/DD/YYY" type="text"/>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">End</label>
-                    <input class="form-control" id="date" name="end" placeholder="MM/DD/YYY" type="text"/>
-                  </div>
-                  <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
-                </div>
-              </div>
-          </div>
-          <div class="row setup-content" id="step-2">
-            <div class="col-xs-12">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label for="exampleInputEmail1">Candidates</label>
-                  <input type="text" class="form-control taginput" name="candidates" data-role="tagsinput" required />
-                </div>
-                <div class="form-group">
-                  <label for="exampleInputEmail1">Number of vacancies</label>
-                  <span class="span-input">
-                    <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="noVacancies">
-                      <span class="glyphicon glyphicon-minus"></span>
-                    </button>
-                  </span>
-                  <span class="span-input">
-                    <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="noVacancies">
-                      <span class="glyphicon glyphicon-plus"></span>
-                    </button>
-                  </span>
-                  <div class="input-number-div">
-                    <input type="text" name="noVacancies" class="form-control input-number" value="1" min="1" max="10">
-                  </div>
-                </div>
-              <div class="form-group">
-                <label for="exampleInputEmail1">Voting Algorithm</label>
-                  @for(value <- algo){
-                    <div class="algoRadio algoRadio-success">
-    						      <input type="radio" id="@value" name="votingAlgo" value=@value>
-    						      <label for="@value">
-    							      <span class="algoRadio-title">@value</span>
-    							      <span class="algoRadio-description"><a href=@wikiPages(value) target="_blank"><i class='glyphicon glyphicon-info-sign'></i></a></span>
-    						      </label>
-    					      </div>
-                  }
-              </div>
-              <div class="form-group">
-                <label for="exampleInputEmail1">Realtime Result</label>
-                  @for(value <- booleanResult){
-                    <div class="algoRadio algoRadio-success">
-    						      <input type="radio" id="realtimeResult@value" name="realtimeResult" value=@value>
-    						      <label for="realtimeResult@value">
-    							      <span class="algoRadio-title">@value</span>
-    						      </label>
-    					      </div>
-                  }
-              </div>
-              <button class="btn btn-primary nextBtn btn-lg pull-right" type="button" >Next</button>
-            </div>
-          </div>
-        </div>
-        <div class="row setup-content" id="step-3">
-          <div class="col-xs-12">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label for="exampleInputEmail1">Ballot visibility</label>
-                  @for(value <- ballotVisibility){
-                    <div class="algoRadio algoRadio-success">
-    						      <input type="radio" id="ballotVisibility@value" name="ballotVisibility" value=@value>
-    						      <label for="ballotVisibility@value">
-    							      <span class="algoRadio-title">@value</span>
-    						      </label>
-    					      </div>
-                  }
-              </div>
-              <div class="form-group">
-                <label for="exampleInputEmail1">Invite Voters</label>
-                  @for(value <- booleanResult){
-                    <div class="algoRadio algoRadio-success">
-    						      <input type="radio" id="isInvite@value" name="isInvite" value=@value>
-    						      <label for="isInvite@value">
-    							      <span class="algoRadio-title">@value</span>
-    						      </label>
-    					      </div>
-                  }
-              </div>
-              <div class="form-group">
-                <label for="exampleInputEmail1">Voter list visibility</label>
-                  @for(value <- voterVisibility.keySet){
-                    <div class="algoRadio algoRadio-success">
-    						      <input type="radio" id="voterListVisibility@value" name="voterListVisibility" value=@voterVisibility(value)>
-    						      <label for="voterListVisibility@value">
-    							      <span class="algoRadio-title">@value</span>
-    						      </label>
-    					      </div>
-                  }
-              </div>
-              <button class="btn btn-primary nextBtn btn-lg pull-right" type="button">Next</button>
-            </div>
-          </div>
-        </div>
-        <div class="row setup-content" id="step-4">
-          <div class="col-xs-12">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label for="exampleInputEmail1">Creator Name</label>
-                <input type="text" class="form-control" name="creatorName" placeholder="Creator name" required>
-              </div>
-              <div class="form-group">
-                <label for="exampleInputEmail1">Creator Email</label>
-                <input type="text" class="form-control" name="creatorEmail" placeholder="Creator email" required>
-              </div>
-              <button class="btn btn-success btn-lg pull-right" type="submit">Finish!</button>
-            </div>
-          </div>
-        </div>
-        }
-      }
       @if(user!=None){
         @b3.form(CSRF(routes.ElectionController.create())) {
           <div class="row setup-content" id="step-1">
@@ -254,7 +115,7 @@
                 </div>
                 <div class="form-group">
                   <label for="exampleInputEmail1">Voting Algorithm</label>
-                  @for(value <- algo){
+                  @for(value <- wikiPages.keySet){
                     <div class="algoRadio algoRadio-success">
     						      <input type="radio" id="@value" name="votingAlgo" value=@value>
     						      <label for="@value">
