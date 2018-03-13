@@ -42,8 +42,7 @@ paths:
           description: Election couldn't have been created.
       security:
         - JWT: []
-        
-  '/elections/':
+  /elections/:
     get:
       tags:
         - election
@@ -58,7 +57,7 @@ paths:
           description: A list of elections created by this user
           schema:
             type: array
-            items: 
+            items:
               $ref: '#/definitions/Election'
       security:
         - JWT: []
@@ -86,7 +85,6 @@ paths:
             $ref: '#/definitions/Election'
         '404':
           description: The Election does not exists.
-  
     put:
       tags:
         - election
@@ -137,8 +135,7 @@ paths:
           description: The Election does not exists.
       security:
         - JWT: []
-        
-  '/election/voter/{electionId}':
+  '/election/{id}/voter':
     put:
       tags:
         - election
@@ -149,7 +146,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: electionId
+        - name: id
           in: path
           required: true
           description: The election ID
@@ -167,8 +164,64 @@ paths:
           description: The Election does not exists
       security:
         - JWT: []
-        
-  '/election/ballot/{id}':
+  '/election/{id}/voters':
+    get:
+      tags:
+        - election
+      summary: Get the list of voters
+      description: Returns a list of voters for the election
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The the election id
+          type: string
+      responses:
+        '200':
+          description: List of Voters
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Voter'
+        '404':
+          description: The BElection does not exist
+      security:
+        - JWT: []
+    put:
+      tags:
+        - election
+      summary: Updates the list of voters with this new list
+      description: This operation will overide the list of voters in the database for this particular election
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The the election id
+          type: string
+        - name: body
+          in: body
+          description: The new list of voters
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/defitions/Voter'
+      responses:
+        '200':
+          description: The operation was successfull
+        '404':
+          description: The BElection does not exist
+      security:
+        - JWT: []
+  '/election/{id}/ballot':
     get:
       tags:
         - election
@@ -193,7 +246,6 @@ paths:
           description: The Ballot does not exists
       security:
         - JWT: []
-        
   /user/signup:
     post:
       tags:
@@ -215,7 +267,6 @@ paths:
       responses:
         default:
           description: successful operation
-          
   /user/login:
     get:
       tags:
@@ -246,6 +297,58 @@ paths:
               description: date in UTC when token expires
         '400':
           description: Invalid username/password supplied
+  '/user/forgotpassword':
+    get:
+      tags:
+        - oAuth
+      summary: Gets a reset code for a valid user email from the server.
+      description: User sends email to the server and if found a reset code is sent to this email. The server then responds with the reset code and expiring time.
+      operationId: forgotPassword
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: body
+          description: The users email address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The reset code.
+          schema:
+            type: integer
+          headers:
+            X-Expires-After:
+              type: string
+              format: date-time
+              description: date in UTC when the reset code expires expires
+        '400':
+          description: Could not find email address
+    post:
+      tags:
+        - oAuth
+      summary: Sends new password to the server
+      description: Enables the server to change the password with new one, given the right reset code.
+      operationId: resetPassword
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: body
+          description: The reset code and the new password
+          required: true
+          schema:
+            $ref: '#/definitions/ResetPassword'
+      responses:
+        '200':
+          description: The operation was successfull. The UI should redirect to login page
+        '400':
+          description: Could not find reset code or reset code expired address
           
   '/authenticate/{provider}':
     get:
@@ -282,7 +385,6 @@ paths:
               description: date in UTC when token expires
         '400':
           description: Could not authenticate with given provider
-          
   /user/logout:
     get:
       tags:
@@ -300,40 +402,11 @@ paths:
           description: successful operation
       security:
         - JWT: []
-        
   '/user/{userId}':
-    get:
-      tags:
-        - user
-      summary: Get user by user id
-      description: ''
-      operationId: getUserByID
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: userId
-          in: path
-          description: The user ID that needs to be fetched.
-          required: true
-          type: string
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/User'
-        '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
-      security:
-        - JWT: []
-        
     put:
       tags:
         - user
-      summary: Updated user
+      summary: Updates user information
       description: This can only be done by the logged in user.
       operationId: updateUser
       consumes:
@@ -359,7 +432,39 @@ paths:
           description: User not found
       security:
         - JWT: []
-      
+  '/user/resetPassword':
+    post:
+      tags:
+        - user
+      summary: Change user password
+      description: This can only be done by the logged in user.
+      operationId: changePassword
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: Id of the user that wants to change password
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: The new password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Opereration was successfull
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+      security:
+        - JWT: []
+  
   '/vote/{id}':
     post:
       tags:
@@ -377,7 +482,7 @@ paths:
           description: The election Id for which the guest user is voting
           required: true
           type: string
-        - name: ballotData
+        - name: body
           in: body
           description: The ballot data
           required: true
@@ -388,7 +493,37 @@ paths:
           description: Your vote was succesful
         '404':
           description: No election with given Id found
-          
+  '/user/vote/{id}':
+    post:
+      tags:
+        - voting
+      summary: User votes
+      description: Enables a user to vote for an election
+      operationId: userVote
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: The election Id for which the user is voting
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: The ballot data
+          required: true
+          schema:
+            $ref: '#/definitions/Ballot'
+      responses:
+        '200':
+          description: Your vote was succesful
+        '404':
+          description: No election with given Id found
+      security:
+        - JWT: []
+      
   '/result/{id}':
     get:
       tags:
@@ -416,14 +551,11 @@ paths:
           description: No election with given Id found
       security:
         - JWT: []
-        
-      
 securityDefinitions:
   JWT:
-    type: "apiKey"
-    name: "X-Token"
-    in: "header"
-    
+    type: apiKey
+    name: X-Token
+    in: header
 definitions:
   User:
     required:
@@ -480,6 +612,15 @@ definitions:
       email:
         type: string
       password:
+        type: string
+  ResetPassword:
+    required:
+      - resetCode
+      - newPassword
+    properties:
+      resetCode:
+        type: string
+      newPassword:
         type: string
   Winner:
     properties:
@@ -552,7 +693,3 @@ definitions:
         type: boolean
       noVacancies:
         type: integer
-
-    
-  
-  
