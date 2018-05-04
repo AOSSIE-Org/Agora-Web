@@ -1,35 +1,9 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
-# https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-GET         /                                 controllers.HomeController.index
-GET         /signOut                          controllers.HomeController.signOut
-GET         /profile                          controllers.HomeController.profile
-GET         /home                             controllers.HomeController.indexAuthorized
-GET         /profile                          controllers.HomeController.profile
-
-GET         /signIn                           controllers.SignInController.view
-
-GET         /authenticate/:provider           controllers.SocialAuthController.authenticate(provider)
-
-GET         /result/:id                       controllers.ElectionController.result(id)
-GET         /guest/election/:id               controllers.ElectionController.viewElection(id)
-GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
-GET         /ballot/:id                       controllers.ElectionController.viewBallot(id)
-GET         /vote/                            controllers.ElectionController.redirectVoter()
-GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
-GET         /user/createElection              controllers.ElectionController.createUserView
-
-
-POST        /createElection                   controllers.ElectionController.create
-POST        /upload/                          controllers.ElectionController.upload()
-POST        /update/                          controllers.ElectionController.update()
-POST        /guest/vote                       controllers.ElectionController.vote()
-POST        /user/election/invite/            controllers.ElectionController.addVoter()
-POST        /guest/delete/                    controllers.ElectionController.deleteElection()
-
+# Home page
+GET         /                                                               controllers.ApplicationController.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                     controllers.Assets.at(path="/public", file)
-GET         /edit/:id                         controllers.ElectionController.updateElection(id)
+GET         /assets/*file                                                   controllers.Assets.versioned(path="/public", file: Asset)
