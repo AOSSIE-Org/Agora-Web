@@ -39,14 +39,14 @@ To install the frontend, please do the following:
 
 To start the API, please do the following:
 
-- Make sure you have java 8 installed and not java 9. For some unknown reasons the build fails with java 9
+- Make sure you have java 8 installed and not java 9. For some reasons the build fails with java 9
 - Start the server by running `sbt run` in the root folder.
-- Go to [http://localhost:9000/](http://localhost:9000/) in a browser. Use one of your social accounts to login to the system.
+- Go to [http://localhost:9000/](http://localhost:9000/) in a browser. Where you will see the API documentation hosted using swagger UI.
     - **Note:** *Changing any source code while the server is running will automatically recompile and reload the application on the next HTTP request.*
 
 ## API documentation
 
-REST API documentation is available under address: [REST API](http://localhost:9000/docs)
+REST API documentation is available under address: [REST API](http://localhost:9000/) T
 
 ### Troubleshooting your local environment
 

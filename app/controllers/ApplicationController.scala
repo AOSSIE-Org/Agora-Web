@@ -10,7 +10,6 @@ import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
-@Api(value = "Example data")
 @Singleton
 class ApplicationController @Inject()(components: ControllerComponents,
                                       silhouette: Silhouette[DefaultEnv]) extends AbstractController(components) {
@@ -22,7 +21,10 @@ class ApplicationController @Inject()(components: ControllerComponents,
     * a path of `/`.
     */
   @ApiOperation(value = "", hidden = true)
-  def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+  def index  = Action { implicit request =>
+    Redirect(
+      url = "/assets/lib/swagger-ui/index.html",
+      queryString = Map("url" -> Seq("http://" + request.host + "/swagger.json"))
+    )
   }
 }
