@@ -1,0 +1,695 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Agora web API Spec
+  description: A proposed openAPI specification for agora web
+schemes:
+  - https
+host: agoravote.org
+basePath: /api/v1
+tags:
+  - name: election
+    description: Everything about your Elections
+  - name: user
+    description: Operations about user
+  - name: oAuth
+    description: Authentication and authorization operations
+  - name: result
+    description: Election results
+  - name: voting
+    description: Voting operations
+paths:
+  /election:
+    post:
+      tags:
+        - election
+      summary: Creates a new election
+      description: Adds a new election to the system.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: election
+          in: body
+          description: The election to create.
+          schema:
+            $ref: '#/definitions/Election'
+      responses:
+        '204':
+          description: Election succesfully created.
+        '400':
+          description: Election couldn't have been created.
+      security:
+        - JWT: []
+  /elections/:
+    get:
+      tags:
+        - election
+      summary: Get elections for particular user
+      description: Returns a list of elections
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: A list of elections created by this user
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Election'
+      security:
+        - JWT: []
+  
+  '/election/{id}':
+    get:
+      tags:
+        - election
+      summary: Get an election
+      description: Returns an election from it's id
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The election ID
+          type: string
+      responses:
+        '200':
+          description: An election
+          schema:
+            $ref: '#/definitions/Election'
+        '404':
+          description: The Election does not exists.
+    put:
+      tags:
+        - election
+      summary: Updates an an election
+      description: Update a particular election with the new information
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The election ID
+          type: string
+        - name: election
+          in: body
+          required: true
+          description: The election data
+          schema:
+            $ref: '#/definitions/Election'
+      responses:
+        '204':
+          description: Election succesfully updated.
+        '400':
+          description: Election couldn't be updated.
+      security:
+        - JWT: []
+    delete:
+      tags:
+        - election
+      summary: Delete's an election
+      description: Delete's an election from the given id
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The election ID
+          type: string
+      responses:
+        '200':
+          description: Election succesfully deleted
+        '404':
+          description: The Election does not exists.
+      security:
+        - JWT: []
+  '/election/{id}/voter':
+    put:
+      tags:
+        - election
+      summary: Add voter
+      description: Add a voter for the election
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The election ID
+          type: string
+        - name: voter
+          in: body
+          description: The voters data
+          required: true
+          schema:
+            $ref: '#/definitions/Voter'
+      responses:
+        '200':
+          description: Election succesfully deleted
+        '404':
+          description: The Election does not exists
+      security:
+        - JWT: []
+  '/election/{id}/voters':
+    get:
+      tags:
+        - election
+      summary: Get the list of voters
+      description: Returns a list of voters for the election
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The the election id
+          type: string
+      responses:
+        '200':
+          description: List of Voters
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Voter'
+        '404':
+          description: The BElection does not exist
+      security:
+        - JWT: []
+    put:
+      tags:
+        - election
+      summary: Updates the list of voters with this new list
+      description: This operation will overide the list of voters in the database for this particular election
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The the election id
+          type: string
+        - name: body
+          in: body
+          description: The new list of voters
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/defitions/Voter'
+      responses:
+        '200':
+          description: The operation was successfull
+        '404':
+          description: The BElection does not exist
+      security:
+        - JWT: []
+  '/election/{id}/ballot':
+    get:
+      tags:
+        - election
+      summary: View ballot
+      description: Returns all information about a particular ballot
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The Ballot ID
+          type: string
+      responses:
+        '200':
+          description: A Ballot
+          schema:
+            $ref: '#/definitions/Ballot'
+        '404':
+          description: The Ballot does not exists
+      security:
+        - JWT: []
+  /user/signup:
+    post:
+      tags:
+        - oAuth
+      summary: Create user
+      description: This creates a new user from the credentials passed
+      operationId: createUser
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Created user object
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        default:
+          description: successful operation
+  /user/login:
+    get:
+      tags:
+        - oAuth
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: login
+          in: body
+          description: The user login
+          required: true
+          schema:
+            $ref: '#/definitions/LoginInfo'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: string
+          headers:
+            X-Expires-After:
+              type: string
+              format: date-time
+              description: date in UTC when token expires
+        '400':
+          description: Invalid username/password supplied
+  '/user/forgotpassword':
+    get:
+      tags:
+        - oAuth
+      summary: Gets a reset code for a valid user email from the server.
+      description: User sends email to the server and if found a reset code is sent to this email. The server then responds with the reset code and expiring time.
+      operationId: forgotPassword
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: body
+          description: The users email address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The reset code.
+          schema:
+            type: integer
+          headers:
+            X-Expires-After:
+              type: string
+              format: date-time
+              description: date in UTC when the reset code expires expires
+        '400':
+          description: Could not find email address
+    post:
+      tags:
+        - oAuth
+      summary: Sends new password to the server
+      description: Enables the server to change the password with new one, given the right reset code.
+      operationId: resetPassword
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: body
+          description: The reset code and the new password
+          required: true
+          schema:
+            $ref: '#/definitions/ResetPassword'
+      responses:
+        '200':
+          description: The operation was successfull. The UI should redirect to login page
+        '400':
+          description: Could not find reset code or reset code expired address
+          
+  '/authenticate/{provider}':
+    get:
+      tags:
+        - oAuth
+      summary: Authenticates a user
+      description: Authenticates a user from a given provider
+      operationId: authenticateFromProvider
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: provider
+          in: path
+          description: The name of the the provider
+          required: true
+          type: string
+        - name: profile
+          in: body
+          description: The profile information about the user
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: string
+          headers:
+            X-Expires-After:
+              type: string
+              format: date-time
+              description: date in UTC when token expires
+        '400':
+          description: Could not authenticate with given provider
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+      security:
+        - JWT: []
+  '/user/{userId}':
+    put:
+      tags:
+        - user
+      summary: Updates user information
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: Id of the user that needs to be updated
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Updated user object
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+      security:
+        - JWT: []
+  '/user/resetPassword':
+    post:
+      tags:
+        - user
+      summary: Change user password
+      description: This can only be done by the logged in user.
+      operationId: changePassword
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: Id of the user that wants to change password
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: The new password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Opereration was successfull
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+      security:
+        - JWT: []
+  
+  '/vote/{id}':
+    post:
+      tags:
+        - voting
+      summary: Guest user votes
+      description: Enables a guest user to vote for an election
+      operationId: guestVote
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: The election Id for which the guest user is voting
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: The ballot data
+          required: true
+          schema:
+            $ref: '#/definitions/Ballot'
+      responses:
+        '200':
+          description: Your vote was succesful
+        '404':
+          description: No election with given Id found
+  '/user/vote/{id}':
+    post:
+      tags:
+        - voting
+      summary: User votes
+      description: Enables a user to vote for an election
+      operationId: userVote
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: The election Id for which the user is voting
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: The ballot data
+          required: true
+          schema:
+            $ref: '#/definitions/Ballot'
+      responses:
+        '200':
+          description: Your vote was succesful
+        '404':
+          description: No election with given Id found
+      security:
+        - JWT: []
+      
+  '/result/{id}':
+    get:
+      tags:
+        - result
+      summary: Election results
+      description: Get election results as text file
+      operationId: electionResult
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: The election Id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Election result
+          schema:
+            type: file
+            format: .txt
+        '404':
+          description: No election with given Id found
+      security:
+        - JWT: []
+securityDefinitions:
+  JWT:
+    type: apiKey
+    name: X-Token
+    in: header
+definitions:
+  User:
+    required:
+      - email
+      - userID
+    properties:
+      userID:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      username:
+        type: string
+      email:
+        type: string
+      avatarURL:
+        type: string
+  Candidate:
+    required:
+      - id
+      - name
+    properties:
+      name:
+        type: string
+      id:
+        type: integer
+        format: int64
+      party:
+        type: string
+  Ballot:
+    required:
+      - voteBallot
+      - voteEmail
+    properties:
+      voteBallot:
+        type: string
+      voteEmail:
+        type: string
+  Voter:
+    required:
+      - name
+      - email
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+  LoginInfo:
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  ResetPassword:
+    required:
+      - resetCode
+      - newPassword
+    properties:
+      resetCode:
+        type: string
+      newPassword:
+        type: string
+  Winner:
+    properties:
+      candidate:
+        $ref: '#/definitions/Candidate'
+      score:
+        $ref: '#/definitions/Score'
+  Score:
+    properties:
+      numerator:
+        type: integer
+      denominator:
+        type: integer
+  Election:
+    required:
+      - electionId
+    properties:
+      electionID:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      creatorName:
+        type: string
+      creatorEmail:
+        type: string
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      realtime:
+        type: boolean
+      canditates:
+        type: array
+        items:
+          $ref: '#/definitions/Candidate'
+      ballotVisibility:
+        type: string
+      voterListVisibility:
+        type: boolean
+      isInvite:
+        type: boolean
+      isCompleted:
+        type: boolean
+      isStarted:
+        type: boolean
+      createdTime:
+        type: string
+        format: date-time
+      adminLink:
+        type: string
+      inviteCode:
+        type: string
+      ballots:
+        type: array
+        items:
+          $ref: '#/definitions/Ballot'
+      voters:
+        type: array
+        items:
+          $ref: '#/definitions/Voter'
+      winners:
+        type: array
+        items:
+          $ref: '#/definitions/Winner'
+      isCounted:
+        type: boolean
+      noVacancies:
+        type: integer
