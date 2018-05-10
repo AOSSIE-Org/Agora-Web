@@ -1,53 +1,42 @@
-name := """agora-web"""
-organization := "com.aossie"
+name := "Agora-REST-API"
+ 
+version := "1.0" 
 
-version := "1.0-SNAPSHOT"
+lazy val `Agora-REST-API` = (project in file(".")).enablePlugins(PlayScala)
+scalacOptions ++= Seq("-deprecation", "-language:_")
 
-scalaVersion := "2.11.8"
-
-resolvers += Resolver.jcenterRepo
-resolvers += "Sonatype OSS Snapshots".at("https://oss.sonatype.org/content/repositories/snapshots/")
+scalaVersion := "2.12.3"
+val reactiveMongoVersion = "0.13.0-play26"
+val silhouetteVersion = "5.0.3"
+val playMailerVersion = "6.0.1"
+val playJsonVersion = "2.6.9"
+val swaggerUIVersion = "3.6.1"
 
 libraryDependencies ++= Seq(
-  "com.mohiva"             %% "play-silhouette" % "4.0.0",
-  "com.mohiva"             %% "play-silhouette-password-bcrypt" % "4.0.0",
-  "com.mohiva"             %% "play-silhouette-persistence" % "4.0.0",
-  "com.mohiva"             %% "play-silhouette-crypto-jca" % "4.0.0",
-  "org.webjars"            %% "webjars-play" % "2.5.0-2",
-  "net.codingwell"         %% "scala-guice" % "4.0.1",
-  "com.iheart"             %% "ficus" % "1.2.6",
-  "org.webjars"            % "bootstrap-datepicker" % "1.6.4",
-  "org.webjars"            % "font-awesome" % "4.7.0",
-  "com.enragedginger"      %% "akka-quartz-scheduler" % "1.5.0-akka-2.4.x",
-  "com.adrianhurt"         %% "play-bootstrap" % "1.1.1-P25-B3",
-  "com.mohiva"             %% "play-silhouette-testkit" % "4.0.0" % "test",
-  "org.webjars"            % "bootstrap-tagsinput" % "0.6.1",
-  "org.webjars"            % "jquery-ui" % "1.12.1",
-  "com.novus"              %% "salat" % "1.9.9",
-  "com.typesafe.play"      %% "play-mailer-guice" % "6.0.0",
-  "org.quartz-scheduler"   % "quartz" % "2.2.2",
-  "org.mongodb"            %% "casbah" % "3.1.1",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
-  specs2              % Test,
-  cache,
-  filters
+  "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoVersion,
+  "com.mohiva" %% "play-silhouette" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-persistence" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-crypto-jca" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-testkit" % silhouetteVersion % "test",
+  "com.iheart" %% "ficus" % "1.4.3",
+  "com.typesafe.play" %% "play-mailer" % playMailerVersion,
+  "com.typesafe.play" %% "play-mailer-guice" % playMailerVersion,
+  "net.codingwell" %% "scala-guice" % "4.1.1",
+  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
+  "com.typesafe.play" %% "play-json" % playJsonVersion,
+  "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
+  "io.swagger" %% "swagger-play2" % "1.6.1-SNAPSHOT",
+  "org.webjars" % "swagger-ui" % swaggerUIVersion,
+  specs2 % Test,
+  ehcache,
+  guice
 )
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 
-routesGenerator := InjectedRoutesGenerator
-
-routesImport += "utils.route.Binders._"
-
-scalacOptions ++= Seq(
-  "-deprecation", // Emit warning and location for usages of deprecated APIs.
-  "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-  "-unchecked", // Enable additional warnings where generated code depends on assumptions.
-  "-Xfatal-warnings", // Fail the compilation if there are any warnings.
-  "-Xlint", // Enable recommended additional warnings.
-  "-Ywarn-adapted-args", // Warn if an argument list is modified to match the receiver.
-  "-Ywarn-dead-code", // Warn when dead code is identified.
-  "-Ywarn-inaccessible", // Warn about inaccessible types in method signatures.
-  "-Ywarn-nullary-override", // Warn when non-nullary overrides nullary, e.g. def foo() over def foo.
-  "-Ywarn-numeric-widen" // Warn when numerics are widened.
-)
+resolvers += Resolver.jcenterRepo
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+resolvers += "iheartradio-maven" at "https://dl.bintray.com/iheartradio/maven"
+resolvers += "atlassian-maven" at "https://maven.atlassian.com/content/repositories/atlassian-public"
