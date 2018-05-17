@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
   "net.codingwell" %% "scala-guice" % "4.1.1",
   "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
   "com.typesafe.play" %% "play-json" % playJsonVersion,
+  "ai.x" %% "play-json-extensions" % "0.10.0",
   "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
   "io.swagger" %% "swagger-play2" % "1.6.1-SNAPSHOT",
   "org.webjars" % "swagger-ui" % swaggerUIVersion,
