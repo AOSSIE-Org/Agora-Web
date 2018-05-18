@@ -8,8 +8,15 @@ GET         /swagger.json                                                   cont
 # Home page
 GET         /                                                               controllers.ApplicationController.index
 
-POST        /api/auth/signin/credentials                                    controllers.CredentialsAuthController.authenticate
-POST        /api/auth/signup                                                controllers.SignUpController.signUp
+# Authentication
+POST        /api/v1/auth/signin/credentials                                    controllers.CredentialsAuthController.authenticate
+POST        /api/v1/auth/signup                                                controllers.SignUpController.signUp
+
+# User
+GET         /api/v1/user                                                    controllers.UserController.user
+POST        /api/v1/user/resetPassword                                      controllers.UserController.resetPassword
+POST        /api/v1/user/update                                             controllers.UserController.update
+GET         /api/v1/user/logout                                             controllers.UserController.logout
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                   controllers.Assets.versioned(path="/public", file: Asset)
