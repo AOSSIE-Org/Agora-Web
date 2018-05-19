@@ -38,9 +38,10 @@ class UserController @Inject()(components: ControllerComponents,
   @ApiImplicitParams(
     Array(
       new ApiImplicitParam(
-        value = "X-Auth-Token",
+        name = "X-Auth-Token",
+        value = "User access token",
         required = true,
-        dataType = "String",
+        dataType = "string",
         paramType = "header"
       )
     )
@@ -60,9 +61,10 @@ class UserController @Inject()(components: ControllerComponents,
         paramType = "body"
       ),
       new ApiImplicitParam(
-        value = "X-Auth-Token",
+        name = "X-Auth-Token",
+        value = "User access token",
         required = true,
-        dataType = "String",
+        dataType = "string",
         paramType = "header"
       )
     )
@@ -86,9 +88,10 @@ class UserController @Inject()(components: ControllerComponents,
         paramType = "body"
       ),
       new ApiImplicitParam(
-        value = "X-Auth-Token",
+        name = "X-Auth-Token",
+        value = "User access token",
         required = true,
-        dataType = "String",
+        dataType = "string",
         paramType = "header"
       )
     )
@@ -96,7 +99,7 @@ class UserController @Inject()(components: ControllerComponents,
   def resetPassword = silhouette.SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[PasswordData].map { data =>
       val authInfo = passwordHasherRegistry.current.hash(data.password)
-      authInfoRepository.add(request.authenticator.loginInfo, authInfo).flatMap(_ => Future.successful(Ok("Password changed")))
+      authInfoRepository.update(request.authenticator.loginInfo, authInfo).flatMap(_ => Future.successful(Ok("Password changed")))
     }.recoverTotal {
       case error =>
         Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))
@@ -107,9 +110,10 @@ class UserController @Inject()(components: ControllerComponents,
   @ApiImplicitParams(
     Array(
       new ApiImplicitParam(
-        value = "X-Auth-Token",
+        name = "X-Auth-Token",
+        value = "User access token",
         required = true,
-        dataType = "String",
+        dataType = "string",
         paramType = "header"
       )
     )
