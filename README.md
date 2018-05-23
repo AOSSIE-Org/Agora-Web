@@ -20,6 +20,8 @@ To run the development environment for this REST API, you need [Git](https://git
 
 - [Installation](#installation)
 - [Running the application](#running-the-application)
+- [API Documentation](#api-documentation)
+- [Deployment](#deployment)
 - [Troubleshooting your local environment](#troubleshooting-your-local-environment)
 - [Testing](#testing)
 - [Further Reading / Useful Links](#further-reading--useful-links)
@@ -27,7 +29,7 @@ To run the development environment for this REST API, you need [Git](https://git
 
 ### Installation
 
-To install the frontend, please do the following:
+To install the backend, please do the following:
 
 1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 2. Clone this repo with `https://gitlab.com/aossie/Agora-Web`
@@ -44,9 +46,12 @@ To start the API, please do the following:
 - Go to [http://localhost:9000/](http://localhost:9000/) in a browser. Where you will see the API documentation hosted using swagger UI.
     - **Note:** *Changing any source code while the server is running will automatically recompile and reload the application on the next HTTP request.*
 
-## API documentation
+### API documentation
 
-REST API documentation is available under address: [REST API](http://localhost:9000/) T
+REST API documentation is available under address: [REST API](http://localhost:9000/)
+
+### Deployment 
+The current development branch is deployed on heroku and is available at http://agora-rest-api.herokuapp.com/
 
 ### Troubleshooting your local environment
 

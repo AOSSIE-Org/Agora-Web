@@ -1,8 +1,8 @@
 package service
 
 import javax.inject.Inject
-
 import com.mohiva.play.silhouette.api.LoginInfo
+import formatters.json.UserData
 import models.security.User
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -21,4 +21,10 @@ class UserServiceImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
 
   override def save(user: User): Future[WriteResult] =
     users.flatMap(_.insert(user))
+
+  override def update(userData: UserData, loginInfo: LoginInfo): Future[Boolean] = {
+    val query = Json.obj("username" -> loginInfo.providerKey)
+    val modifier = Json.obj("firstName" -> userData.firstName, "lastName" -> userData.lastName, "avatarURL" -> userData.avatarURL)
+    users.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+  }
 }
