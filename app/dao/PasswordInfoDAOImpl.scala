@@ -20,7 +20,7 @@ class PasswordInfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(impl
   /**
     * The data store for the auth info.
     */
-  def passwords = reactiveMongoApi.database.map(_.collection[JSONCollection]("password"))
+  def passwords = reactiveMongoApi.database.map(_.collection[JSONCollection]("PasswordInfo"))
 
   implicit lazy val format = Json.format[PasswordInfo]
 

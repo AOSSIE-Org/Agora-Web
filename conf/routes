@@ -9,8 +9,9 @@ GET         /swagger.json                                                   cont
 GET         /                                                               controllers.ApplicationController.index
 
 # Authentication
-POST        /api/v1/auth/signin/credentials                                    controllers.CredentialsAuthController.authenticate
-POST        /api/v1/auth/signup                                                controllers.SignUpController.signUp
+POST        /api/v1/auth/signin/credentials                                 controllers.CredentialsAuthController.authenticate
+POST        /api/v1/auth/signup                                             controllers.SignUpController.signUp
+GET         /api/v1/auth/authenticate/:provider                             controllers.SocialAuthController.authenticate(provider)
 
 # User
 GET         /api/v1/user                                                    controllers.UserController.user

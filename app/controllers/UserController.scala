@@ -71,7 +71,10 @@ class UserController @Inject()(components: ControllerComponents,
   )
   def update = silhouette.SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[UserData].map { data =>
-      userService.update(data, request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok("User updated")))
+      if(request.authenticator.loginInfo.providerID != CredentialsProvider.ID)
+        userService.update(data, request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok("User updated")))
+      else
+        Future.successful(BadRequest(Json.toJson(Bad(code= Some(401), message= "Unauthorized. Change your personal information with your social provider"))))
     }.recoverTotal {
       case error =>
         Future.successful(BadRequest(Json.toJson(Bad(code= Some(400), message = JsError.toJson(error)))))
