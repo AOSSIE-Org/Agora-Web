@@ -9,15 +9,22 @@ GET         /swagger.json                                                   cont
 GET         /                                                               controllers.ApplicationController.index
 
 # Authentication
-POST        /api/v1/auth/signin/credentials                                 controllers.CredentialsAuthController.authenticate
+POST        /api/v1/auth/login                                              controllers.CredentialsAuthController.authenticate
 POST        /api/v1/auth/signup                                             controllers.SignUpController.signUp
+POST         /api/v1/auth/forgotPassword/send/:userName                     controllers.ForgotPasswordController.send(userName: String)
+POST        /api/v1/auth/forgotPassword/reset/:token                        controllers.ForgotPasswordController.reset(token: String)
 GET         /api/v1/auth/authenticate/:provider                             controllers.SocialAuthController.authenticate(provider)
 
 # User
 GET         /api/v1/user                                                    controllers.UserController.user
-POST        /api/v1/user/resetPassword                                      controllers.UserController.resetPassword
+POST        /api/v1/user/changePassword                                     controllers.UserController.changePassword
 POST        /api/v1/user/update                                             controllers.UserController.update
 GET         /api/v1/user/logout                                             controllers.UserController.logout
+
+# Verification
+GET         /api/v1/account/email/:userName                                 controllers.ActivateAccountController.send(userName: String)
+GET         /api/v1/account/activate/:token                                 controllers.ActivateAccountController.activate(token: String)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                   controllers.Assets.versioned(path="/public", file: Asset)
