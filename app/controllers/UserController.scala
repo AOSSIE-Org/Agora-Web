@@ -1,12 +1,9 @@
 package controllers
 
-import java.lang.annotation.Annotation
 
-import akka.http.scaladsl.model.headers.Authorization
 import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
 import com.mohiva.play.silhouette.api.repositories.{AuthInfoRepository, AuthenticatorRepository}
 import com.mohiva.play.silhouette.api.util.{Clock, PasswordHasherRegistry}
-import com.mohiva.play.silhouette.impl.authenticators.JWTAuthenticator
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import formatters.json.{PasswordData, ResponseMessage, UserData}
 import io.swagger.annotations._
@@ -71,10 +68,15 @@ class UserController @Inject()(components: ControllerComponents,
   )
   def update = silhouette.SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[UserData].map { data =>
-      if(request.authenticator.loginInfo.providerID != CredentialsProvider.ID)
-        userService.update(data, request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok("User updated")))
-      else
-        Future.successful(BadRequest(Json.toJson(Bad(code= Some(401), message= "Unauthorized. Change your personal information with your social provider"))))
+      userService.retrieve(request.authenticator.loginInfo).flatMap {
+        case Some(user) =>
+          if(request.authenticator.loginInfo.providerID != CredentialsProvider.ID)
+            userService.update(user.copy(firstName = data.firstName, lastName = data.lastName, avatarURL = data.avatarURL),
+            request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok("User updated")))
+          else
+            Future.successful(BadRequest(Json.toJson(Bad(code= Some(401), message= "Unauthorized. Change your personal information with your social provider"))))
+        case None => Future.successful(BadRequest("User not updated"))
+      }
     }.recoverTotal {
       case error =>
         Future.successful(BadRequest(Json.toJson(Bad(code= Some(400), message = JsError.toJson(error)))))
@@ -99,7 +101,7 @@ class UserController @Inject()(components: ControllerComponents,
       )
     )
   )
-  def resetPassword = silhouette.SecuredAction.async(parse.json) { implicit request =>
+  def changePassword = silhouette.SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[PasswordData].map { data =>
       val authInfo = passwordHasherRegistry.current.hash(data.password)
       authInfoRepository.update(request.authenticator.loginInfo, authInfo).flatMap(_ => Future.successful(Ok("Password changed")))

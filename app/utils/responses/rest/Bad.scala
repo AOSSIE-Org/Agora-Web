@@ -5,7 +5,7 @@ import play.api.libs.functional.syntax._
 
 class Bad(val code: Option[Int], val error: JsValue) {
 
-  def status = "ko"
+  def status = "Bad request"
 }
 
 object Bad {

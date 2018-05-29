@@ -12,5 +12,5 @@ trait UserService extends IdentityService[User] {
 
   def save(user: User): Future[WriteResult]
 
-  def update(userData: UserData, loginInfo: LoginInfo) : Future[Boolean]
+  def update(userData: User, loginInfo: LoginInfo) : Future[Boolean]
 }

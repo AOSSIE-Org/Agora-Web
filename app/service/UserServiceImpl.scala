@@ -22,9 +22,9 @@ class UserServiceImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   override def save(user: User): Future[WriteResult] =
     users.flatMap(_.insert(user))
 
-  override def update(userData: UserData, loginInfo: LoginInfo): Future[Boolean] = {
+  override def update(userData: User, loginInfo: LoginInfo): Future[Boolean] = {
     val query = Json.obj("loginInfo" -> loginInfo)
-    val modifier = Json.obj("firstName" -> userData.firstName, "lastName" -> userData.lastName, "avatarURL" -> userData.avatarURL)
-    users.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+    users.flatMap(_.update(query, userData)).flatMap(_ => Future.successful(true))
+
   }
 }

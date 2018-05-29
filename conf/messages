@@ -56,6 +56,7 @@ activate.account.text3 = Click <a href="{0}">here</a> to send the activation ema
 
 sign.up.email.sent = You''re almost done! We sent an activation mail to {0}. Please follow the instructions in the email to activate your account. If it doesn''t arrive, check your spam folder, or try to log in again to send another activation mail.
 activation.email.sent = We sent another activation email to you at {0}. It might take a few minutes for it to arrive; be sure to check your spam folder.
+activation.email.not.sent = We were unable to send another activation email to you at {0}. Please try again later
 reset.email.sent = We have sent you an email with further instructions to reset your password, on condition that the address was found in our system. If you do not receive an email within the next 5 minutes, then please recheck your entered email address and try it again.
 
 invalid.activation.link = The link isn't valid anymore! Please sign in to send the activation email again.
@@ -76,7 +77,7 @@ yahoo = Yahoo
 # Emails
 ##########
 
-email.from = Silhouette <noreply@mohiva.com>
+email.from = Agora Vote <noreply@aossie.org>
 
 # Sign Up
 email.sign.up.subject = Welcome
