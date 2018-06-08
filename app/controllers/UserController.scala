@@ -5,9 +5,10 @@ import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
 import com.mohiva.play.silhouette.api.repositories.{AuthInfoRepository, AuthenticatorRepository}
 import com.mohiva.play.silhouette.api.util.{Clock, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import formatters.json.{PasswordData, ResponseMessage, UserData}
+import formatters.json.{PasswordData, UserData}
 import io.swagger.annotations._
 import javax.inject.Inject
+import models.swagger.ResponseMessage
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}

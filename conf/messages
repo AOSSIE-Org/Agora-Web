@@ -102,3 +102,8 @@ email.activate.account.subject = Activate account
 email.activate.account.hello = Hello {0},
 email.activate.account.html.text = Please follow <a href="{0}">this link</a> to confirm and activate your new account.
 email.activate.account.txt.text = Please follow the link to confirm and activate your new account: {0}
+
+# Voting
+email.vote.subject = Vote Invitation
+email.vote.txt.text = email.vote.html.text = Hello {0}, {1} {2} is inviting you to vote in the following election: {3}, {4} .To vote, click on the link below and type the passcode when prompted. Voting Link: {5} Passcode: {6} Kind regards,The Agora Team.
+email.vote.html.text = <p>Hello {0},</p><p>{1} {2} is inviting you to vote in the following election:</p><p>{3}</p><p>{4}</p><p>To vote, click on the link below and type the passcode when prompted:</p><p>Voting Link: <a href={5}>{5}</a></p><p>Passcode: {6}</p><p>Kind regards,The Agora Team</p>

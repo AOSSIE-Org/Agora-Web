@@ -1,0 +1,10 @@
+@import play.api.i18n.Messages
+@import play.twirl.api.Html
+
+@(election: models.Election, voter: models.Voter, url: String, passCode: String)(implicit messages: Messages)
+
+<html>
+    <body>
+        <p>@Html(messages("email.vote.html.text", voter.name, election.creatorName, election.creatorEmail, election.name, election.description, url, passCode))</p>
+    </body>
+</html>

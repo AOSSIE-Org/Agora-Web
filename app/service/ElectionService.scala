@@ -1,5 +1,6 @@
 package service
 
+import com.mohiva.play.silhouette.api.LoginInfo
 import models.{Ballot, Election, Voter, Winner}
 
 import scala.concurrent.Future
@@ -12,9 +13,9 @@ trait ElectionService {
 
   def delete(id: String) : Future[Unit]
 
-  def userElectionList(email: Option[String]): Future[List[Election]]
+  def userElectionList(loginInfo : LoginInfo): Future[List[Election]]
 
-  def userElectionListCount(email: Option[String]): Future[Int]
+  def userElectionListCount(loginInfo : LoginInfo): Future[Int]
 
   def viewCandidate(id: String): Future[List[String]]
 
@@ -25,6 +26,8 @@ trait ElectionService {
   def getVoterList(id: String): Future[List[Voter]]
 
   def addVoter(id: String , voter : Voter ): Future[Boolean]
+
+  def addVoters(id: String, voters: List[Voter]) : Future[List[Voter]]
 
   def getInviteCode(id: String): Future[String]
 

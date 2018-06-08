@@ -25,7 +25,7 @@ class AuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: ReactiveMongoApi)(
   /**
     * The data store for the password info.
     */
-  def passwordInfo = reactiveMongoApi.database.map(_.collection[JSONCollection]("passwordInfo"))
+  def authRepository = reactiveMongoApi.database.map(_.collection[JSONCollection]("authRepository"))
 
   /**
     * Finds the authenticator for the given ID.
@@ -34,7 +34,7 @@ class AuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: ReactiveMongoApi)(
     * @return The found authenticator or None if no authenticator could be found for the given ID.
     */
   override def find(id: String): Future[Option[JWTAuthenticator]] = {
-    passwordInfo.flatMap(_.find(Json.obj("_id" -> id)).one[JWTAuthenticator])
+    authRepository.flatMap(_.find(Json.obj("_id" -> id)).one[JWTAuthenticator])
   }
 
   /**
@@ -45,7 +45,7 @@ class AuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: ReactiveMongoApi)(
     */
   override def add(authenticator: JWTAuthenticator): Future[JWTAuthenticator] = {
     val passInfo = Json.obj("_id" -> authenticator.id, "authenticator" -> authenticator, "duration" -> maxDuration)
-    passwordInfo.flatMap(_.insert(passInfo)).flatMap(_ => Future(authenticator))
+    authRepository.flatMap(_.insert(passInfo)).flatMap(_ => Future(authenticator))
   }
 
   /**
@@ -56,7 +56,7 @@ class AuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: ReactiveMongoApi)(
     */
   override def update(authenticator: JWTAuthenticator) = {
     val passInfo = Json.obj("_id" -> authenticator.id, "authenticator" -> authenticator, "duration" -> maxDuration)
-    passwordInfo.flatMap(_.update(Json.obj("_id" -> authenticator.id), passInfo)).flatMap(_ => Future(authenticator))
+    authRepository.flatMap(_.update(Json.obj("_id" -> authenticator.id), passInfo)).flatMap(_ => Future(authenticator))
   }
 
   /**
@@ -66,5 +66,5 @@ class AuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: ReactiveMongoApi)(
     * @return An empty future.
     */
   override def remove(id: String): Future[Unit] =
-    passwordInfo.flatMap(_.remove(Json.obj("_id" -> id))).flatMap(_ => Future.successful(()))
+    authRepository.flatMap(_.remove(Json.obj("_id" -> id))).flatMap(_ => Future.successful(()))
 }
