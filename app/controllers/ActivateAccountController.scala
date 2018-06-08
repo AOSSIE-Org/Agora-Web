@@ -6,8 +6,9 @@ import java.util.UUID
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import formatters.json.{ResponseMessage, Token}
+import formatters.json.Token
 import io.swagger.annotations.{Api, ApiOperation}
+import models.swagger.ResponseMessage
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.json.Json
 import play.api.libs.mailer.{Email, MailerClient}

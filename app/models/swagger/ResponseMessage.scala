@@ -1,4 +1,4 @@
-package formatters.json
+package models.swagger
 
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 
