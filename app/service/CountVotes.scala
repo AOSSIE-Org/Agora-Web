@@ -1,19 +1,19 @@
 package service
 
+import agora.model.{Candidate, Election, PreferenceBallot}
+import agora.votecounter._
+
 import scala.collection.mutable.ListBuffer
-
-import countvotes.structures._
-import countvotes.methods._
-
 import models.Ballot
+import spire.math.Rational
 
 object  CountVotes {
 
-  def parseCandidates( ballot : String ) : List[Candidate] = {
+  def parseBallot(ballot : Ballot ) : List[Candidate] = {
       var candidatesList = ListBuffer[Candidate]()
-      val ballotToList = ballot.split(",|>")
+      val ballotToList = ballot.voteBallot.split(",|>")
       for(candidate <- ballotToList){
-        candidatesList+=new Candidate(candidate)
+        candidatesList += Candidate(candidate)
       }
       candidatesList.toList
   }
@@ -25,7 +25,7 @@ object  CountVotes {
     val list = ballot.split("\\=|>")
     for(candidate <- list){
       ballotVar = ballotVar.replaceFirst(candidate, "")
-      val cand = (new Candidate(candidate),rank)
+      val cand = (Candidate(candidate),rank)
       candidatesList += cand
       if(ballotVar.size>0){
         if(ballotVar.charAt(0)=='>'){
@@ -38,23 +38,6 @@ object  CountVotes {
     candidatesList.toList
   }
 
-
-  def  getWeightedBallots( ballots : List[Ballot] ): List[WeightedBallot] = {
-      var weightedBallotList      = ListBuffer[WeightedBallot]()
-      var i = 1
-      for(ballot <- ballots){
-        weightedBallotList += new WeightedBallot(parseCandidates(ballot.voteBallot),i,1)
-        i=i+1
-      }
-      weightedBallotList.toList
-  }
-
-  def getWeightedBallotsWithRanked(ballots : List[Ballot]) = {
-      for(ballot <- ballots){
-        println(parseCandidatesWithIndifference(ballot.voteBallot))
-      }
-  }
-
   def parseCandidates( candidates : List[String]) : List[Candidate] = {
     var candidatesList = ListBuffer[Candidate]()
     for(candidate <- candidates){
@@ -63,12 +46,19 @@ object  CountVotes {
     candidatesList.toList
   }
 
+  def parsePreferenceBallots(ballots: List[Ballot]) : List[agora.model.PreferenceBallot] = {
+    var preferenceBallots = ListBuffer[agora.model.PreferenceBallot]()
+    var id = 1
+    for (ballot <- ballots) {
+      preferenceBallots += PreferenceBallot(parseBallot(ballot), id, Rational(1,1))
+      id = id + 1
+    }
+    preferenceBallots.toList
+  }
 
-
-  def countVotesMethod(ballots : List[Ballot], algorithm : String, candidates: List[String]) : List[(Candidate, Rational)] = {
+  def countVotesMethod(ballots : List[Ballot], algorithm : String, candidateNames: List[String], noVacancies: Int) : List[(Candidate, Rational)] = {
     if(ballots.size!=0){
-      val election = getWeightedBallots(ballots)
-      val candidate = parseCandidates(candidates)
+      val candidates = parseCandidates(candidateNames)
       /**
       Algorithms which are not menitioned in the doc
         EVACS
@@ -88,65 +78,83 @@ object  CountVotes {
         | "Ranked Pairs" | "Cumulative voting" => {
           List.empty[(Candidate, Rational)]
         }
-        case "Oklahoma Method" => {
-          OklahomaMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+        case "Oklahoma" => {
+          val election = Election(parsePreferenceBallots(ballots))
+          Oklahoma.winners(election, candidates, noVacancies)
         }
-        case "Satisfaction Approval voting" => {
-          SatisfactionApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+        case "SAV" => {
+          val election = Election(parsePreferenceBallots(ballots))
+          SatisfactionApprovalVoting.winners(election, candidates, noVacancies)
         }
         case "Sequential Proportional Approval voting" => {
-          SequentialProportionalApprovalVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          SequentialProportionalApprovalVoting.winners(election, candidates,noVacancies)
         }
-        case "Top Cycle" => {
-          SmithSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+        case "SmithSet" => {
+          val election = Election(parsePreferenceBallots(ballots))
+          SmithSet.winners(election, candidates,noVacancies)
         }
         case "Approval" => {
-          ApprovalRule.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          ApprovalRule.winners(election,candidates,noVacancies)
         }
         case "Exhaustive ballot" => {
-          InstantExhaustiveBallot.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          InstantExhaustiveBallot.winners(election ,candidates,noVacancies)
         }
         case "Baldwin" => {
-          BaldwinMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          BaldwinMethod.winners(election, candidates,noVacancies)
         }
-        case "Preferential block voting" => {
-          PreferentialBlockVoting.winners(Election.weightedElectionToACTElection(election),candidate,1)
-        }
+
         case "Exhaustive ballot with dropoff" => {
-          InstantExhaustiveDropOffRule.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          InstantExhaustiveDropOffRule.winners(election, candidates,noVacancies)
         }
+
         case "Uncovered Set" => {
-          UncoveredSetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          UncoveredSet.winners(election,candidates,noVacancies)
         }
         case "Copeland" => {
-          CopelandMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          Copeland.winners(election, candidates,noVacancies)
         }
         case "Minimax Condorcet" => {
-          MinimaxCondorcetMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          MinimaxCondorcet.winners(election,candidates,noVacancies)
         }
         case "Random Ballot" => {
-          RandomBallotMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          RandomBallot.winners(election, candidates,noVacancies)
         }
         case "Majority" => {
-          MajorityRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          Majority.winners(election ,candidates,noVacancies)
         }
         case "Borda" => {
-          BordaRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          Borda.winners(election, candidates,noVacancies)
         }
         case "Kemeny-Young" => {
-          KemenyYoungMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          KemenyYoung.winners(election,candidates,noVacancies)
         }
         case "Nanson" => {
-          NansonMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          Nanson.winners(election, candidates, noVacancies)
         }
         case "Instant Runoff 2-round" => {
-          InstantRunoff2Round.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          InstantRunoff2Round.winners(election ,candidates,noVacancies)
         }
         case "Contingent Method" => {
-          ContingentMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          Contingent.winners(election,candidates,noVacancies)
         }
         case "Coomb’s" => {
-          CoombRuleMethod.winners(Election.weightedElectionToACTElection(election),candidate,1)
+          val election = Election(parsePreferenceBallots(ballots))
+          Coomb.winners(election,candidates,noVacancies)
         }
         case _ => {
           List.empty[(Candidate, Rational)]

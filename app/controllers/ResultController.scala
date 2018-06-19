@@ -48,10 +48,10 @@ class ResultController @Inject()(components: ControllerComponents,
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
           && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey
           && (election.realtimeResult || election.isCompleted)) =>
-          val result = CountVotes.countVotesMethod(election.ballot,election.votingAlgo,election.candidates)
+          val result = CountVotes.countVotesMethod(election.ballot,election.votingAlgo,election.candidates, election.noVacancies)
           if(result.nonEmpty){
             val winnerList = for ((candidate, rational ) <- result) yield {
-              new Winner( candidate, Score(rational.numerator.intValue , rational.denominator.intValue ))
+              new Winner(candidate, Score(rational.numerator.intValue , rational.denominator.intValue ))
             }
             electionService.updateWinner(winnerList, election.id.get)
             Future.successful(Ok(Json.toJson(winnerList)))

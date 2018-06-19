@@ -1,6 +1,6 @@
 package models
 
-import countvotes.structures.Candidate
+import agora.model.Candidate
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import play.api.libs.json.{Format, JsPath, Json, OFormat}
 import play.api.libs.functional.syntax._
