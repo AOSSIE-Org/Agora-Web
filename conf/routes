@@ -30,6 +30,9 @@ GET         /api/v1/election/:id/ballots                                    cont
 # Vote
 POST        /api/v1/vote/:id                                                controllers.VoteController.vote(id: String)
 
+# Result
+GET        /api/v1/result/:id                                                controllers.ResultController.result(id: String)
+
 # User
 GET         /api/v1/user                                                    controllers.UserController.user
 POST        /api/v1/user/changePassword                                     controllers.UserController.changePassword
