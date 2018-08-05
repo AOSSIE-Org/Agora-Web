@@ -29,6 +29,7 @@ GET         /api/v1/election/:id/ballots                                    cont
 
 # Vote
 POST        /api/v1/vote/:id                                                controllers.VoteController.vote(id: String)
+GET         /api/v1/voter/verify/:id/:pass                                  controllers.VoteController.getElectionData(id: String, pass: String)
 
 # Result
 GET        /api/v1/result/:id                                                controllers.ResultController.result(id: String)

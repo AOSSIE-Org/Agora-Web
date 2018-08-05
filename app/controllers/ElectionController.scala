@@ -3,6 +3,7 @@ package controllers
 import java.net.URLDecoder
 import java.util.Date
 
+import akka.http.scaladsl.model.DateTime
 import com.mohiva.play.silhouette.api.Silhouette
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{Clock, PasswordHasherRegistry}
@@ -13,12 +14,14 @@ import javax.inject.Inject
 import models.Election._
 import models._
 import models.swagger.{BallotList, ElectionList, ResponseMessage, VoterList}
+import org.joda.time
+import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json._
 import play.api.libs.mailer.{Email, MailerClient}
 import play.api.mvc.{AbstractController, ControllerComponents}
-import service.{ElectionService, UserService}
+import service.{CountVotes, ElectionService, UserService}
 import utils.auth.DefaultEnv
 import utils.responses.rest.Bad
 
@@ -79,7 +82,7 @@ class ElectionController @Inject()(components: ControllerComponents,
               isInvite = data.isInvite,
               isCompleted = false,
               isStarted = false,
-              createdTime = new Date(),
+              createdTime = clock.now,
               adminLink = "",
               inviteCode = s"${Random.alphanumeric take 10 mkString ("")}",
               ballot = List.empty[Ballot],
@@ -89,9 +92,9 @@ class ElectionController @Inject()(components: ControllerComponents,
               noVacancies = data.noVacancies,
               loginInfo = Some(request.authenticator.loginInfo)
             )
-          ).flatMap(_ => Future.successful(Ok("Election created successfuly")))
+          ).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Election created successfuly"))))
 
-        case None => Future.successful(BadRequest("Failed to create election"))
+        case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to create election")))
       }
     }.recoverTotal {
       case error =>
@@ -116,8 +119,10 @@ class ElectionController @Inject()(components: ControllerComponents,
       case Some(_) => electionService.retrieve(id).flatMap {
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
           && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
-          Future.successful(Ok(Json.toJson(election.copy(loginInfo = None))))
-        case None => Future.successful(NotFound("Election not found"))
+          if(!election.realtimeResult && !new time.DateTime(election.end).isAfterNow)
+            Future.successful(Ok(Json.toJson(election.copy(loginInfo = None, winners = List.empty[Winner]))))
+          else Future.successful(Ok(Json.toJson(election.copy(loginInfo = None))))
+        case None => Future.successful(NotFound(Json.toJson("message" ->"Election not found")))
       }
     }
   }
@@ -174,11 +179,11 @@ class ElectionController @Inject()(components: ControllerComponents,
                 noVacancies = data.noVacancies,
                 loginInfo = election.loginInfo
               )
-            ).flatMap(_ => Future.successful(Ok("Election updated successfully")))
+            ).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Election updated successfully"))))
 
-          case None => Future.successful(NotFound("Election not found"))
+          case None => Future.successful(NotFound(Json.toJson("message" -> "Election not found")))
         }
-        case None => Future.successful(BadRequest("Failed to update election"))
+        case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to update election")))
       }
     }.recoverTotal {
       case error =>
@@ -203,8 +208,8 @@ class ElectionController @Inject()(components: ControllerComponents,
       case Some(_) => electionService.retrieve(id).flatMap {
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
           && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
-          electionService.delete(id).flatMap(_ => Future.successful(Ok("Election deleted")))
-        case _ => Future.successful(NotFound("Election not found"))
+          electionService.delete(id).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Election deleted"))))
+        case _ => Future.successful(NotFound(Json.toJson("message" -> "Election not found")))
       }
     }
   }
@@ -258,8 +263,8 @@ class ElectionController @Inject()(components: ControllerComponents,
               isAdded <- electionService.addVoter(id, data)
             } yield {
               if (isAdded) {
-                val url = routes.VoteController.vote(election.id.get).absoluteURL()
                 val passCode  = PassCodeGenerator.encrypt(election.inviteCode, data.email)
+                val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
                   from = Messages("email.from"),
@@ -267,17 +272,24 @@ class ElectionController @Inject()(components: ControllerComponents,
                   bodyText = Some(views.txt.emails.vote(election, data, url, passCode).body),
                   bodyHtml = Some(views.html.emails.vote(election, data, url, passCode).body)
                 ))
-                Future.successful(Ok(s"Voter added to election ${election.name}"))
+                val result = CountVotes.countVotesMethod(election.ballot, election.votingAlgo, election.candidates, election.noVacancies)
+                if (result.nonEmpty) {
+                  val winnerList = for ((candidate, rational) <- result) yield {
+                    new Winner(candidate, Score(rational.numerator.intValue, rational.denominator.intValue))
+                  }
+                  electionService.updateWinner(winnerList, election.id.get)
+                }
+                Future.successful(Ok(Json.toJson("message" -> s"Voter added to election ${election.name}")))
               } else {
-                Future.successful(InternalServerError("Failed to add voter"))
+                Future.successful(InternalServerError(Json.toJson("message" -> "Failed to add voter")))
               }
 
             }
             electionService.addVoter(id, data).flatMap(_ =>
-              Future.successful(Ok(s"Voter added to election ${election.name}")))
+              Future.successful(Ok(Json.toJson("message" -> s"Voter added to election ${election.name}"))))
           case _ => Future.successful(NotFound("Election not found"))
         }
-        case None => Future.successful(BadRequest("Failed to add voter"))
+        case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to add voter")))
       }
     }.recoverTotal {
       case error =>
@@ -303,7 +315,7 @@ class ElectionController @Inject()(components: ControllerComponents,
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
           && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
           electionService.getVoterList(id).flatMap(voters => Future.successful(Ok(Json.obj("voters" -> voters))))
-        case _ => Future.successful(NotFound("Election with specified ID not found"))
+        case _ => Future.successful(NotFound(Json.toJson("message" -> "Election with specified ID not found")))
       }
     }
   }
@@ -336,8 +348,8 @@ class ElectionController @Inject()(components: ControllerComponents,
             && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
             electionService.addVoters(id, data).flatMap{filteredVoters =>
               filteredVoters.foreach{ v =>
-                val url = routes.VoteController.vote(election.id.get).absoluteURL()
                 val passCode  = PassCodeGenerator.encrypt(election.inviteCode, v.email)
+                val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
                   from = Messages("email.from"),
@@ -346,11 +358,11 @@ class ElectionController @Inject()(components: ControllerComponents,
                   bodyHtml = Some(views.html.emails.vote(election, v, url, passCode).body)
                 ))
               }
-              Future.successful(Ok(s"Voters list updated for election ${election.name}"))
+              Future.successful(Ok(Json.toJson("message" -> s"Voters list updated for election ${election.name}")))
             }
-          case _ => Future.successful(NotFound("Election not found"))
+          case _ => Future.successful(NotFound(Json.toJson("message" -> "Election not found")))
         }
-        case None => Future.successful(BadRequest("Failed to add voters"))
+        case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to add voters")))
       }
     }.recoverTotal {
       case error =>
@@ -376,9 +388,9 @@ class ElectionController @Inject()(components: ControllerComponents,
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
           && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
           electionService.getBallots(id).flatMap(ballots => Future.successful(Ok(Json.obj("ballots" -> ballots))))
-        case _ => Future.successful(NotFound("Election not found"))
+        case _ => Future.successful(NotFound(Json.toJson("message" -> "Election not found")))
       }
-      case None => Future.successful(BadRequest("Failed to get ballots"))
+      case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to get ballots")))
     }
   }
 }

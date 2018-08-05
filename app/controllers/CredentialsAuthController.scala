@@ -9,7 +9,7 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{Clock, Credentials, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
-import formatters.json.{CredentialFormat, Token}
+import formatters.json.{CredentialFormat, Token, UserData}
 import io.swagger.annotations.{Api, ApiImplicitParam, ApiImplicitParams, ApiOperation}
 import models.security.SignUp
 import play.api.Configuration
@@ -40,7 +40,7 @@ class CredentialsAuthController @Inject()(components: ControllerComponents,
 
   implicit val signUpFormat = Json.format[SignUp]
 
-  @ApiOperation(value = "Login and get authentication token", response = classOf[Token])
+  @ApiOperation(value = "Login and get authentication token", response = classOf[UserData])
   @ApiImplicitParams(
     Array(
       new ApiImplicitParam(
@@ -69,7 +69,7 @@ class CredentialsAuthController @Inject()(components: ControllerComponents,
                 bodyText = Some(views.txt.emails.activateAccount(user, url).body),
                 bodyHtml = Some(views.html.emails.activateAccount(user, url).body)
               ))
-              Future.successful(BadRequest("Account not activated. A message has been sent to your email, follow the link to activate your account and try again"))
+              Future.successful(BadRequest(Json.toJson("message" -> "Account not activated. A message has been sent to your email, follow the link to activate your account and try again")))
             }
           case Some(user) =>
             val config = configuration.underlying
@@ -88,9 +88,9 @@ class CredentialsAuthController @Inject()(components: ControllerComponents,
                         token,
                         Ok(
                           Json.toJson(
-                            Token(
+                            user.extractUserData.copy(token = Some(Token(
                               token,
-                              expiresOn = authenticator.expirationDateTime
+                              expiresOn = authenticator.expirationDateTime))
                             )
                           )
                         )

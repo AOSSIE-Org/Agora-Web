@@ -2,6 +2,7 @@ package service
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import models.{Ballot, Election, Voter, Winner}
+import org.joda.time.DateTime
 
 import scala.concurrent.Future
 
@@ -35,9 +36,9 @@ trait ElectionService {
 
   def removeVoter(id : String, email : String ): Future[Boolean]
 
-  def getStartDate(id: String): Future[java.util.Date]
+  def getStartDate(id: String): Future[DateTime]
 
-  def getEndDate(id: String): Future[java.util.Date]
+  def getEndDate(id: String): Future[DateTime]
 
   //get all the inactive elections
   def getInactiveElections() :  Future[List[Election]]

@@ -4,6 +4,7 @@ import com.mohiva.play.silhouette.api.LoginInfo
 import javax.inject.Inject
 import models.Election._
 import models.{Ballot, Election, Voter, Winner}
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.modules.reactivemongo._
 import reactivemongo.api.ReadPreference
@@ -147,13 +148,13 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
 
-  override def getStartDate(id: String): Future[java.util.Date] = {
+  override def getStartDate(id: String): Future[DateTime] = {
     retrieve(id).flatMap {
       case Some(elect) => Future.successful(elect.start)
     }
   }
 
-  override def getEndDate(id: String): Future[java.util.Date] = {
+  override def getEndDate(id: String): Future[DateTime] = {
     retrieve(id).flatMap {
       case Some(elect) => Future.successful(elect.end)
     }

@@ -5,7 +5,9 @@ import java.util.Date
 
 import play.api.libs.json._
 import com.mohiva.play.silhouette.api.LoginInfo
+import formatters.json.ElectionData
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import org.joda.time.DateTime
 
 import scala.util.{Failure, Success, Try}
 
@@ -42,8 +44,8 @@ case class Election(
                      description: String,
                      creatorName: String,
                      creatorEmail: String,
-                     start: Date,
-                     end: Date,
+                     start: DateTime,
+                     end: DateTime,
                      realtimeResult: Boolean,
                      votingAlgo: String,
                      candidates: List[String],
@@ -52,7 +54,7 @@ case class Election(
                      isInvite: Boolean,
                      isCompleted: Boolean,
                      isStarted: Boolean,
-                     createdTime: Date,
+                     createdTime: DateTime,
                      adminLink: String,
                      inviteCode: String,
                      ballot: List[Ballot],
@@ -68,18 +70,15 @@ case class Election(
     else "Completed"
   }
 
+  def getElectionData: ElectionData = ElectionData(name, description, candidates, ballotVisibility, voterListVisibility, start, end, isInvite, realtimeResult, votingAlgo, noVacancies)
+
 
 }
 
 object Election {
 
-  implicit object DateFormat extends Format[Date] {
-    val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-
-    def reads(json: JsValue): JsResult[Date] = JsSuccess(format.parse(json.as[String]))
-
-    def writes(date: Date) = JsString(format.format(date))
-  }
+  implicit val jodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss'Z'")
+  implicit val jodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
   implicit val loginInfoReader = Json.reads[LoginInfo]
   implicit val loginInfoWriter = Json.writes[LoginInfo]
@@ -211,8 +210,8 @@ object Election {
           val description = (election \ "description").as[String]
           val creatorName = (election \ "creatorName").as[String]
           val creatorEmail = (election \ "creatorEmail").as[String]
-          val start = (election \ "start").as[Date]
-          val end = (election \ "end").as[Date]
+          val start = (election \ "start").as[DateTime]
+          val end = (election \ "end").as[DateTime]
           val realtimeResult = (election \ "realtimeResult").as[Boolean]
           val votingAlgo = (election \ "votingAlgo").as[String]
           val candidates = (election \ "candidates").as[List[String]]
@@ -221,7 +220,7 @@ object Election {
           val isInvite = (election \ "isInvite").as[Boolean]
           val isCompleted = (election \ "isCompleted").as[Boolean]
           val isStarted = (election \ "isStarted").as[Boolean]
-          val createdTime = (election \ "createdTime").as[Date]
+          val createdTime = (election \ "createdTime").as[DateTime]
           val adminLink = (election \ "adminLink").as[String]
           val inviteCode = (election \ "inviteCode").as[String]
           val ballot = (election \ "ballot").as[List[Ballot]]
