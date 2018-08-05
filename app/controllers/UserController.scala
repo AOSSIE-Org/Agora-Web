@@ -46,7 +46,7 @@ class UserController @Inject()(components: ControllerComponents,
   )
   def logout = silhouette.SecuredAction.async { implicit request =>
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
-    silhouette.env.authenticatorService.discard(request.authenticator, Ok("User logged out"))
+    silhouette.env.authenticatorService.discard(request.authenticator, Ok)
   }
 
   @ApiOperation(value = "Updates user information", response = classOf[ResponseMessage])
@@ -71,12 +71,12 @@ class UserController @Inject()(components: ControllerComponents,
     request.body.validate[UserData].map { data =>
       userService.retrieve(request.authenticator.loginInfo).flatMap {
         case Some(user) =>
-          if(request.authenticator.loginInfo.providerID != CredentialsProvider.ID)
+          if(request.authenticator.loginInfo.providerID == CredentialsProvider.ID)
             userService.update(user.copy(firstName = data.firstName, lastName = data.lastName, avatarURL = data.avatarURL),
-            request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok("User updated")))
+            request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok(Json.toJson("message" ->"User updated"))))
           else
             Future.successful(BadRequest(Json.toJson(Bad(code= Some(401), message= "Unauthorized. Change your personal information with your social provider"))))
-        case None => Future.successful(BadRequest("User not updated"))
+        case None => Future.successful(BadRequest(Json.toJson("message" ->"User not updated")))
       }
     }.recoverTotal {
       case error =>
@@ -105,7 +105,7 @@ class UserController @Inject()(components: ControllerComponents,
   def changePassword = silhouette.SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[PasswordData].map { data =>
       val authInfo = passwordHasherRegistry.current.hash(data.password)
-      authInfoRepository.update(request.authenticator.loginInfo, authInfo).flatMap(_ => Future.successful(Ok("Password changed")))
+      authInfoRepository.update(request.authenticator.loginInfo, authInfo).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Password changed"))))
     }.recoverTotal {
       case error =>
         Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))

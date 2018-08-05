@@ -92,9 +92,9 @@ class ForgotPasswordController @Inject() (
               authInfoRepository.update[PasswordInfo](user.loginInfo, authInfo).flatMap { _ =>
                 Future.successful(Ok(Messages("password.reset")))
               }
-            case _ => Future.successful(BadRequest(Messages("invalid.reset.link")))
+            case _ => Future.successful(BadRequest(Json.toJson("message" -> Messages("invalid.reset.link"))))
           }
-        case None => Future.successful(BadRequest(Messages("invalid.reset.link")))
+        case None => Future.successful(BadRequest(Json.toJson("message" -> Messages("invalid.reset.link"))))
       }
     }.recoverTotal{
       case error =>

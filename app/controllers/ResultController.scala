@@ -46,21 +46,25 @@ class ResultController @Inject()(components: ControllerComponents,
     userService.retrieve(request.authenticator.loginInfo).flatMap {
       case Some(_) => electionService.retrieve(id).flatMap {
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
-          && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey
-          && (election.realtimeResult || election.isCompleted)) =>
-          val result = CountVotes.countVotesMethod(election.ballot,election.votingAlgo,election.candidates, election.noVacancies)
-          if(result.nonEmpty){
-            val winnerList = for ((candidate, rational ) <- result) yield {
-              new Winner(candidate, Score(rational.numerator.intValue , rational.denominator.intValue ))
+          && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
+          if (election.realtimeResult || election.isCompleted) {
+            val result = CountVotes.countVotesMethod(election.ballot, election.votingAlgo, election.candidates, election.noVacancies)
+            if (result.nonEmpty) {
+              val winnerList = for ((candidate, rational) <- result) yield {
+                new Winner(candidate, Score(rational.numerator.intValue, rational.denominator.intValue))
+              }
+              electionService.updateWinner(winnerList, election.id.get)
+              Future.successful(Ok(Json.toJson(winnerList)))
             }
-            electionService.updateWinner(winnerList, election.id.get)
-            Future.successful(Ok(Json.toJson(winnerList)))
-          }
-          else{
+            else {
+              electionService.updateIsCounted(election.id.get)
+              Future.successful(NoContent)
+            }
+          } else {
             electionService.updateIsCounted(election.id.get)
-            Future.successful(Ok(Json.toJson(s"Election not yet completed. The election will end at: ${election.end}")))
+            Future.successful(NoContent)
           }
-        case None => Future.successful(NotFound("Election not found"))
+        case None => Future.successful(NotFound(Json.toJson("message" ->"Election not found")))
       }
     }
   }

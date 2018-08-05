@@ -4,7 +4,7 @@ import com.mohiva.play.silhouette.api.Silhouette
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{Clock, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import formatters.json.BallotData
+import formatters.json.{BallotData, ElectionData, VoteVerificationData}
 import io.swagger.annotations.{Api, ApiImplicitParam, ApiImplicitParams, ApiOperation}
 import javax.inject.Inject
 import models.swagger.ResponseMessage
@@ -53,14 +53,27 @@ class VoteController @Inject()(components: ControllerComponents,
           if (isVoterInList(email, election.voterList)) {
             val ballot = Ballot(data.ballotInput, email)
             electionService.vote(id, ballot).flatMap(_ =>
-              electionService.removeVoter(id, email).flatMap(_ => Future.successful(Ok("Thank you for voting"))))
-          } else Future.successful(NotFound("Invalid pass code."))
+              electionService.removeVoter(id, email).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Thank you for voting")))))
+          } else Future.successful(NotFound(Json.toJson("message" -> "Invalid pass code.")))
 
-        case None => Future.successful(NotFound("Election with specified id not found"))
+        case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
       }
     }.recoverTotal{
       case error =>
         Future.successful(BadRequest(Json.toJson(Bad(code = Some(400), message = JsError.toJson(error)))))
+    }
+  }
+
+  @ApiOperation(value = "Verify voters link", response = classOf[ElectionData])
+  def getElectionData(id: String, pass: String) = silhouette.UserAwareAction.async { implicit request =>
+    electionService.retrieve(id).flatMap {
+      case Some(election) =>
+        val email = PassCodeGenerator.decrypt(election.inviteCode, pass)
+        if (isVoterInList(email, election.voterList)) {
+          Future.successful(Ok(Json.toJson(election.getElectionData)))
+        } else Future.successful(NotFound)
+
+      case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
     }
   }
 

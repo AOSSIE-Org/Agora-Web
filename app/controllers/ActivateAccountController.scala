@@ -6,7 +6,7 @@ import java.util.UUID
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import formatters.json.Token
+import formatters.json.{Token, UserData}
 import io.swagger.annotations.{Api, ApiOperation}
 import models.swagger.ResponseMessage
 import play.api.i18n.{I18nSupport, Messages}
@@ -55,7 +55,7 @@ class ActivateAccountController @Inject()(
   }
 
 
-  @ApiOperation(value = "Activate account and get authentication token", response = classOf[Token])
+  @ApiOperation(value = "Activate account and get authentication token", response = classOf[UserData])
   def activate(token: String) = Action.async { implicit request: Request[AnyContent] =>
     authTokenService.validate(token).flatMap {
       case Some(authToken) => userService.retrieve(authToken.userLoginInfo).flatMap {
@@ -65,7 +65,14 @@ class ActivateAccountController @Inject()(
             authenticator <- silhouette.env.authenticatorService.create(authToken.userLoginInfo)
             token <- silhouette.env.authenticatorService.init(authenticator)
             result <- silhouette.env.authenticatorService.embed(token,
-              Ok(Json.toJson(Token(token = token, expiresOn = authenticator.expirationDateTime)))
+              Ok(
+                Json.toJson(
+                  user.extractUserData.copy(token = Some(Token(
+                    token,
+                    expiresOn = authenticator.expirationDateTime))
+                  )
+                )
+              )
             )
           } yield {
             silhouette.env.eventBus.publish(LoginEvent(user, request))
