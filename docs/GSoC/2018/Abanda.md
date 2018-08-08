@@ -8,7 +8,7 @@
 
 ## Agora Backend (REST API)  
 
-The goal of the project is to divide the current agora platform into a REST API and a web frontend. This part of the project was to produce a REST API(backend) for the Agora platform. I made use of the models that were already found in the code base and also reused as much code as I could. The following parts will describe the project in details.
+The goal of the project is to divide the old agora platform into a REST API and a web frontend. This part of the project was to produce a REST API(backend) for the Agora platform. I made use of the models that were already found in the code base and also reused as much code as I could. The following parts will describe the project in details.
 
 ### Use case modeling 
 
@@ -22,7 +22,7 @@ I have identified the following tasks in the project at the starting of the proj
 7. Endpoints for election creator to invite the voter to the Election. - **Done** 
 8. System will inform the voter with the link to vote the Election.  - **Done**
 7. System will handle the timeline of the Election. **Done**
-8. System will count the voters and produce the results for the Election after the Election. - **Done** 
+8. System will count the votes and produce the results for the Election after the Election. - **Done** 
 9. Voter can vote the Election. - **Done** 
 
 ### Deep view into the technology. 
@@ -40,7 +40,7 @@ These are some of the main technologies, we have used in the project.
 * [Play2-ReactiveMongoDB](http://reactivemongo.org/releases/0.1x/documentation/tutorial/play.html) - Used to connect with the MongoDB
 * [specs2](https://github.com/etorreborre/specs2) - Used to unit tests.
 
-We started the Google summer of code by defining all backend specifications as [Swagger Play](https://github.com/swagger-api/swagger-play) specs. Configured the project using play framework 2.6 seeds and integrated swagger UI then deploying it in the cloud. We used Heroku as the Cloud option. We have made available the prototype user interfaces in the Heroku cloud. After that, we have started to work with abstract schema of the models and create controllers to handle actions on those models. Then we started to work with the user authentication part. We use silhouette as our authentication library. After that we spent time to configure the Silhouette module and created email based signup and signin endpoints after which we worked on authentication with social providers still using silhouette. Finally we have built JWT token based authentication and authorization system for OAuth2 and email based login. Apart from that we created endpoints for user to logout, update their account and change their password.
+We started the Google summer of code by defining all backend specifications as [Swagger](https://swagger.io/docs/specification/2-0/basic-structure/) specs. Configured the project using play framework 2.6 seeds and integrated swagger UI then deploying it in the cloud. We used Heroku as the Cloud option. We have made available the prototype user interfaces in the Heroku cloud. After that, we have started to work with abstract schema of the models and create controllers to handle actions on those models. Then we started to work with the user authentication part. We use silhouette as our authentication library. After that we spent time to configure the Silhouette module and created email based signup and signin endpoints after which we worked on authentication with social providers still using silhouette. Finally we have built JWT token based authentication and authorization system for OAuth2 and email based login. Apart from that we created endpoints for user to logout, update their account and change their password.
 
 After that we started working on the election services and models.Then we searched a cloud solution for MongoDB. We use Mlab as our cloud database and found it to be great for development. We used [Play2-ReactiveMongoDB](http://reactivemongo.org/releases/0.1x/documentation/tutorial/play.html) to connect to mongoDB in order to store and get our election and user data. After which we created controllers and endpoints to create, edit, delete and get election data.
 
@@ -48,7 +48,7 @@ After that we started working on the election services and models.Then we search
 After which we created endpoints to verify voters identity and for voters to vote for elections. We have used the [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) (Advanced encryption standard) for creating the `passcode` for the voter. We used [Play-Mailer](https://github.com/playframework/play-mailer) with Sendgrid to send the emails to voters. Then we started to implement the vote counting function using [Agora](https://gitlab.com/aossie/Agora) library and saved the data into the database.
 
 We created results endpoints to serve the results for finished elections or elections that have support for real-time results.
-All these endpoints are available at the [demo](http://agora-rest-api.herokuapp.com/) with basic swagger documentation describing each endpoints. I discussed a lot with my mentors on each step that was to be taken and they have always helped me with valuable guidance on what is needed.Though the API supports various features I can't really say it is production ready since we have to test it with real users and observe how it responds. We worked on the API documentation as we were building the API due to swagger integration. So each new endpoint that was created was accompanied with its documentation, we have many things to improve in documentation and also in the Agora API.
+All these endpoints are available at [demo](http://agora-rest-api.herokuapp.com/) with basic swagger documentation describing each endpoints. I discussed a lot with my mentors on each step that was to be taken and they have always helped me with valuable guidance on what is needed.Though the API supports various features I can't really say it is production ready since we have to test it with real users and observe how it responds. We worked on the API documentation as we were building the API due to swagger integration. So each new endpoint that was created was accompanied with its documentation, we have many things to improve in documentation and also in the Agora API.
 
 I would like to thank every AOSSIE member, especially my mentors, Thuvarakan Tharmarajasingam, Bruno Woltzenlogel Paleo and Ezequiel Postan for being so nice and helpful. I have learnt a lot in the past 3 months and it has been a great experience to be a part of this wonderful community. 
 
