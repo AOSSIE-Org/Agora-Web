@@ -3,7 +3,7 @@
 ## Student - Abanda Ludovic
 ## Links  
 - Project : https://gitlab.com/aossie/Agora-Web
-- Live demo of the Project :  https://agora-backend.herokuapp.com
+- Live demo of the Project :  http://agora-rest-api.herokuapp.com/
 - Wiki page : [Wiki](../../wiki-2018.md)
 
 ## Agora Backend (REST API)  
@@ -48,7 +48,7 @@ After that we started working on the election services and models.Then we search
 After which we created endpoints to verify voters identity and for voters to vote for elections. We have used the [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) (Advanced encryption standard) for creating the `passcode` for the voter. We used [Play-Mailer](https://github.com/playframework/play-mailer) with Sendgrid to send the emails to voters. Then we started to implement the vote counting function using [Agora](https://gitlab.com/aossie/Agora) library and saved the data into the database.
 
 We created results endpoints to serve the results for finished elections or elections that have support for real-time results.
-All these endpoints are available at the [demo](https://agora-backend.herokuapp.com) with basic swagger documentation describing each endpoints. I discussed a lot with my mentors on each step that was to be taken and they have always helped me with valuable guidance on what is needed.Though the API supports various features I can't really say it is production ready since we have to test it with real users and observe how it responds. We worked on the API documentation as we were building the API due to swagger integration. So each new endpoint that was created was accompanied with its documentation, we have many things to improve in documentation and also in the Agora API.
+All these endpoints are available at the [demo](http://agora-rest-api.herokuapp.com/) with basic swagger documentation describing each endpoints. I discussed a lot with my mentors on each step that was to be taken and they have always helped me with valuable guidance on what is needed.Though the API supports various features I can't really say it is production ready since we have to test it with real users and observe how it responds. We worked on the API documentation as we were building the API due to swagger integration. So each new endpoint that was created was accompanied with its documentation, we have many things to improve in documentation and also in the Agora API.
 
 I would like to thank every AOSSIE member, especially my mentors, Thuvarakan Tharmarajasingam, Bruno Woltzenlogel Paleo and Ezequiel Postan for being so nice and helpful. I have learnt a lot in the past 3 months and it has been a great experience to be a part of this wonderful community. 
 
