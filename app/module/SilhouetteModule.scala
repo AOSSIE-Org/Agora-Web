@@ -10,8 +10,7 @@ import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.api.{Environment, EventBus, Silhouette, SilhouetteProvider}
 import com.mohiva.play.silhouette.crypto.{JcaCrypter, JcaCrypterSettings, JcaSigner, JcaSignerSettings}
 import com.mohiva.play.silhouette.impl.authenticators._
-import com.mohiva.play.silhouette.impl.providers.oauth1.TwitterProvider
-import com.mohiva.play.silhouette.impl.providers.oauth2.{FacebookProvider, GoogleProvider}
+import com.mohiva.play.silhouette.impl.providers.oauth2.{FacebookProvider, GoogleProvider, LinkedInProvider}
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
 import com.mohiva.play.silhouette.impl.providers._
 import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{CookieSecretProvider, CookieSecretSettings}
@@ -79,19 +78,19 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     *
     * @param facebookProvider The Facebook provider implementation.
     * @param googleProvider The Google provider implementation.
-    * @param twitterProvider The Twitter provider implementation.
+    * @param linkedInProvider The LinkedIn provider implementation.
     * @return The Silhouette environment.
     */
   @Provides
   def provideSocialProviderRegistry(
                                      facebookProvider: FacebookProvider,
                                      googleProvider: GoogleProvider,
-                                     twitterProvider: TwitterProvider): SocialProviderRegistry = {
+                                     linkedInProvider: LinkedInProvider): SocialProviderRegistry = {
 
     SocialProviderRegistry(Seq(
       googleProvider,
       facebookProvider,
-      twitterProvider
+      linkedInProvider
     ))
   }
 
@@ -318,21 +317,20 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   /**
-    * Provides the Twitter provider.
+    * Provides the Linkedin provider.
     *
     * @param httpLayer The HTTP layer implementation.
-    * @param tokenSecretProvider The token secret provider implementation.
+    * @param socialStateHandler The social state handler implementation.
     * @param configuration The Play configuration.
-    * @return The Twitter provider.
+    * @return The Linkedin provider.
     */
   @Provides
-  def provideTwitterProvider(
-                              httpLayer: HTTPLayer,
-                              tokenSecretProvider: OAuth1TokenSecretProvider,
-                              configuration: Configuration): TwitterProvider = {
+  def provideLinkedInProvider(
+                             httpLayer: HTTPLayer,
+                             socialStateHandler: SocialStateHandler,
+                             configuration: Configuration): LinkedInProvider = {
 
-    val settings = configuration.underlying.as[OAuth1Settings]("silhouette.twitter")
-    new TwitterProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
+    new LinkedInProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.linkedin"))
   }
 
 }
