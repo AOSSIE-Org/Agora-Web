@@ -1,35 +1,49 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
-# https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-GET         /                                 controllers.HomeController.index
-GET         /signOut                          controllers.HomeController.signOut
-GET         /profile                          controllers.HomeController.profile
-GET         /home                             controllers.HomeController.indexAuthorized
-GET         /profile                          controllers.HomeController.profile
+# Swagger API
+GET         /swagger.json                                                   controllers.ApiHelpController.getResources
 
-GET         /signIn                           controllers.SignInController.view
+# Home page
+GET         /                                                               controllers.ApplicationController.index
 
-GET         /authenticate/:provider           controllers.SocialAuthController.authenticate(provider)
+# Authentication
+POST        /api/v1/auth/login                                              controllers.CredentialsAuthController.authenticate
+POST        /api/v1/auth/signup                                             controllers.SignUpController.signUp
+POST        /api/v1/auth/forgotPassword/send/:userName                      controllers.ForgotPasswordController.send(userName: String)
+POST        /api/v1/auth/forgotPassword/reset/:token                        controllers.ForgotPasswordController.reset(token: String)
+GET         /api/v1/auth/authenticate/:provider                             controllers.SocialAuthController.authenticate(provider)
 
-GET         /result/:id                       controllers.ElectionController.result(id)
-GET         /guest/election/:id               controllers.ElectionController.viewElection(id)
-GET         /user/election/:id                controllers.ElectionController.viewElectionSecured(id)
-GET         /ballot/:id                       controllers.ElectionController.viewBallot(id)
-GET         /vote/                            controllers.ElectionController.redirectVoter()
-GET         /guest/vote/:id                   controllers.ElectionController.voteGuest(id)
-GET         /user/createElection              controllers.ElectionController.createUserView
+# Elections
+POST        /api/v1/election                                                controllers.ElectionController.createElection()
+GET         /api/v1/election/:id                                            controllers.ElectionController.getElection(id: String)
+DELETE      /api/v1/election/:id                                            controllers.ElectionController.deleteElection(id: String)
+POST         /api/v1/election/:id                                           controllers.ElectionController.editElection(id: String)
+GET         /api/v1/election                                                controllers.ElectionController.getUserElections()
 
+POST        /api/v1/election/:id/voter                                      controllers.ElectionController.addVoter(id: String)
+GET         /api/v1/election/:id/voters                                     controllers.ElectionController.getVoters(id: String)
+POST        /api/v1/election/:id/voters                                     controllers.ElectionController.addVoters(id: String)
+GET         /api/v1/election/:id/ballots                                    controllers.ElectionController.getBallots(id: String)
 
-POST        /createElection                   controllers.ElectionController.create
-POST        /upload/                          controllers.ElectionController.upload()
-POST        /update/                          controllers.ElectionController.update()
-POST        /guest/vote                       controllers.ElectionController.vote()
-POST        /user/election/invite/            controllers.ElectionController.addVoter()
-POST        /guest/delete/                    controllers.ElectionController.deleteElection()
+# Vote
+POST        /api/v1/vote/:id                                                controllers.VoteController.vote(id: String)
+GET         /api/v1/voter/verify/:id/:pass                                  controllers.VoteController.getElectionData(id: String, pass: String)
+
+# Result
+GET        /api/v1/result/:id                                                controllers.ResultController.result(id: String)
+
+# User
+GET         /api/v1/user                                                    controllers.UserController.user
+POST        /api/v1/user/changePassword                                     controllers.UserController.changePassword
+POST        /api/v1/user/update                                             controllers.UserController.update
+GET         /api/v1/user/logout                                             controllers.UserController.logout
+
+# Verification
+GET         /api/v1/account/email/:userName                                 controllers.ActivateAccountController.send(userName: String)
+GET         /api/v1/account/activate/:token                                 controllers.ActivateAccountController.activate(token: String)
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                     controllers.Assets.at(path="/public", file)
-GET         /edit/:id                         controllers.ElectionController.updateElection(id)
+GET         /assets/*file                                                   controllers.Assets.versioned(path="/public", file: Asset)

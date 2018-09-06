@@ -1,0 +1,5 @@
+@import play.api.i18n.Messages
+
+@(election: models.Election, voter: models.Voter, url: String, passCode: String)(implicit messages: Messages)
+
+messages("email.vote.txt.text", voter.name, election.creatorName, election.creatorEmail, election.name, election.description, url)

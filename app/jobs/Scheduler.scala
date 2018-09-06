@@ -4,22 +4,14 @@ import akka.actor.{ ActorRef, ActorSystem }
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
-
-import AuthTokenCleaner.Clean
-
 /**
  * Schedules the jobs.
  */
-class Scheduler @Inject()(
+class Scheduler @Inject() (
   system: ActorSystem,
-  @Named("auth-token-cleaner") authTokenCleaner: ActorRef
-) {
+  @Named("auth-token-cleaner") authTokenCleaner: ActorRef) {
 
-  QuartzSchedulerExtension(system).schedule(
-    "AuthTokenCleaner",
-    authTokenCleaner,
-    Clean
-  )
+  QuartzSchedulerExtension(system).schedule("AuthTokenCleaner", authTokenCleaner, AuthTokenCleaner.Clean)
 
-  authTokenCleaner ! Clean
+  authTokenCleaner ! AuthTokenCleaner.Clean
 }

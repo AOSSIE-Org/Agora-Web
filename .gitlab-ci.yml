@@ -1,4 +1,4 @@
-image: java:8
+image: openjdk:8-jdk
 
 before_script:
   # Enable the usage of sources over https
@@ -11,23 +11,13 @@ before_script:
   - apt-get update -yqq
   - apt-get install sbt -yqq
   # Log the sbt version
-  - sbt sbt-version
+  - sbt sbtVersion
 
 stages:
   - test
-  - deploy
 
 test:
   stage: test
   script:
     - sbt test
 
-deploy:
-  stage: deploy
-  script:
-    # Install dpl
-    - apt-get update -yq
-    - apt-get install rubygems ruby-dev -y
-    - gem install dpl
-    # Deploy to Heroku
-    - dpl --provider=heroku --app=agora-web-aossie --api-key=$HEROKU_API_KEY
