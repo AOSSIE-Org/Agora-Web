@@ -70,7 +70,12 @@ case class Election(
     else "Completed"
   }
 
-  def getElectionData: ElectionData = ElectionData(name, description, candidates, ballotVisibility, voterListVisibility, start, end, isInvite, realtimeResult, votingAlgo, noVacancies)
+  def getElectionData: ElectionData = {
+    var ballots: List[Ballot] = List.empty
+    if(ballotVisibility.equalsIgnoreCase("public"))
+      ballots = ballot
+    ElectionData(name, description, candidates, ballotVisibility, voterListVisibility, start, end, isInvite, realtimeResult, votingAlgo, noVacancies, ballots)
+  }
 
 
 }
