@@ -44,7 +44,7 @@ class ForgotPasswordController @Inject() (
   @ApiOperation(value = "Send reset password token to user email", response = classOf[ResponseMessage])
   def send(userName: String) = Action.async { implicit request =>
         val loginInfo = LoginInfo(CredentialsProvider.ID, userName)
-        val result = Ok(Messages("reset.email.sent"))
+        val result = Ok(Json.toJson("message" -> Messages("reset.email.sent")))
         userService.retrieve(loginInfo).flatMap {
           case Some(user) =>
             authTokenService.create(user.loginInfo).map { authToken =>
