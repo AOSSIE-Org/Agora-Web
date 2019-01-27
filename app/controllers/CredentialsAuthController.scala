@@ -98,7 +98,7 @@ class CredentialsAuthController @Inject()(components: ControllerComponents,
                   }
               }
           case None =>
-            Future.failed(new IdentityNotFoundException("Couldn't find user"))
+            Future.successful(Json.toJson("message" -> s"""${new IdentityNotFoundException("Couldn't find user")}""")
         }
       }
       .recover {

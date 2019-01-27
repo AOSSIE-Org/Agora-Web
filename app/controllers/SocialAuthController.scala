@@ -83,10 +83,10 @@ class SocialAuthController @Inject()(components: ControllerComponents,
       case _ =>
         Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
     }).recover {
-      case e: OAuth2StateException =>
-        NotFound(Json.obj("message" -> "Could not authenticate"))
-      case e: ProviderException =>
-        NotFound(Json.obj("message" -> "Could not authenticate"))
+      case error: OAuth2StateException =>
+        Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))
+      case error: ProviderException =>
+        Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))
     }
   }
 
