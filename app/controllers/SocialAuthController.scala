@@ -11,7 +11,7 @@ import io.swagger.annotations.{Api, ApiImplicitParam, ApiImplicitParams, ApiOper
 import javax.inject.Inject
 import models.security.User
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.UserService
 import utils.auth.DefaultEnv
@@ -85,9 +85,9 @@ class SocialAuthController @Inject()(components: ControllerComponents,
         Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
     }).recover {
       case error: OAuth2StateException =>
-        Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))
+         BadRequest(Json.toJson("message" -> s"$error"))
       case error: ProviderException =>
-        Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))
+        BadRequest(Json.toJson("message" -> s"$error"))
     }
   }
 
