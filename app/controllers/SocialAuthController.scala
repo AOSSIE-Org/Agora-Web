@@ -15,6 +15,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.UserService
 import utils.auth.DefaultEnv
+import utils.responses.rest.Bad
 
 import scala.concurrent.{ExecutionContext, Future}
 
