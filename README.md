@@ -49,12 +49,16 @@ To install the backend, please do the following:
         google.clientSecret = ${?GOOGLE_CLIENT_SECRET}
         ```
     4. Change the redirect URL in `silhouetteLocal.conf` to your localhost `localhost:9000`.
-    5. include the `silhouetteLocal.conf` into the `silhouette.conf`.
+    5. Delete the line `include "silhouetteLocal.conf"` from `silhouetteLocal.conf`.
 
+5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. 
+    1. Assign your MongoDB URI (e.g. `mongodb://localhost`, if you are connecting to a MongoDB server running in your local computer) to the `mongodb.default.uri` field (e.g `mongodb.default.uri = "mongodb://localhost"`). 
+    2. Set your [SendGrid](https://sendgrid.com) username and password in `applicationLocal.conf`.
         ```
-        include "silhouetteLocal.conf"
+        user = ${?SENDGRID_USERNAME}
+        password = ${?SENDGRID_PASSWORD}
         ```
-5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. Assign your MongoDB URI (e.g. `mongodb://localhost`, if you are connecting to a MongoDB server running in your local computer) to the `mongodb.default.uri` field (e.g `mongodb.default.uri = "mongodb://localhost"`), set your [SendGrid](https://sendgrid.com) username and password, and include `applicationLocal.conf` into `application.conf`.
+    3. Delete the lines `include "silhouette.conf"` and `include "applicationLocal"` from `applicationLocal.conf`.
 
 ### Running the application
 
