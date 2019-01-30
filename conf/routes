@@ -44,6 +44,5 @@ GET         /api/v1/user/logout                                             cont
 GET         /api/v1/account/email/:userName                                 controllers.ActivateAccountController.send(userName: String)
 GET         /api/v1/account/activate/:token                                 controllers.ActivateAccountController.activate(token: String)
 
-
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                   controllers.Assets.versioned(path="/public", file: Asset)

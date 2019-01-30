@@ -1,11 +1,85 @@
-@import play.api.i18n.Messages
-@import play.twirl.api.Html
-
 @(user: models.security.User, url: String)(implicit messages: Messages)
 
 <html>
-    <body>
-        <p>@messages("email.sign.up.hello", user.firstName)</p>
-        <p>@Html(messages("email.sign.up.html.text", url))</p>
+    <body style="margin: 0; padding: 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse;">
+                        <tr>
+                            <td bgcolor="#00f38a">
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="400" style="border-collapse: collapse; font-family: Arial, sans-serif;">
+                                    <tr>
+                                        <td style="font-size: 0; line-height: 0;" height="40">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="140" height="60">
+                                            &nbsp;
+                                        </td>
+                                        <td width="120" height="60" rowspan="2">
+                                            <a href="https://agora-frontend.herokuapp.com/" target="_blank">
+                                                <img src="@routes.Assets.versioned("images/agora-white.png")" alt="agora image" width="120">
+                                            </a>
+                                        </td>
+                                        <td width="140" height="60">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td bgcolor="#363636" colspan="3" height="60" width="400">
+                                            &nbsp;
+                                        </td>
+                                    </tr>    
+                                    <tr>
+                                        <td colspan="3" bgcolor="#363636" style="padding: 20px 30px 40px 30px;">
+                                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                <tr>
+                                                    <td align="center" style="color: white; font-size: 30px;">
+                                                        HEY!
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center" style="color: white; padding: 20px 0px 30px 0px; font-size: 20px;">
+                                                        @user.firstName
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center" style="color: #00f38a; padding: 10px 0px 0px 0px;">
+                                                        Click on the link below to activate your account 
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center" style="padding: 30px 0px 0px 0px;">
+                                                        <a href="@url" style="text-decoration: none;" target="_blank">
+                                                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="80%" height="40">
+                                                                <tr>
+                                                                    <td align="center" bgcolor="#00f38a" style="color: white; border-radius: 20px; font-weight: 400;">
+                                                                        Activate Your Account
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" align="center" border="0" bgcolor="#363636">
+                                            <a href="https://aossie.gitlab.io" target="_blank">
+                                                <img src="@routes.Assets.versioned("images/aossie.png")" alt="aossie image" width="100" style="display: block; padding: 0px 0px 20px 0px;">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 0; line-height: 0;" height="40">&nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
