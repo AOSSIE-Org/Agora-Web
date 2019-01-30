@@ -259,6 +259,7 @@ class ElectionController @Inject()(components: ControllerComponents,
         case Some(_) => electionService.retrieve(id).flatMap {
           case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
             && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
+            var response = Future.successful(InternalServerError(Json.toJson("message" -> "Failed to add voter")))
             for {
               isAdded <- electionService.addVoter(id, data)
             } yield {
@@ -279,14 +280,12 @@ class ElectionController @Inject()(components: ControllerComponents,
                   }
                   electionService.updateWinner(winnerList, election.id.get)
                 }
-                Future.successful(Ok(Json.toJson("message" -> s"Voter added to election ${election.name}")))
+                response = Future.successful(Ok(Json.toJson("message" -> s"Voter added to election ${election.name}")))
               } else {
-                Future.successful(InternalServerError(Json.toJson("message" -> "Failed to add voter")))
+                response = Future.successful(BadRequest(Json.toJson("message" -> "Failed to add voter")))
               }
-
             }
-            electionService.addVoter(id, data).flatMap(_ =>
-              Future.successful(Ok(Json.toJson("message" -> s"Voter added to election ${election.name}"))))
+          response
           case _ => Future.successful(NotFound("Election not found"))
         }
         case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to add voter")))
