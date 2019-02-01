@@ -5,7 +5,7 @@ import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
 import com.mohiva.play.silhouette.api.repositories.{AuthInfoRepository, AuthenticatorRepository}
 import com.mohiva.play.silhouette.api.util.{Clock, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import formatters.json.{PasswordData, UserData}
+import formatters.json.{AvatarURLData, PasswordData, UserData}
 import io.swagger.annotations._
 import javax.inject.Inject
 import models.swagger.ResponseMessage
@@ -109,6 +109,41 @@ class UserController @Inject()(components: ControllerComponents,
     }.recoverTotal {
       case error =>
         Future.successful(BadRequest(Json.toJson(Bad(message = JsError.toJson(error)))))
+    }
+  }
+
+  @ApiOperation(value = "Change avatar URL", response = classOf[ResponseMessage])
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        value = "URL",
+        required = true,
+        dataType = "formatters.json.AvatarURLData",
+        paramType = "body"
+      ),
+      new ApiImplicitParam(
+        name = "X-Auth-Token",
+        value = "User access token",
+        required = true,
+        dataType = "string",
+        paramType = "header"
+      )
+    )
+  )
+  def updateAvatar = silhouette.SecuredAction.async(parse.json) { implicit request =>
+    request.body.validate[AvatarURLData].map { data =>
+      userService.retrieve(request.authenticator.loginInfo).flatMap {
+        case Some(user) =>
+          if(request.authenticator.loginInfo.providerID == CredentialsProvider.ID)
+            userService.update(user.copy(avatarURL = Some(data.url)),
+              request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok(Json.toJson("message" ->"User updated"))))
+          else
+            Future.successful(BadRequest(Json.toJson(Bad(code= Some(401), message= "Unauthorized. Change your personal information with your social provider"))))
+        case None => Future.successful(BadRequest(Json.toJson("message" ->"User not updated")))
+      }
+    }.recoverTotal {
+      case error =>
+        Future.successful(BadRequest(Json.toJson(Bad(code= Some(400), message = JsError.toJson(error)))))
     }
   }
 

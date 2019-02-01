@@ -37,6 +37,7 @@ GET        /api/v1/result/:id                                                con
 # User
 GET         /api/v1/user                                                    controllers.UserController.user
 POST        /api/v1/user/changePassword                                     controllers.UserController.changePassword
+POST        /api/v1/user/changeAvatar                                       controllers.UserController.updateAvatar
 POST        /api/v1/user/update                                             controllers.UserController.update
 GET         /api/v1/user/logout                                             controllers.UserController.logout
 
