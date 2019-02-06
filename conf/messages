@@ -58,6 +58,7 @@ sign.up.email.sent = You''re almost done! We sent an activation mail to {0}. Ple
 activation.email.sent = We sent another activation email to you at {0}. It might take a few minutes for it to arrive; be sure to check your spam folder.
 activation.email.not.sent = We were unable to send another activation email to you at {0}. Please try again later
 reset.email.sent = We have sent you an email with further instructions to reset your password, on condition that the address was found in our system. If you do not receive an email within the next 5 minutes, then please recheck your entered email address and try it again.
+reset.email.no.user = User not found! The username does not match with any record in our system.
 
 invalid.activation.link = The link isn't valid anymore! Please sign in to send the activation email again.
 invalid.reset.link = The link isn't valid anymore! Please request a new link to reset your password.
