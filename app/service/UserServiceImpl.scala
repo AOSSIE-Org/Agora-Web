@@ -19,6 +19,9 @@ class UserServiceImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
     users.flatMap(_.find(Json.obj("loginInfo" -> loginInfo)).one[User])
 
+  override def checkEmail(email : String): Future[Option[User]] =
+    users.flatMap(_.find(Json.obj("email" -> email)).one[User])
+
   override def save(user: User): Future[WriteResult] =
     users.flatMap(_.insert(user))
 
