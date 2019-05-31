@@ -93,38 +93,9 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   private def isVoterInList(voter: Voter, list: List[Voter]): Boolean = {
-    //Should return gmail for emails like abc@gmail.com or abc.d@gmail.com
-    // i.e return the string between the last @ and the first .
-    val domainRegx = """(?<=@)[^.]+(?=\.)""".r
-
-    //Should return username for email eg abc for abc@gmail.com
-    //i.e return the the string before the last @
-    val usernameRegx = """.+(?=@)""".r
-
-    val decodedEmail = URLDecoder.decode(voter.email, "UTF-8").toLowerCase()
     for (voterD <- list) {
-      val decodedEmailInList = URLDecoder.decode(voterD.email, "UTF-8").toLowerCase()
-      if (decodedEmail == decodedEmailInList) {
+      if (voterD.email == voter.email)
         return true
-      } else {
-        //Check if this email is from gmail and test for difference in username with . (dots)
-        for {
-          domain <- domainRegx.findFirstIn(decodedEmail)
-        } yield {
-          if (domain == "gmail") {
-            for {
-              username1 <- usernameRegx.findFirstIn(decodedEmail)
-              username2 <- usernameRegx.findFirstIn(decodedEmailInList)
-            } yield {
-              //For emails with abc+def@gmail.com everything after the + is ignored
-              val realUsername1 = username1.split('+').head
-              val realUsername2 = username2.split('+').head
-              if(username1.replaceAll("\\.", "") == username2.replaceAll("\\.", ""))
-                return true
-            }
-          }
-        }
-      }
     }
     return false
   }
