@@ -49,11 +49,11 @@ class VoteController @Inject()(components: ControllerComponents,
     request.body.validate[BallotData].map {data =>
       electionService.retrieve(id).flatMap {
         case Some(election) =>
-          val email = PassCodeGenerator.decrypt(election.inviteCode,data.passCode)
-          if (isVoterInList(email, election.voterList)) {
-            val ballot = Ballot(data.ballotInput, email)
+          val hashedEmail = PassCodeGenerator.decrypt(election.inviteCode,data.passCode)
+          if (isVoterInList(hashedEmail, election.voterList)) {
+            val ballot = Ballot(data.ballotInput, hashedEmail)
             electionService.vote(id, ballot).flatMap(_ =>
-              electionService.removeVoter(id, email).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Thank you for voting")))))
+              electionService.removeVoter(id, hashedEmail).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Thank you for voting")))))
           } else Future.successful(NotFound(Json.toJson("message" -> "Invalid pass code.")))
 
         case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
@@ -77,9 +77,9 @@ class VoteController @Inject()(components: ControllerComponents,
     }
   }
 
-  private def isVoterInList(email: String, list: List[Voter]): Boolean = {
+  private def isVoterInList(hashedEmail: String, list: List[Voter]): Boolean = {
     for (voterD <- list) {
-      if (voterD.email == email)
+      if (voterD.hash == hashedEmail)
         return true
     }
     return false

@@ -94,7 +94,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
 
   private def isVoterInList(voter: Voter, list: List[Voter]): Boolean = {
     for (voterD <- list) {
-      if (voterD.email == voter.email)
+      if (voterD.hash == voter.hash)
         return true
     }
     return false
@@ -102,7 +102,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
 
   private def isVoterInBallot(voter: Voter, list: List[Ballot]): Boolean = {
     for (voterD <- list) {
-      if (voterD.voterEmail == voter.email)
+      if (voterD.hash == voter.hash)
         return true
     }
     return false
@@ -110,9 +110,10 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
 
   override def addVoter(id: String, voter: Voter): Future[Boolean] = {
     val query = Json.obj("_id" -> Json.obj("$oid" -> id))
-    val hashedVoter = Voter(voter.name, md5HashString(voter.email.concat(getInviteCode(id).toString)))
-    getVoterList(id).flatMap {
-      result =>
+    retrieve(id).flatMap {
+      case Some(election) =>
+        val hashedVoter = Voter(voter.name, md5HashString(voter.hash.concat(election.inviteCode)))
+        val result = election.voterList
         if (!isVoterInList(hashedVoter, result)) {
           getBallots(id).flatMap {
             ballotResult =>
@@ -135,16 +136,17 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
 
   override def addVoters(id: String, voters: List[Voter]): Future[List[Voter]] = {
     val query = Json.obj("_id" -> Json.obj("$oid" -> id))
-    getVoterList(id).flatMap {
-      result =>
-         getBallots(id).flatMap {
-            ballotResult =>
-              val hashedVoters = voters.map{ voter => Voter(voter.name, md5HashString(voter.email.concat(getInviteCode(id).toString))) }
-              val hashedFilteredList = hashedVoters.filter(voter => !isVoterInList(voter, result) && !isVoterInBallot(voter, ballotResult))
-              val allVoters = hashedFilteredList.:::(result)
-              val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(allVoters)))
-              electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(voters))
-          }
+    retrieve(id).flatMap{
+      case Some(election) =>
+        getBallots(id).flatMap{
+          ballotResult =>
+            val result = election.voterList
+            val hashedVoters = voters.map{ voter => Voter(voter.name, md5HashString(voter.hash.concat(election.inviteCode))) }
+            val hashedFilteredList = hashedVoters.filter(voter => !isVoterInList(voter, result) && !isVoterInBallot(voter, ballotResult))
+            val allVoters = hashedFilteredList.:::(result)
+            val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(allVoters)))
+            electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(voters))
+        }
     }
   }
 
@@ -162,11 +164,11 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
     }
   }
 
-  override def removeVoter(id: String, email: String): Future[Boolean] = {
+  override def removeVoter(id: String, hashedEmail: String): Future[Boolean] = {
     val query = Json.obj("_id" -> Json.obj("$oid" -> id))
     getVoterList(id).flatMap {
       result =>
-        val voters = result.filter(v => v.email != email)
+        val voters = result.filter(v => v.hash!= hashedEmail)
         val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(voters)))
         electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
     }
@@ -258,29 +260,6 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
     }
   }
 
-  override def votedElectionList(email: Option[String]): Future[List[Election]] = {
-    val electionList = electionsCollection.flatMap(_.find(Json.obj("isStarted" -> true))
-      .cursor[Election](readPreference = ReadPreference.primary).collect[List]())
-    if (email.isDefined) {
-      var votedList = ListBuffer[Election]()
-      electionList.flatMap {
-        elects =>
-          for (election <- elects) {
-            breakable {
-              for (ballot <- election.ballot) {
-                if (ballot.voterEmail == email.get) {
-                  votedList += election
-                  break
-                }
-              }
-            }
-          }
-          Future.successful(votedList.toList)
-      }
-    } else {
-      Future.successful(List.empty)
-    }
-  }
   override def md5HashString(key: String): String = {
     val md = MessageDigest.getInstance("MD5")
     val digest = md.digest(key.getBytes)
