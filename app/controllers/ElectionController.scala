@@ -264,7 +264,7 @@ class ElectionController @Inject()(components: ControllerComponents,
               isAdded <- electionService.addVoter(id, data)
             } yield {
               if (isAdded) {
-                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, electionService.md5HashString(data.hash.concat(election.inviteCode)))
+                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, md5HashString.hashString(data.hash.concat(election.inviteCode)))
                 val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
@@ -347,7 +347,7 @@ class ElectionController @Inject()(components: ControllerComponents,
             && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
             electionService.addVoters(id, data).flatMap{filteredVoters =>
               filteredVoters.foreach{ v =>
-                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, electionService.md5HashString(v.hash.concat(election.inviteCode)))
+                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, md5HashString.hashString(v.hash.concat(election.inviteCode)))
                 val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),

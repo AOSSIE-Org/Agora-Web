@@ -4,7 +4,7 @@ import java.net.URLDecoder
 import com.mohiva.play.silhouette.api.LoginInfo
 import javax.inject.Inject
 import models.Election._
-import models.{Ballot, Election, Voter, Winner}
+import models.{Ballot, Election, Voter, Winner, md5HashString}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.modules.reactivemongo._
@@ -16,9 +16,6 @@ import service.ElectionService
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.Breaks._
-
-import java.security.MessageDigest
-import java.math.BigInteger
 
 
 class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit ex: ExecutionContext) extends ElectionService {
@@ -112,7 +109,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
     val query = Json.obj("_id" -> Json.obj("$oid" -> id))
     retrieve(id).flatMap {
       case Some(election) =>
-        val hashedVoter = Voter(voter.name, md5HashString(voter.hash.concat(election.inviteCode)))
+        val hashedVoter = Voter(voter.name, md5HashString.hashString(voter.hash.concat(election.inviteCode)))
         val result = election.voterList
         if (!isVoterInList(hashedVoter, result)) {
           getBallots(id).flatMap {
@@ -141,7 +138,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
         getBallots(id).flatMap{
           ballotResult =>
             val result = election.voterList
-            val hashedVoters = voters.map{ voter => Voter(voter.name, md5HashString(voter.hash.concat(election.inviteCode))) }
+            val hashedVoters = voters.map{ voter => Voter(voter.name, md5HashString.hashString(voter.hash.concat(election.inviteCode))) }
             val hashedFilteredList = hashedVoters.filter(voter => !isVoterInList(voter, result) && !isVoterInBallot(voter, ballotResult))
             val allVoters = hashedFilteredList.:::(result)
             val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(allVoters)))
@@ -260,11 +257,4 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
     }
   }
 
-  override def md5HashString(key: String): String = {
-    val md = MessageDigest.getInstance("MD5")
-    val digest = md.digest(key.getBytes)
-    val bigInt = new BigInteger(1,digest)
-    val hashedString = bigInt.toString(16)
-    hashedString
-  }
 }

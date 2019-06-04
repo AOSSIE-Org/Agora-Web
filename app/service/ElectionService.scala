@@ -69,5 +69,4 @@ trait ElectionService {
 
   def getStatus(id : String) : Future[String]
 
-  def md5HashString(key: String): String
 }
