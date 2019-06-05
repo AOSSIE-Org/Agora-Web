@@ -5,7 +5,7 @@ import play.api.libs.functional.syntax._
 
 case class Ballot(
    voteBallot :String,
-   voterEmail : String
+   hash : String
 )
 
 object Ballot {

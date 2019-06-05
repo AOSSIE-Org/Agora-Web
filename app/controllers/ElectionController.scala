@@ -264,12 +264,12 @@ class ElectionController @Inject()(components: ControllerComponents,
               isAdded <- electionService.addVoter(id, data)
             } yield {
               if (isAdded) {
-                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, data.email)
+                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, md5HashString.hashString(data.hash.concat(election.inviteCode)))
                 val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
                   from = Messages("email.from"),
-                  to = Seq(URLDecoder.decode(data.email, "UTF-8")),
+                  to = Seq(URLDecoder.decode(data.hash, "UTF-8")),
                   bodyText = Some(views.txt.emails.vote(election, data, url, passCode).body),
                   bodyHtml = Some(views.html.emails.vote(election, data, url, passCode).body)
                 ))
@@ -347,12 +347,12 @@ class ElectionController @Inject()(components: ControllerComponents,
             && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
             electionService.addVoters(id, data).flatMap{filteredVoters =>
               filteredVoters.foreach{ v =>
-                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, v.email)
+                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, md5HashString.hashString(v.hash.concat(election.inviteCode)))
                 val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
                   from = Messages("email.from"),
-                  to = Seq(URLDecoder.decode(v.email, "UTF-8")),
+                  to = Seq(URLDecoder.decode(v.hash, "UTF-8")),
                   bodyText = Some(views.txt.emails.vote(election, v, url, passCode).body),
                   bodyHtml = Some(views.html.emails.vote(election, v, url, passCode).body)
                 ))
