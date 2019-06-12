@@ -16,6 +16,7 @@ import scala.util.{Failure, Success, Try}
   *
   * @param id                  The name of the election
   * @param name                The name of the election
+  * @param electionType                electionType of election
   * @param description         The short description about the election
   * @param creatorName         The name of the creator of the election
   * @param creatorEmail        The email of the creator of the election
@@ -42,6 +43,7 @@ case class Election(
                      id: Option[String],
                      name: String,
                      description: String,
+                     electionType: String,
                      creatorName: String,
                      creatorEmail: String,
                      start: DateTime,
@@ -96,6 +98,7 @@ object Election {
             "_id" -> id,
             "name" -> election.name,
             "description" -> election.description,
+            "electionType" -> election.electionType,
             "creatorName" -> election.creatorName,
             "creatorEmail" -> election.creatorEmail,
             "start" -> election.start,
@@ -126,6 +129,7 @@ object Election {
             "_id" -> id,
             "name" -> election.name,
             "description" -> election.description,
+            "electionType" -> election.electionType,
             "creatorName" -> election.creatorName,
             "creatorEmail" -> election.creatorEmail,
             "start" -> election.start,
@@ -151,6 +155,7 @@ object Election {
           Json.obj(
             "name" -> election.name,
             "description" -> election.description,
+            "electionType" -> election.electionType,
             "creatorName" -> election.creatorName,
             "creatorEmail" -> election.creatorEmail,
             "start" -> election.start,
@@ -180,6 +185,7 @@ object Election {
           Json.obj(
             "name" -> election.name,
             "description" -> election.description,
+            "electionType" -> election.electionType,
             "creatorName" -> election.creatorName,
             "creatorEmail" -> election.creatorEmail,
             "start" -> election.start,
@@ -213,6 +219,7 @@ object Election {
 
           val name = (election \ "name").as[String]
           val description = (election \ "description").as[String]
+          val electionType = (election \ "electionType").as[String]
           val creatorName = (election \ "creatorName").as[String]
           val creatorEmail = (election \ "creatorEmail").as[String]
           val start = (election \ "start").as[DateTime]
@@ -240,6 +247,7 @@ object Election {
               id,
               name,
               description,
+              electionType,
               creatorName,
               creatorEmail,
               start,

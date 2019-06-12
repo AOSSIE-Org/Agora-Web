@@ -61,7 +61,7 @@ class ElectionController @Inject()(components: ControllerComponents,
       )
     )
   )
-  def createElection() = silhouette.SecuredAction.async(parse.json) { implicit request =>
+  def createElection(electionType: String) = silhouette.SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[ElectionData].map { data =>
       userService.retrieve(request.authenticator.loginInfo).flatMap {
         case Some(user) =>
@@ -70,6 +70,7 @@ class ElectionController @Inject()(components: ControllerComponents,
               None,
               name = data.name,
               description = data.description,
+              electionType = electionType,
               creatorName = s"${user.firstName} ${user.lastName}",
               creatorEmail = user.email,
               start = data.startingDate,
@@ -157,6 +158,7 @@ class ElectionController @Inject()(components: ControllerComponents,
                 election.id,
                 name = data.name,
                 description = data.description,
+                election.electionType,
                 creatorName = s"${user.firstName} ${user.lastName}",
                 creatorEmail = user.email,
                 start = data.startingDate,

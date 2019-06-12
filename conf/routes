@@ -16,7 +16,7 @@ POST        /api/v1/auth/forgotPassword/reset/:token                        cont
 GET         /api/v1/auth/authenticate/:provider                             controllers.SocialAuthController.authenticate(provider)
 
 # Elections
-POST        /api/v1/election                                                controllers.ElectionController.createElection()
+POST        /api/v1/election/:electionType                                  controllers.ElectionController.createElection(electionType: String)
 GET         /api/v1/election/:id                                            controllers.ElectionController.getElection(id: String)
 DELETE      /api/v1/election/:id                                            controllers.ElectionController.deleteElection(id: String)
 POST         /api/v1/election/:id                                           controllers.ElectionController.editElection(id: String)
