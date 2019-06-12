@@ -15,18 +15,9 @@ before_script:
 
 stages:
   - test
-  - deploy
-
 
 test:
   stage: test
   script:
     - sbt test
 
-deploy:
-  stage: deploy
-  script:
-    - apt-get update -yq
-    - apt-get install rubygems ruby-dev -y
-    - gem install dpl
-    - dpl --provider=heroku --app=agora-web-gsoc --api-key=fc9a49ce-4ce6-4962-b6cc-be05185e938f
