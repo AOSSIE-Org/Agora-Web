@@ -394,4 +394,33 @@ class ElectionController @Inject()(components: ControllerComponents,
       case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to get ballots")))
     }
   }
+
+  @ApiOperation(value = "Generate voter link for public elections", response = classOf[ResponseMessage])
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        name = "X-Auth-Token",
+        value = "User access token",
+        required = true,
+        dataType = "string",
+        paramType = "header"
+      )
+    )
+  )
+  def publicVoterLink(id: String) = silhouette.SecuredAction.async { implicit request =>
+    userService.retrieve(request.authenticator.loginInfo).flatMap {
+      case Some(_) => electionService.retrieve(id).flatMap {
+        case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
+          && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
+          if(election.electionType == "Public"){
+            val voterLink = routes.VoteController.verifyVotersPoll(id).absoluteURL()
+            electionService.savePollLink(id, voterLink).flatMap(voters => Future.successful(Ok(Json.obj("adminLink" -> voterLink))))
+          }
+          else{
+            Future.successful(NotFound(Json.toJson("message" -> "Public Election with specified ID not found")))
+          }
+        case _ => Future.successful(NotFound(Json.toJson("message" -> "Election with specified ID not found")))
+      }
+    }
+  }
 }

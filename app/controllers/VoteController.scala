@@ -49,7 +49,7 @@ class VoteController @Inject()(components: ControllerComponents,
     request.body.validate[BallotData].map {data =>
       electionService.retrieve(id).flatMap {
         case Some(election) =>
-        if(election.electionType == "private"){
+        if(election.electionType == "Private"){
           val hashedEmail = PassCodeGenerator.decrypt(election.inviteCode,data.passCode)
           if (isVoterInList(hashedEmail, election.voterList)) {
             val ballot = Ballot(data.ballotInput, hashedEmail)
@@ -65,7 +65,7 @@ class VoteController @Inject()(components: ControllerComponents,
             electionService.vote(id, ballot).flatMap(_ =>
               Future.successful(Ok(Json.toJson("message" -> "Thank you for voting"))))
           }
-          else Future.successful(NotFound(Json.toJson("message" -> "Voter has already voted")))
+          else Future.successful(NotFound(Json.toJson("message" -> "Already Voted")))
         }
         case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
       }
@@ -75,12 +75,26 @@ class VoteController @Inject()(components: ControllerComponents,
     }
   }
 
-  @ApiOperation(value = "Verify voters link", response = classOf[ElectionData])
+  @ApiOperation(value = "Verify Private Election voters link", response = classOf[ElectionData])
   def getElectionData(id: String, pass: String) = silhouette.UserAwareAction.async { implicit request =>
     electionService.retrieve(id).flatMap {
       case Some(election) =>
         val email = PassCodeGenerator.decrypt(election.inviteCode, pass)
         if (isVoterInList(email, election.voterList)) {
+          Future.successful(Ok(Json.toJson(election.getElectionData)))
+        } else Future.successful(NotFound)
+
+      case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
+    }
+  }
+
+  @ApiOperation(value = "Verify Public Election voters link", response = classOf[ElectionData])
+  def verifyVotersPoll(id: String) = silhouette.UserAwareAction.async { implicit request =>
+    electionService.retrieve(id).flatMap {
+      case Some(election) =>
+        val ipAddress = request.remoteAddress
+        val hashedIP = md5HashString.hashString(ipAddress.concat(election.inviteCode))
+        if (!isVoterInBallot(hashedIP, election.ballot)) {
           Future.successful(Ok(Json.toJson(election.getElectionData)))
         } else Future.successful(NotFound)
 
@@ -96,9 +110,9 @@ class VoteController @Inject()(components: ControllerComponents,
     return false
   }
 
-  private def isVoterInBallot(hashedEmail: String, list: List[Ballot]): Boolean = {
+  private def isVoterInBallot(hashedIP: String, list: List[Ballot]): Boolean = {
     for (voterD <- list) {
-      if (voterD.hash == hashedEmail)
+      if (voterD.hash == hashedIP)
         return true
     }
     return false
