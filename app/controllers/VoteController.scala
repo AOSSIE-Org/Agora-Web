@@ -49,10 +49,7 @@ class VoteController @Inject()(components: ControllerComponents,
     request.body.validate[BallotData].map {data =>
       electionService.retrieve(id).flatMap {
         case Some(election) =>
-<<<<<<< HEAD
         if(election.electionType == "Private"){
-=======
->>>>>>> upstream/gsoc-2019
           val hashedEmail = PassCodeGenerator.decrypt(election.inviteCode,data.passCode)
           if (isVoterInList(hashedEmail, election.voterList)) {
             val ballot = Ballot(data.ballotInput, hashedEmail)
