@@ -12,6 +12,7 @@ import play.api.libs.json.{Format, JodaReads, JodaWrites, JsPath}
 case class ElectionData(
    @ApiModelProperty(value = "Election name", required = true)name: String,
    @ApiModelProperty(value = "Election description", required = true)description: String,
+   @ApiModelProperty(value = "Election type", required = true)electionType: String,
    @ApiModelProperty(value = "Election candidates", required = true)candidates: List[String],
    @ApiModelProperty(value = "Election ballot visibility status", required = true)ballotVisibility: String,
    @ApiModelProperty(value = "Voters list should be made visible?", required = true)voterListVisibility:  Boolean,
