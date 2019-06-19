@@ -31,6 +31,7 @@ object ElectionData {
   implicit val electionDataFormat : Format[ElectionData] = (
       (JsPath \ "name").format[String] and
       (JsPath \ "description").format[String] and
+      (JsPath \ "electionType").format[String] and
       (JsPath \ "candidates").format[List[String]] and
       (JsPath \ "ballotVisibility").format[String] and
       (JsPath \ "voterListVisibility").format[Boolean] and

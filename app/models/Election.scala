@@ -76,7 +76,7 @@ case class Election(
     var ballots: List[Ballot] = List.empty
     if(ballotVisibility.equalsIgnoreCase("public"))
       ballots = ballot
-    ElectionData(name, description, candidates, ballotVisibility, voterListVisibility, start, end, isInvite, realtimeResult, votingAlgo, noVacancies, ballots)
+    ElectionData(name, description, electionType, candidates, ballotVisibility, voterListVisibility, start, end, isInvite, realtimeResult, votingAlgo, noVacancies, ballots)
   }
 
 
