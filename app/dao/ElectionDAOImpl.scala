@@ -257,4 +257,15 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
     }
   }
 
+  override def savePollLink(id: String, voterLink: String): Future[Boolean] = {
+    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    retrieve(id).flatMap {
+      case Some(election) => {
+         val modifier = Json.obj("$set" -> Json.obj("adminLink" -> Json.toJson(voterLink)))
+          electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+      }
+      case _ => Future.successful(false)
+    }
+  }
+
 }

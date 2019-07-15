@@ -69,4 +69,6 @@ trait ElectionService {
 
   def getStatus(id : String) : Future[String]
 
+  def savePollLink(id: String, voterLink: String): Future[Boolean]
+
 }

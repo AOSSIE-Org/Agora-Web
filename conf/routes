@@ -16,7 +16,7 @@ POST        /api/v1/auth/forgotPassword/reset/:token                        cont
 GET         /api/v1/auth/authenticate/:provider                             controllers.SocialAuthController.authenticate(provider)
 
 # Elections
-POST        /api/v1/election                                                controllers.ElectionController.createElection()
+POST        /api/v1/election/                                               controllers.ElectionController.createElection()
 GET         /api/v1/election/:id                                            controllers.ElectionController.getElection(id: String)
 DELETE      /api/v1/election/:id                                            controllers.ElectionController.deleteElection(id: String)
 POST         /api/v1/election/:id                                           controllers.ElectionController.editElection(id: String)
@@ -26,10 +26,12 @@ POST        /api/v1/election/:id/voter                                      cont
 GET         /api/v1/election/:id/voters                                     controllers.ElectionController.getVoters(id: String)
 POST        /api/v1/election/:id/voters                                     controllers.ElectionController.addVoters(id: String)
 GET         /api/v1/election/:id/ballots                                    controllers.ElectionController.getBallots(id: String)
+GET         /api/v1/election/:id/pollVoterLink                              controllers.ElectionController.publicVoterLink(id: String)
 
 # Vote
 POST        /api/v1/vote/:id                                                controllers.VoteController.vote(id: String)
 GET         /api/v1/voter/verify/:id/:pass                                  controllers.VoteController.getElectionData(id: String, pass: String)
+GET         /api/v1/voter/verifyPoll/:id                                    controllers.VoteController.verifyVotersPoll(id: String)
 
 # Result
 GET        /api/v1/result/:id                                                controllers.ResultController.result(id: String)
