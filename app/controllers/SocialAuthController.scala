@@ -16,6 +16,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import service.UserService
 import utils.auth.DefaultEnv
 import utils.responses.rest.Bad
+import models.Question
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,7 +63,7 @@ class SocialAuthController @Inject()(components: ControllerComponents,
             case None =>
               for {
                 _ <- userService.save(User(None, profile.loginInfo, s"${profile.firstName.get}.${profile.lastName.get}",
-                  profile.email.get, profile.firstName.get, profile.lastName.get, profile.avatarURL, true))
+                  profile.email.get, profile.firstName.get, profile.lastName.get, profile.avatarURL,false, null, true))
                 authInfo <- authInfoRepository.save(profile.loginInfo, authInfo)
                 authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
                 token <- silhouette.env.authenticatorService.init(authenticator)
@@ -70,7 +71,7 @@ class SocialAuthController @Inject()(components: ControllerComponents,
                   Ok(Json.toJson(Token(token = token, expiresOn = authenticator.expirationDateTime))))
               } yield {
                 val savedUser = User(None, profile.loginInfo, s"${profile.firstName.get}.${profile.lastName.get}",
-                  profile.email.get, profile.firstName.get, profile.lastName.get, profile.avatarURL, true)
+                  profile.email.get, profile.firstName.get, profile.lastName.get, profile.avatarURL,false, null, true)
                 silhouette.env.eventBus.publish(LoginEvent(savedUser, request))
                 silhouette.env.eventBus.publish(SignUpEvent(savedUser, request))
                 result

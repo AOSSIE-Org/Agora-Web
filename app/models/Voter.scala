@@ -11,6 +11,6 @@ case class Voter (@ApiModelProperty(value = "Voters name", required = true)name:
 object Voter{
   implicit val voterFormat : Format[Voter] = (
     (JsPath \ "name").format[String] and
-      (JsPath \ "email").format[String]
+      (JsPath \ "hash").format[String]
     )(Voter.apply, unlift(Voter.unapply))
 }

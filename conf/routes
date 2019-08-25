@@ -15,8 +15,15 @@ POST        /api/v1/auth/forgotPassword/send/:userName                      cont
 POST        /api/v1/auth/forgotPassword/reset/:token                        controllers.ForgotPasswordController.reset(token: String)
 GET         /api/v1/auth/authenticate/:provider                             controllers.SocialAuthController.authenticate(provider)
 
+# Two Factor Authentication
+POST        /api/v1/verifyOtp                                               controllers.TwoFactorAuthController.verifyOtp
+GET         /api/v1/resendOtp/:userName                                     controllers.TwoFactorAuthController.resendOtp(userName: String)
+GET         /api/v1/toggleTwoFactorAuth                                     controllers.TwoFactorAuthController.toggleTwoFactorAuth()
+GET         /api/v1/securityQuestion/:crypto                                controllers.TwoFactorAuthController.securityQuestion(crypto: String)
+POST        /api/v1/verifySecurityQuestion                                  controllers.TwoFactorAuthController.verifySecurityQuestion
+
 # Elections
-POST        /api/v1/election/                                               controllers.ElectionController.createElection()
+POST        /api/v1/election                                                controllers.ElectionController.createElection()
 GET         /api/v1/election/:id                                            controllers.ElectionController.getElection(id: String)
 DELETE      /api/v1/election/:id                                            controllers.ElectionController.deleteElection(id: String)
 POST         /api/v1/election/:id                                           controllers.ElectionController.editElection(id: String)

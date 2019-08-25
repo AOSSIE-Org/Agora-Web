@@ -11,7 +11,7 @@ case class Ballot(
 object Ballot {
   implicit val ballotFormat : Format[Ballot] = (
     (JsPath \ "voteBallot").format[String] and
-      (JsPath \ "voterEmail").format[String]
+      (JsPath \ "hash").format[String]
     )(Ballot.apply, unlift(Ballot.unapply))
 
 }

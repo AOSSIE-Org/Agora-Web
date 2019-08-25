@@ -72,7 +72,7 @@ class UserController @Inject()(components: ControllerComponents,
       userService.retrieve(request.authenticator.loginInfo).flatMap {
         case Some(user) =>
           if(request.authenticator.loginInfo.providerID == CredentialsProvider.ID)
-            userService.update(user.copy(firstName = data.firstName, lastName = data.lastName, avatarURL = data.avatarURL),
+            userService.update(user.copy(firstName = data.firstName, lastName = data.lastName, twoFactorAuthentication = data.twoFactorAuthentication, avatarURL = data.avatarURL),
             request.authenticator.loginInfo).flatMap(_ => Future.successful(Ok(Json.toJson("message" ->"User updated"))))
           else
             Future.successful(BadRequest(Json.toJson(Bad(code= Some(401), message= "Unauthorized. Change your personal information with your social provider"))))

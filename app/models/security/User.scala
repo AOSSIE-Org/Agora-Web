@@ -3,12 +3,13 @@ package models.security
 import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 import formatters.json.UserData
 import play.api.libs.json.{Json, _}
+import models.Question
 
 import scala.util.{Failure, Success, Try}
 
 case class User(id: Option[String], loginInfo: LoginInfo, username: String, email: String,
-                firstName: String, lastName: String, avatarURL: Option[String], activated: Boolean) extends Identity {
-  def extractUserData : UserData = UserData(username, email, firstName, lastName, avatarURL, None)
+                firstName: String, lastName: String, avatarURL: Option[String], twoFactorAuthentication: Boolean, securityQuestion: Question, activated: Boolean) extends Identity {
+  def extractUserData : UserData = UserData(username, email, firstName, lastName, avatarURL, twoFactorAuthentication, None, None)
 }
 
 object User {
@@ -34,7 +35,9 @@ object User {
             "firstName" -> user.firstName,
             "lastName" -> user.lastName,
             "avatarURL" -> user.avatarURL,
-            "activated" -> user.activated
+            "twoFactorAuthentication" -> user.twoFactorAuthentication,
+            "activated" -> user.activated,
+            "securityQuestion" -> user.securityQuestion
           )
         case _ =>
           Json.obj(
@@ -47,7 +50,9 @@ object User {
             "firstName" -> user.firstName,
             "lastName" -> user.lastName,
             "avatarURL" -> user.avatarURL,
-            "activated" -> user.activated
+            "twoFactorAuthentication" -> user.twoFactorAuthentication,
+            "activated" -> user.activated,
+            "securityQuestion" -> user.securityQuestion
           )
       }
 
@@ -65,7 +70,9 @@ object User {
             val firstName = (user \ "firstName").as[String]
             val lastName = (user \ "lastName").as[String]
             val avatarURL = (user \ "avatarURL").asOpt[String]
+            val twoFactorAuthentication = (user \ "twoFactorAuthentication").as[Boolean]
             val activated = (user \ "activated").as[Boolean]
+            val securityQuestion = (user \ "securityQuestion").as[Question]
 
             JsSuccess(
               new User(
@@ -76,6 +83,8 @@ object User {
                 firstName,
                 lastName,
                 avatarURL,
+                twoFactorAuthentication,
+                securityQuestion,
                 activated
               )
             )
