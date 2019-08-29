@@ -225,9 +225,9 @@ class TwoFactorAuthController @Inject()(components: ControllerComponents,
                     result
                   }
                 }
-                else Future.successful(BadRequest(Json.toJson("message" -> Messages("wrong answer"))))
+                else Future.successful(BadRequest(Json.toJson("message" -> Messages("invalid.otp"))))
               }
-              else Future.successful(BadRequest(Json.toJson("message" -> Messages("wrong answer"))))
+              else Future.successful(BadRequest(Json.toJson("message" -> Messages("invalid.otp"))))
             }
           case _=>  Future.successful(BadRequest(Json.toJson("message" -> Messages("invalid.crypto"))))
         }
