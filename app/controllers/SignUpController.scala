@@ -59,7 +59,7 @@ class SignUpController @Inject()(components: ControllerComponents,
         case None => /* User not already exists */
           userService.retrieve(loginInfo).flatMap {
             case None => /* UserName not already exists */ 
-            val user = User(None, loginInfo, loginInfo.providerKey, signUp.email, signUp.firstName, signUp.lastName, None, false)
+            val user = User(None, loginInfo, loginInfo.providerKey, signUp.email, signUp.firstName, signUp.lastName, None, false, signUp.securityQuestion, false)
             val authInfo = passwordHasherRegistry.current.hash(signUp.password)
             for {
               avatar <- avatarService.retrieveURL(signUp.email)

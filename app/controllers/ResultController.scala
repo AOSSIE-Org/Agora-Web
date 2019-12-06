@@ -9,6 +9,8 @@ import javax.inject.Inject
 import models.{Score, Winner}
 import models.swagger.{ResponseMessage, ResultList}
 import play.api.Configuration
+import org.joda.time
+import org.joda.time.DateTime
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -47,7 +49,7 @@ class ResultController @Inject()(components: ControllerComponents,
       case Some(_) => electionService.retrieve(id).flatMap {
         case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
           && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
-          if (election.realtimeResult || election.isCompleted) {
+          if (election.realtimeResult || !new time.DateTime(election.end).isAfterNow) {
             val result = CountVotes.countVotesMethod(election.ballot, election.votingAlgo, election.candidates, election.noVacancies)
             if (result.nonEmpty) {
               val winnerList = for ((candidate, rational) <- result) yield {

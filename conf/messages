@@ -55,6 +55,7 @@ activate.account.text2 = Please follow the instructions in that email to activat
 activate.account.text3 = Click <a href="{0}">here</a> to send the activation email again.
 
 sign.up.email.sent = You''re almost done! We sent an activation mail to {0}. Please follow the instructions in the email to activate your account. If it doesn''t arrive, check your spam folder, or try to log in again to send another activation mail.
+totp.email.sent = We have sent a One Time Password at your registered email address. Please enter the code to proceed.
 activation.email.sent = We sent another activation email to you at {0}. It might take a few minutes for it to arrive; be sure to check your spam folder.
 activation.email.not.sent = We were unable to send another activation email to you at {0}. Please try again later
 reset.email.sent = We have sent you an email with further instructions to reset your password, on condition that the address was found in our system. If you do not receive an email within the next 5 minutes, then please recheck your entered email address and try it again.
@@ -108,3 +109,6 @@ email.activate.account.txt.text = Please follow the link to confirm and activate
 email.vote.subject = Vote Invitation
 email.vote.txt.text = email.vote.html.text = Hello {0}, {1} {2} is inviting you to vote in the following election: {3}, {4} .To vote, click on the link below. Voting Link: {5} .Kind regards,The Agora Team.
 email.vote.html.text = <p>Hello {0},</p><p>{1} {2} is inviting you to vote in the following election:</p><p>{3}</p><p>{4}</p><p>To vote, click on the link below</p><p>Voting Link: <a href={5}>{5}</a></p><p><p>Kind regards,The Agora Team</p>
+
+# Two Factor authentication
+email.two.factor.authentication.subject = Two Factor authentication

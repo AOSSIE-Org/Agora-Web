@@ -5,13 +5,13 @@ import play.api.libs.functional.syntax._
 
 case class Ballot(
    voteBallot :String,
-   voterEmail : String
+   hash : String
 )
 
 object Ballot {
   implicit val ballotFormat : Format[Ballot] = (
     (JsPath \ "voteBallot").format[String] and
-      (JsPath \ "voterEmail").format[String]
+      (JsPath \ "hash").format[String]
     )(Ballot.apply, unlift(Ballot.unapply))
 
 }

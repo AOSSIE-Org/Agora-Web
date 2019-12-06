@@ -70,6 +70,7 @@ class ElectionController @Inject()(components: ControllerComponents,
               None,
               name = data.name,
               description = data.description,
+              electionType = data.electionType,
               creatorName = s"${user.firstName} ${user.lastName}",
               creatorEmail = user.email,
               start = data.startingDate,
@@ -157,6 +158,7 @@ class ElectionController @Inject()(components: ControllerComponents,
                 election.id,
                 name = data.name,
                 description = data.description,
+                election.electionType,
                 creatorName = s"${user.firstName} ${user.lastName}",
                 creatorEmail = user.email,
                 start = data.startingDate,
@@ -264,12 +266,12 @@ class ElectionController @Inject()(components: ControllerComponents,
               isAdded <- electionService.addVoter(id, data)
             } yield {
               if (isAdded) {
-                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, data.email)
+                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, md5HashString.hashString(data.hash.concat(election.inviteCode)))
                 val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
                   from = Messages("email.from"),
-                  to = Seq(URLDecoder.decode(data.email, "UTF-8")),
+                  to = Seq(URLDecoder.decode(data.hash, "UTF-8")),
                   bodyText = Some(views.txt.emails.vote(election, data, url, passCode).body),
                   bodyHtml = Some(views.html.emails.vote(election, data, url, passCode).body)
                 ))
@@ -347,12 +349,12 @@ class ElectionController @Inject()(components: ControllerComponents,
             && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
             electionService.addVoters(id, data).flatMap{filteredVoters =>
               filteredVoters.foreach{ v =>
-                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, v.email)
+                val passCode  = PassCodeGenerator.encrypt(election.inviteCode, md5HashString.hashString(v.hash.concat(election.inviteCode)))
                 val url = routes.VoteController.getElectionData(election.id.get, passCode).absoluteURL()
                 mailerClient.send(Email(
                   subject = Messages("email.vote.subject"),
                   from = Messages("email.from"),
-                  to = Seq(URLDecoder.decode(v.email, "UTF-8")),
+                  to = Seq(URLDecoder.decode(v.hash, "UTF-8")),
                   bodyText = Some(views.txt.emails.vote(election, v, url, passCode).body),
                   bodyHtml = Some(views.html.emails.vote(election, v, url, passCode).body)
                 ))
@@ -390,6 +392,35 @@ class ElectionController @Inject()(components: ControllerComponents,
         case _ => Future.successful(NotFound(Json.toJson("message" -> "Election not found")))
       }
       case None => Future.successful(BadRequest(Json.toJson("message" -> "Failed to get ballots")))
+    }
+  }
+
+  @ApiOperation(value = "Generate voter link for public elections", response = classOf[ResponseMessage])
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        name = "X-Auth-Token",
+        value = "User access token",
+        required = true,
+        dataType = "string",
+        paramType = "header"
+      )
+    )
+  )
+  def publicVoterLink(id: String) = silhouette.SecuredAction.async { implicit request =>
+    userService.retrieve(request.authenticator.loginInfo).flatMap {
+      case Some(_) => electionService.retrieve(id).flatMap {
+        case Some(election) if (election.loginInfo.get.providerID == request.authenticator.loginInfo.providerID
+          && election.loginInfo.get.providerKey == request.authenticator.loginInfo.providerKey) =>
+          if(election.electionType == "Public"){
+            val voterLink = routes.VoteController.verifyVotersPoll(id).absoluteURL()
+            electionService.savePollLink(id, voterLink).flatMap(voters => Future.successful(Ok(Json.obj("adminLink" -> voterLink))))
+          }
+          else{
+            Future.successful(NotFound(Json.toJson("message" -> "Public Election with specified ID not found")))
+          }
+        case _ => Future.successful(NotFound(Json.toJson("message" -> "Election with specified ID not found")))
+      }
     }
   }
 }

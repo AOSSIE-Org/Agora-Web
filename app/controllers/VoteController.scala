@@ -8,7 +8,7 @@ import formatters.json.{BallotData, ElectionData, VoteVerificationData}
 import io.swagger.annotations.{Api, ApiImplicitParam, ApiImplicitParams, ApiOperation}
 import javax.inject.Inject
 import models.swagger.ResponseMessage
-import models.{Ballot, PassCodeGenerator, Voter}
+import models.{Ballot, PassCodeGenerator, Voter, md5HashString}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json
@@ -49,13 +49,24 @@ class VoteController @Inject()(components: ControllerComponents,
     request.body.validate[BallotData].map {data =>
       electionService.retrieve(id).flatMap {
         case Some(election) =>
-          val email = PassCodeGenerator.decrypt(election.inviteCode,data.passCode)
-          if (isVoterInList(email, election.voterList)) {
-            val ballot = Ballot(data.ballotInput, email)
+        if(election.electionType == "Private"){
+          val hashedEmail = PassCodeGenerator.decrypt(election.inviteCode,data.passCode)
+          if (isVoterInList(hashedEmail, election.voterList)) {
+            val ballot = Ballot(data.ballotInput, hashedEmail)
             electionService.vote(id, ballot).flatMap(_ =>
-              electionService.removeVoter(id, email).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Thank you for voting")))))
+              electionService.removeVoter(id, hashedEmail).flatMap(_ => Future.successful(Ok(Json.toJson("message" -> "Thank you for voting")))))
           } else Future.successful(NotFound(Json.toJson("message" -> "Invalid pass code.")))
-
+        }
+        else{
+          val ipAddress = request.remoteAddress
+          val hashedIP = md5HashString.hashString(ipAddress.concat(election.inviteCode))
+          if(!isVoterInBallot(hashedIP, election.ballot)){
+            val ballot = Ballot(data.ballotInput, hashedIP)
+            electionService.vote(id, ballot).flatMap(_ =>
+              Future.successful(Ok(Json.toJson("message" -> "Thank you for voting"))))
+          }
+          else Future.successful(NotFound(Json.toJson("message" -> "Already Voted")))
+        }
         case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
       }
     }.recoverTotal{
@@ -64,7 +75,7 @@ class VoteController @Inject()(components: ControllerComponents,
     }
   }
 
-  @ApiOperation(value = "Verify voters link", response = classOf[ElectionData])
+  @ApiOperation(value = "Verify Private Election voters link", response = classOf[ElectionData])
   def getElectionData(id: String, pass: String) = silhouette.UserAwareAction.async { implicit request =>
     electionService.retrieve(id).flatMap {
       case Some(election) =>
@@ -77,9 +88,31 @@ class VoteController @Inject()(components: ControllerComponents,
     }
   }
 
-  private def isVoterInList(email: String, list: List[Voter]): Boolean = {
+  @ApiOperation(value = "Verify Public Election voters link", response = classOf[ElectionData])
+  def verifyVotersPoll(id: String) = silhouette.UserAwareAction.async { implicit request =>
+    electionService.retrieve(id).flatMap {
+      case Some(election) =>
+        val ipAddress = request.remoteAddress
+        val hashedIP = md5HashString.hashString(ipAddress.concat(election.inviteCode))
+        if (!isVoterInBallot(hashedIP, election.ballot)) {
+          Future.successful(Ok(Json.toJson(election.getElectionData)))
+        } else Future.successful(NotFound)
+
+      case None => Future.successful(NotFound(Json.toJson("message" -> "Election with specified id not found")))
+    }
+  }
+
+  private def isVoterInList(hashedEmail: String, list: List[Voter]): Boolean = {
     for (voterD <- list) {
-      if (voterD.email == email)
+      if (voterD.hash == hashedEmail)
+        return true
+    }
+    return false
+  }
+
+  private def isVoterInBallot(hashedIP: String, list: List[Ballot]): Boolean = {
+    for (voterD <- list) {
+      if (voterD.hash == hashedIP)
         return true
     }
     return false
