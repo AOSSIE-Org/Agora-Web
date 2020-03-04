@@ -6,7 +6,7 @@ import play.api.libs.functional.syntax._
 
 @ApiModel(description = "Security Question", value = "Question")
 case class Question (@ApiModelProperty(value = "Security Question", required = true, example = "What is your pet name?")question: String,
-                  @ApiModelProperty(value = "Answer", required = true, example = "Bruno")answer: String)
+                  @ApiModelProperty(value = "Answer", required = true, example = "Snow")answer: String)
 object Question {
   implicit val voterFormat : Format[Question] = (
     (JsPath \ "question").format[String] and
