@@ -15,9 +15,18 @@ before_script:
 
 stages:
   - test
+  - deploy
 
 test:
   stage: test
   script:
-    - sbt test
+    - sbt clean coverage test coverageReport
+
+deploy:
+  stage: deploy
+  script:
+    - apt-get update -yq
+    - apt-get install rubygems ruby-dev -y
+    - gem install dpl
+    - dpl --provider=heroku --app=gitlab-play-sample-app --api-key=$HEROKU_API_KEY
 
