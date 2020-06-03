@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "spire" % "0.14.1",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
   "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
-  "io.swagger" %% "swagger-play2" % "1.6.1-SNAPSHOT",
+  "io.swagger" %% "swagger-play2" % "1.6.0",
   "org.webjars" % "swagger-ui" % swaggerUIVersion,
   specs2 % Test,
   ehcache,

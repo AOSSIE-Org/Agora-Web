@@ -15,9 +15,32 @@ before_script:
 
 stages:
   - test
+  - deploy-dev
+  - deploy-prod
 
 test:
   stage: test
   script:
     - sbt test
 
+deploy-dev:
+  stage: deploy-dev
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: always
+  script:
+    - apt-get update -yq
+    - apt-get install rubygems ruby-dev -y
+    - gem install dpl
+    - dpl --provider=heroku --app=$AGORA_API_DEV --api-key=$HEROKU_API_KEY
+
+deploy-prod:
+  stage: deploy-prod
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: manual
+  script:
+    - apt-get update -yq
+    - apt-get install rubygems ruby-dev -y
+    - gem install dpl
+    - dpl --provider=heroku --app=$AGORA_API_APP --api-key=$HEROKU_API_KEY
