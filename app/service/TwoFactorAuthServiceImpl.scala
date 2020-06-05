@@ -5,15 +5,18 @@ import javax.crypto.SecretKey
 import java.nio.ByteBuffer
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
-import javax.crypto.Cipher;
+
+import javax.crypto.Cipher
 import com.mohiva.play.silhouette.api.LoginInfo
-import javax.crypto.KeyGenerator;
+import javax.crypto.KeyGenerator
 import javax.crypto.spec.SecretKeySpec
 import com.mohiva.play.silhouette.api.util.Clock
+
 import scala.math.pow
 import scala.math.BigInt
-import java.security.Key;
-import java.security.SecureRandom;
+import java.security.Key
+import java.security.SecureRandom
+
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.play.json._
@@ -23,9 +26,10 @@ import org.joda.time.DateTimeZone
 import org.joda.time.DateTime
 import models.{TotpToken, TrustedDevices}
 import java.util.UUID
+
 import models.security.User
 import javax.inject.Inject
-
+import reactivemongo.api.Cursor
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -88,7 +92,7 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
   }
 
   override def findExpired(dateTime: DateTime) =
-     totpTokenCollection.flatMap(_.find(Json.obj()).cursor[TotpToken]().collect[Seq]())
+     totpTokenCollection.flatMap(_.find(Json.obj()).cursor[TotpToken]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[TotpToken]]()))
        .flatMap(tokens => Future.successful(tokens.filter(token => token.expiry.isBefore(dateTime))))
 
   override def remove(crypto: String) = {
@@ -161,7 +165,7 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
   }
 
    override def findTrustedDeviceExpired(dateTime: DateTime) =
-     trustedDevicesCollection.flatMap(_.find(Json.obj()).cursor[TrustedDevices]().collect[Seq]())
+     trustedDevicesCollection.flatMap(_.find(Json.obj()).cursor[TrustedDevices]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[TrustedDevices]]()))
        .flatMap(trustedDevices => Future.successful(trustedDevices.filter(trustedDevice => trustedDevice.expiry.isBefore(dateTime))))
 
   override def removeExpiredTrustedDevice() = {

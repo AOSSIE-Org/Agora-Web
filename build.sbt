@@ -6,11 +6,12 @@ lazy val `Agora-REST-API` = (project in file(".")).enablePlugins(PlayScala)
 scalacOptions ++= Seq("-deprecation", "-language:_")
 
 scalaVersion := "2.12.3"
-val reactiveMongoVersion = "0.13.0-play26"
-val silhouetteVersion = "5.0.3"
-val playMailerVersion = "6.0.1"
-val playJsonVersion = "2.6.9"
-val swaggerUIVersion = "3.6.1"
+val reactiveMongoVersion = "0.20.10-play27"
+val silhouetteVersion = "6.1.1"
+val playMailerVersion = "7.0.1"
+val playJsonVersion = "2.7.4"
+val swaggerPlay2Version = "1.7.1"
+val swaggerUIVersion = "3.25.2"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoVersion,
@@ -19,17 +20,17 @@ libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette-password-bcrypt" % silhouetteVersion,
   "com.mohiva" %% "play-silhouette-crypto-jca" % silhouetteVersion,
   "com.mohiva" %% "play-silhouette-testkit" % silhouetteVersion % "test",
-  "com.iheart" %% "ficus" % "1.4.3",
+  "com.iheart" %% "ficus" % "1.4.7",
   "com.typesafe.play" %% "play-mailer" % playMailerVersion,
   "com.typesafe.play" %% "play-mailer-guice" % playMailerVersion,
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
-  "net.codingwell" %% "scala-guice" % "4.1.1",
-  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
+  "net.codingwell" %% "scala-guice" % "4.2.6",
+  "com.adrianhurt" %% "play-bootstrap" % "1.6.1-P27-B4",
   "com.typesafe.play" %% "play-json" % playJsonVersion,
   "org.typelevel" %% "spire" % "0.14.1",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
-  "io.swagger" %% "swagger-play2" % "1.6.0",
+  "io.swagger" %% "swagger-play2" % swaggerPlay2Version,
   "org.webjars" % "swagger-ui" % swaggerUIVersion,
   specs2 % Test,
   ehcache,

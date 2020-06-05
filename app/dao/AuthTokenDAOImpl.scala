@@ -7,6 +7,7 @@ import models.AuthToken
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.api.Cursor
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
 
@@ -35,7 +36,7 @@ class AuthTokenDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
     * @param dateTime The current date time.
     */
    def findExpired(dateTime: DateTime) =
-     authTokenCollection.flatMap(_.find(Json.obj()).cursor[AuthToken]().collect[Seq]())
+     authTokenCollection.flatMap(_.find(Json.obj()).cursor[AuthToken]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[AuthToken]]()))
        .flatMap(tokens => Future.successful(tokens.filter(token => token.expiry.isBefore(dateTime))))
 
   /**

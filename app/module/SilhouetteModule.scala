@@ -11,18 +11,19 @@ import com.mohiva.play.silhouette.api.{Environment, EventBus, Silhouette, Silhou
 import com.mohiva.play.silhouette.crypto.{JcaCrypter, JcaCrypterSettings, JcaSigner, JcaSignerSettings}
 import com.mohiva.play.silhouette.impl.authenticators._
 import com.mohiva.play.silhouette.impl.providers.oauth2.{FacebookProvider, GoogleProvider, LinkedInProvider}
-import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
+import com.mohiva.play.silhouette.impl.providers.state.{CsrfStateItemHandler, CsrfStateSettings}
 import com.mohiva.play.silhouette.impl.providers._
 import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{CookieSecretProvider, CookieSecretSettings}
-import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
 import com.mohiva.play.silhouette.impl.services.GravatarService
 import com.mohiva.play.silhouette.impl.util.{PlayCacheLayer, SecureRandomIDGenerator}
 import com.mohiva.play.silhouette.password.{BCryptPasswordHasher, BCryptSha256PasswordHasher}
 import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, InMemoryAuthInfoDAO}
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import com.typesafe.config.Config
 import dao.{OAuth2InfoDAOImpl, PasswordInfoDAOImpl}
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+import net.ceedubs.ficus.readers.ValueReader
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.libs.ws.WSClient
@@ -30,10 +31,30 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import repository.AuthenticatorRepositoryImpl
 import service.{UserService, UserServiceImpl}
 import utils.auth.{CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv}
+import play.api.mvc.{ Cookie, CookieHeaderEncoding }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SilhouetteModule extends AbstractModule with ScalaModule {
+
+  /**
+   * A very nested optional reader, to support these cases:
+   * Not set, set None, will use default ('Lax')
+   * Set to null, set Some(None), will use 'No Restriction'
+   * Set to a string value try to match, Some(Option(string))
+   */
+  implicit val sameSiteReader: ValueReader[Option[Option[Cookie.SameSite]]] =
+    (config: Config, path: String) => {
+      if (config.hasPathOrNull(path)) {
+        if (config.getIsNull(path))
+          Some(None)
+        else {
+          Some(Cookie.SameSite.parse(config.getString(path)))
+        }
+      } else {
+        None
+      }
+    }
 
   override def configure() = {
     bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
@@ -45,10 +66,26 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[EventBus].toInstance(EventBus())
     bind[Clock].toInstance(Clock())
 
-    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAOImpl]
-    bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAOImpl]
     bind[AuthenticatorRepository[JWTAuthenticator]].to[AuthenticatorRepositoryImpl]
   }
+
+  /**
+    * Provides the passwordInfoDAO implementation.
+    *
+    * @param ReactiveMongoApi.
+    * @return The passwordInfoDAO implementation.
+    */
+  @Provides
+  def providePasswordInfoDAO(reactiveMongoApi: ReactiveMongoApi): DelegableAuthInfoDAO[PasswordInfo] = new PasswordInfoDAOImpl(reactiveMongoApi)
+
+  /**
+    * Provides the OAuth2InfoDAO implementation.
+    *
+    * @param ReactiveMongoApi.
+    * @return The OAuth2InfoDAO implementation.
+    */
+  @Provides
+  def provideOAuth2InfoDAO(reactiveMongoApi: ReactiveMongoApi): DelegableAuthInfoDAO[OAuth2Info] = new OAuth2InfoDAOImpl(reactiveMongoApi)
 
   /**
     * Provides the HTTP layer implementation.

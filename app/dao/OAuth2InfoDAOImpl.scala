@@ -10,8 +10,9 @@ import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
 
-class OAuth2InfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit ex: ExecutionContext) extends DelegableAuthInfoDAO[OAuth2Info] {
+class OAuth2InfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit ex: ExecutionContext, val classTag: ClassTag[OAuth2Info]) extends DelegableAuthInfoDAO[OAuth2Info] {
 
   /**
     * The data store for the auth info.
