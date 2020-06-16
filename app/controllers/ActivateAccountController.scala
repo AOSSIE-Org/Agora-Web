@@ -14,14 +14,14 @@ import play.api.libs.json.Json
 import play.api.libs.mailer.{Email, MailerClient}
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 import service.{AuthTokenService, UserService}
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Api(value = "Verification")
 class ActivateAccountController @Inject()(
                                            components: ControllerComponents,
-                                           silhouette: Silhouette[DefaultEnv],
+                                           silhouette: CustomSilhouette[DefaultEnv],
                                            userService: UserService,
                                            authTokenService: AuthTokenService,
                                            mailerClient: MailerClient
@@ -67,7 +67,7 @@ class ActivateAccountController @Inject()(
             result <- silhouette.env.authenticatorService.embed(token,
               Ok(
                 Json.toJson(
-                  user.extractUserData.copy(token = Some(Token(
+                  user.extractUserData.copy(authToken = Some(Token(
                     token,
                     expiresOn = authenticator.expirationDateTime))
                   )

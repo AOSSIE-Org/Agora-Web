@@ -15,7 +15,7 @@ import play.api.libs.json.{JsError, Json}
 import play.api.libs.mailer.{Email, MailerClient}
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 import service.{AuthTokenService, UserService}
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 import utils.responses.rest.Bad
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Api(value = "Authentication")
 class ForgotPasswordController @Inject() (
   components: ControllerComponents,
-  silhouette: Silhouette[DefaultEnv],
+  silhouette: CustomSilhouette[DefaultEnv],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,

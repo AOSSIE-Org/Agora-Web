@@ -1,18 +1,17 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import com.mohiva.play.silhouette.api.Silhouette
 import io.swagger.annotations.{Api, ApiOperation}
 import play.api.libs.json.Json
 import play.api.mvc._
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 
 import scala.concurrent.Future
 
 @Singleton
 class ApplicationController @Inject()(components: ControllerComponents,
-                                      silhouette: Silhouette[DefaultEnv]) extends AbstractController(components) {
+                                      silhouette: CustomSilhouette[DefaultEnv]) extends AbstractController(components) {
 
   /**
     * Create an Action to render an HTML page with a welcome message.

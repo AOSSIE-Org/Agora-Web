@@ -9,6 +9,7 @@ GET         /swagger.json                                                   cont
 GET         /                                                               controllers.ApplicationController.index
 
 # Authentication
+GET         /api/v1/auth/refreshAccessToken                                 controllers.CredentialsAuthController.refreshAuthToken
 POST        /api/v1/auth/login                                              controllers.CredentialsAuthController.authenticate
 POST        /api/v1/auth/signup                                             controllers.SignUpController.signUp
 POST        /api/v1/auth/forgotPassword/send/:userName                      controllers.ForgotPasswordController.send(userName: String)

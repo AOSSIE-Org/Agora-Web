@@ -14,7 +14,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.UserService
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 import utils.responses.rest.Bad
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(components: ControllerComponents,
                                userService: UserService,
                                configuration: Configuration,
-                               silhouette: Silhouette[DefaultEnv],
+                               silhouette: CustomSilhouette[DefaultEnv],
                                clock: Clock,
                                credentialsProvider: CredentialsProvider,
                                authInfoRepository: AuthInfoRepository,

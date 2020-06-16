@@ -15,7 +15,7 @@ import play.api.libs.json
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.{ElectionService, UserService}
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 import utils.responses.rest.Bad
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VoteController @Inject()(components: ControllerComponents,
                                userService: UserService,
                                configuration: Configuration,
-                               silhouette: Silhouette[DefaultEnv],
+                               silhouette: CustomSilhouette[DefaultEnv],
                                electionService: ElectionService,
                                clock: Clock,
                                credentialsProvider: CredentialsProvider,

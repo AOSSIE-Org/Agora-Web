@@ -11,7 +11,8 @@ case class UserData (
                       @ApiModelProperty(value = "User last name", required = true)lastName: String,
                       @ApiModelProperty(value = "Avatar URL", required = false)avatarURL: Option[String],
                       @ApiModelProperty(value = "Two Factor Authentication", required = true)twoFactorAuthentication: Boolean,
-                      token: Option[Token],
+                      @ApiModelProperty(value = "The Auth Token", required = false)authToken: Option[Token],
+                      @ApiModelProperty(value = "The Refresh Token", required = false)refreshToken: Option[Token],
                       @ApiModelProperty(value = "Trusted Device", required = false)trustedDevice: Option[String])
 
 object UserData {
