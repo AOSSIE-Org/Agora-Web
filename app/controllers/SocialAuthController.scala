@@ -14,7 +14,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.UserService
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 import utils.responses.rest.Bad
 import models.Question
 
@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Api(value = "Authentication")
 class SocialAuthController @Inject()(components: ControllerComponents,
-                               silhouette: Silhouette[DefaultEnv],
+                               silhouette: CustomSilhouette[DefaultEnv],
                                userService: UserService,
                                authInfoRepository: AuthInfoRepository,
                                socialProviderRegistry: SocialProviderRegistry,
@@ -52,29 +52,41 @@ class SocialAuthController @Inject()(components: ControllerComponents,
             case Some(user) =>
               //just return token
               for {
-                authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
-                token <- silhouette.env.authenticatorService.init(authenticator)
-                result <- silhouette.env.authenticatorService.embed(token,
-                  Ok(Json.toJson(Token(token = token, expiresOn = authenticator.expirationDateTime))))
+                jwtAuthenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
+                refreshTokenAuthenticator <- silhouette.env.authenticatorService.createRefreshToken(profile.loginInfo)
+                authToken <- silhouette.env.authenticatorService.init(jwtAuthenticator)
+                refreshToken <- silhouette.env.authenticatorService.initRefreshToken(refreshTokenAuthenticator)
               } yield {
-                silhouette.env.eventBus.publish(LoginEvent(user, request))
-                result
+                Ok(
+                  Json.toJson(
+                    user.extractUserData.copy(
+                      authToken = Some(Token(authToken, expiresOn = jwtAuthenticator.expirationDateTime)),
+                      refreshToken = Some(Token(refreshToken, expiresOn = refreshTokenAuthenticator.expirationDateTime))
+                    )
+                  )
+                )
               }
             case None =>
               for {
                 _ <- userService.save(User(None, profile.loginInfo, s"${profile.firstName.get}.${profile.lastName.get}",
                   profile.email.get, profile.firstName.get, profile.lastName.get, profile.avatarURL,false, Question("", ""), true))
-                authInfo <- authInfoRepository.save(profile.loginInfo, authInfo)
-                authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
-                token <- silhouette.env.authenticatorService.init(authenticator)
-                result <- silhouette.env.authenticatorService.embed(token,
-                  Ok(Json.toJson(Token(token = token, expiresOn = authenticator.expirationDateTime))))
+                jwtAuthenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
+                refreshTokenAuthenticator <- silhouette.env.authenticatorService.createRefreshToken(profile.loginInfo)
+                authToken <- silhouette.env.authenticatorService.init(jwtAuthenticator)
+                refreshToken <- silhouette.env.authenticatorService.initRefreshToken(refreshTokenAuthenticator)
               } yield {
                 val savedUser = User(None, profile.loginInfo, s"${profile.firstName.get}.${profile.lastName.get}",
                   profile.email.get, profile.firstName.get, profile.lastName.get, profile.avatarURL,false, Question("", ""), true)
-                silhouette.env.eventBus.publish(LoginEvent(savedUser, request))
                 silhouette.env.eventBus.publish(SignUpEvent(savedUser, request))
-                result
+                silhouette.env.eventBus.publish(LoginEvent(savedUser, request))
+                Ok(
+                  Json.toJson(
+                    savedUser.extractUserData.copy(
+                      authToken = Some(Token(authToken, expiresOn = jwtAuthenticator.expirationDateTime)),
+                      refreshToken = Some(Token(refreshToken, expiresOn = refreshTokenAuthenticator.expirationDateTime))
+                    )
+                  )
+                )
               }
           }
         }

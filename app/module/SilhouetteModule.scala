@@ -2,7 +2,7 @@ package module
 
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides}
-import com.mohiva.play.silhouette.api.actions.{SecuredErrorHandler, UnsecuredErrorHandler}
+import com.mohiva.play.silhouette.api.actions.{SecuredAction, SecuredErrorHandler, UnsecuredAction, UnsecuredErrorHandler, UserAwareAction}
 import com.mohiva.play.silhouette.api.crypto.{Crypter, CrypterAuthenticatorEncoder, Signer}
 import com.mohiva.play.silhouette.api.repositories.{AuthInfoRepository, AuthenticatorRepository}
 import com.mohiva.play.silhouette.api.services.{AuthenticatorService, AvatarService}
@@ -28,10 +28,10 @@ import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 import play.modules.reactivemongo.ReactiveMongoApi
-import repository.AuthenticatorRepositoryImpl
+import repository.{AuthenticatorRepositoryImpl, RefreshTokenAuthenticatorRepository, RefreshTokenAuthenticatorRepositoryImpl}
 import service.{UserService, UserServiceImpl}
-import utils.auth.{CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv}
-import play.api.mvc.{ Cookie, CookieHeaderEncoding }
+import utils.auth.{CustomAuthenticatorService, CustomEnvironment, CustomJWTAuthenticatorService, CustomSecuredErrorHandler, CustomSilhouette, CustomSilhouetteProvider, CustomUnsecuredErrorHandler, DefaultEnv, RefreshTokenAuthenticatorSettings}
+import play.api.mvc.{Cookie, CookieHeaderEncoding}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -57,7 +57,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     }
 
   override def configure() = {
-    bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
+    bind[CustomSilhouette[DefaultEnv]].to[CustomSilhouetteProvider[DefaultEnv]]
     bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
     bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
     bind[UserService].to[UserServiceImpl]
@@ -67,7 +67,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[Clock].toInstance(Clock())
 
     bind[AuthenticatorRepository[JWTAuthenticator]].to[AuthenticatorRepositoryImpl]
+    bind[RefreshTokenAuthenticatorRepository[JWTAuthenticator]].to[RefreshTokenAuthenticatorRepositoryImpl]
   }
+
 
   /**
     * Provides the passwordInfoDAO implementation.
@@ -105,10 +107,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     * @return The Silhouette environment.
     */
   @Provides
-  def provideEnvironment(userService: UserService,
-                         authenticatorService: AuthenticatorService[JWTAuthenticator],
-                         eventBus: EventBus): Environment[DefaultEnv] =
-    Environment[DefaultEnv](userService, authenticatorService, Seq(), eventBus)
+  def provideCustomEnvironment(userService: UserService,
+                         authenticatorService: CustomAuthenticatorService[JWTAuthenticator],
+                         eventBus: EventBus): CustomEnvironment[DefaultEnv] =
+    CustomEnvironment[DefaultEnv](userService, authenticatorService, Seq(), eventBus)
 
   /**
     * Provides the social provider registry.
@@ -240,12 +242,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
                                   idGenerator: IDGenerator,
                                   configuration: Configuration,
                                   clock: Clock,
-                                  reactiveMongoApi: ReactiveMongoApi): AuthenticatorService[JWTAuthenticator] = {
-    val settings = JWTAuthenticatorSettings(sharedSecret = configuration.get[String]("play.http.secret.key"))
+                                  reactiveMongoApi: ReactiveMongoApi): CustomAuthenticatorService[JWTAuthenticator] = {
+    val authTokenSettings = JWTAuthenticatorSettings(sharedSecret = configuration.get[String]("play.http.secret.key"))
+    val refreshTokenSettings = RefreshTokenAuthenticatorSettings(sharedSecret = configuration.get[String]("play.http.secret.key"))
     val encoder = new CrypterAuthenticatorEncoder(crypter)
-    val authenticatorRepository = new AuthenticatorRepositoryImpl(reactiveMongoApi)
+    val authTokenAuthenticatorRepository = new AuthenticatorRepositoryImpl(reactiveMongoApi)
+    val refreshTokenAuthenticatorRepository = new RefreshTokenAuthenticatorRepositoryImpl(reactiveMongoApi)
 
-    new JWTAuthenticatorService(settings, Some(authenticatorRepository), encoder, idGenerator, clock)
+    new CustomJWTAuthenticatorService(authTokenSettings, refreshTokenSettings, Some(authTokenAuthenticatorRepository), Some(refreshTokenAuthenticatorRepository), encoder, idGenerator, clock)
   }
 
   /**

@@ -9,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 
 case class User(id: Option[String], loginInfo: LoginInfo, username: String, email: String,
                 firstName: String, lastName: String, avatarURL: Option[String], twoFactorAuthentication: Boolean, securityQuestion: Question, activated: Boolean) extends Identity {
-  def extractUserData : UserData = UserData(username, email, firstName, lastName, avatarURL, twoFactorAuthentication, None, None)
+  def extractUserData : UserData = UserData(username, email, firstName, lastName, avatarURL, twoFactorAuthentication, None, None, None)
 }
 
 object User {

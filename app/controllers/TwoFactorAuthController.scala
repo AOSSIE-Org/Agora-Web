@@ -10,7 +10,7 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{Clock, Credentials, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
-import formatters.json.{CredentialFormat, Token, UserData, Crypto, QuestionData}
+import formatters.json.{CredentialFormat, Crypto, QuestionData, Token, UserData}
 import io.swagger.annotations.{Api, ApiImplicitParam, ApiImplicitParams, ApiOperation}
 import models.TotpToken
 import models.swagger.ResponseMessage
@@ -19,15 +19,13 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.libs.mailer.{Email, MailerClient}
-import service.{AuthTokenService, UserService, TwoFactorAuthService}
+import service.{AuthTokenService, TwoFactorAuthService, UserService}
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 import org.joda.time.DateTimeZone
 import org.joda.time.DateTime
 import utils.responses.rest.Bad
-import utils.auth.DefaultEnv
-
+import utils.auth.{CustomSilhouette, DefaultEnv}
 import java.util.UUID
-
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TwoFactorAuthController @Inject()(components: ControllerComponents,
                                           userService: UserService,
                                           configuration: Configuration,
-                                          silhouette: Silhouette[DefaultEnv],
+                                          silhouette: CustomSilhouette[DefaultEnv],
                                           clock: Clock,
                                           mailerClient: MailerClient,
                                           authTokenService: AuthTokenService,
@@ -76,7 +74,7 @@ class TwoFactorAuthController @Inject()(components: ControllerComponents,
                       result <- silhouette.env.authenticatorService.embed(token,
                         Ok(
                           Json.toJson(
-                            user.extractUserData.copy(token = Some(Token(
+                            user.extractUserData.copy(authToken = Some(Token(
                               token,
                               expiresOn = authenticator.expirationDateTime)),
                               trustedDevice = Some(trustedDevice.trustedDevice)
@@ -97,7 +95,7 @@ class TwoFactorAuthController @Inject()(components: ControllerComponents,
                     result <- silhouette.env.authenticatorService.embed(token,
                       Ok(
                         Json.toJson(
-                          user.extractUserData.copy(token = Some(Token(
+                          user.extractUserData.copy(authToken = Some(Token(
                             token,
                             expiresOn = authenticator.expirationDateTime))
                           )
@@ -208,21 +206,19 @@ class TwoFactorAuthController @Inject()(components: ControllerComponents,
               if(result) {
                 if(user.loginInfo.providerID == CredentialsProvider.ID) {
                   for {
-                    authenticator <- silhouette.env.authenticatorService.create(totpToken.userLoginInfo)
-                    token <- silhouette.env.authenticatorService.init(authenticator)
-                    result <- silhouette.env.authenticatorService.embed(token,
-                      Ok(
-                        Json.toJson(
-                          user.extractUserData.copy(token = Some(Token(
-                            token,
-                            expiresOn = authenticator.expirationDateTime))
-                          )
+                    jwtAuthenticator <- silhouette.env.authenticatorService.create(user.loginInfo)
+                    refreshTokenAuthenticator <- silhouette.env.authenticatorService.createRefreshToken(user.loginInfo)
+                    authToken <- silhouette.env.authenticatorService.init(jwtAuthenticator)
+                    refreshToken <- silhouette.env.authenticatorService.initRefreshToken(refreshTokenAuthenticator)
+                  } yield {
+                    Ok(
+                      Json.toJson(
+                        user.extractUserData.copy(
+                          authToken = Some(Token(authToken, expiresOn = jwtAuthenticator.expirationDateTime)),
+                          refreshToken = Some(Token(refreshToken, expiresOn = refreshTokenAuthenticator.expirationDateTime))
                         )
                       )
                     )
-                  } yield {
-                    silhouette.env.eventBus.publish(LoginEvent(user, request))
-                    result
                   }
                 }
                 else Future.successful(BadRequest(Json.toJson("message" -> Messages("wrong answer"))))

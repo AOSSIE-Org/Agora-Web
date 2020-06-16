@@ -15,7 +15,7 @@ import play.api.libs.json.{JsError, Json}
 import play.api.libs.mailer.{Email, MailerClient}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.{AuthTokenService, UserService}
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 import utils.responses.rest.Bad
 
 import scala.concurrent.duration._
@@ -26,7 +26,7 @@ import scala.language.postfixOps
 class SignUpController @Inject()(components: ControllerComponents,
                                  userService: UserService,
                                  configuration: Configuration,
-                                 silhouette: Silhouette[DefaultEnv],
+                                 silhouette: CustomSilhouette[DefaultEnv],
                                  clock: Clock,
                                  credentialsProvider: CredentialsProvider,
                                  authInfoRepository: AuthInfoRepository,

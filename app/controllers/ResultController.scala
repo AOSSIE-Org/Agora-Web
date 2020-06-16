@@ -15,7 +15,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import service.{CountVotes, ElectionService, UserService}
-import utils.auth.DefaultEnv
+import utils.auth.{CustomSilhouette, DefaultEnv}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ResultController @Inject()(components: ControllerComponents,
                                  userService: UserService,
                                  configuration: Configuration,
-                                 silhouette: Silhouette[DefaultEnv],
+                                 silhouette: CustomSilhouette[DefaultEnv],
                                  electionService: ElectionService,
                                  clock: Clock,
                                  credentialsProvider: CredentialsProvider,
