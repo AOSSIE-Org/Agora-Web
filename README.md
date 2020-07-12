@@ -14,7 +14,7 @@ This project is created using the play framework 2.6 seeds [template](https://gi
 | :-: | :-: | :-:
 | <img src="https://raw.githubusercontent.com/OlegIlyenko/scala-icon/master/scala-icon.png " width="25"> | <img src="https://raw.githubusercontent.com/OlegIlyenko/scala-icon/master/play-icon.png " width="25"> | August 08, 2018
 
-To run the development environment for this REST API, you need [Git](https://git-scm.com/), [Sbt](http://www.scala-sbt.org/) and [MongoDB](https://www.mongodb.com/) installed.
+To run the development environment for this REST API, you need [Git](https://git-scm.com/), [Sbt](http://www.scala-sbt.org/) and [MongoDB](https://www.mongodb.com/) to be installed.
 
 ## Table of contents
 
