@@ -5,6 +5,7 @@ target
 /.classpath
 /.project
 /.settings
+/database
 /RUNNING_PID
 /conf/applicationLocal.conf
 /conf/silhouetteLocal.conf

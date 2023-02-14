@@ -1,0 +1,21 @@
+
+version: '3.5'
+services:
+  mongo:
+    image: mongo:5.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./database/db:/data/db
+      - ./database/dev.archive:/Databases/dev.archive
+      - ./database/production:/Databases/production
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017
+    links:
+      - mongo
+    ports:
+      - "8086:8081"
