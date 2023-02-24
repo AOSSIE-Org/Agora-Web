@@ -37,6 +37,30 @@ libraryDependencies ++= Seq(
   guice
 )
 
+mainClass in assembly := Some("play.core.server.ProdServerStart")
+
+assemblyJarName in assembly := "agora-api.jar"
+
+assemblyOutputPath in assembly := new File(s"dist/${(assembly/assemblyJarName).value}")
+
+fullClasspath in assembly += Attributed.blank(PlayKeys.playPackageAssets.value)
+
+assemblyMergeStrategy in assembly := {
+  case manifest if manifest.contains("MANIFEST.MF") =>
+    // We don't need manifest files since sbt-assembly will create
+    // one with the given settings
+    MergeStrategy.discard
+  case referenceOverrides if referenceOverrides.contains("reference-overrides.conf") || referenceOverrides.contains("reference.conf") =>
+    // Keep the content for all reference-overrides.conf files
+    MergeStrategy.concat
+  case PathList("META-INF", ps@_*) =>
+    if (ps.map(_.toLowerCase).exists(a => a.contains("swagger-ui")))
+      MergeStrategy.singleOrError
+    else MergeStrategy.discard
+  case x if x.endsWith("module-info.class") => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}
+
 unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 
 resolvers += Resolver.jcenterRepo
