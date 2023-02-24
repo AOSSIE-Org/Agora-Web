@@ -46,10 +46,6 @@ assemblyOutputPath in assembly := new File(s"dist/${(assembly/assemblyJarName).v
 fullClasspath in assembly += Attributed.blank(PlayKeys.playPackageAssets.value)
 
 assemblyMergeStrategy in assembly := {
-  case manifest if manifest.contains("MANIFEST.MF") =>
-    // We don't need manifest files since sbt-assembly will create
-    // one with the given settings
-    MergeStrategy.discard
   case referenceOverrides if referenceOverrides.contains("reference-overrides.conf") || referenceOverrides.contains("reference.conf") =>
     // Keep the content for all reference-overrides.conf files
     MergeStrategy.concat
