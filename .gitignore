@@ -9,3 +9,4 @@ target
 /RUNNING_PID
 /conf/applicationLocal.conf
 /conf/silhouetteLocal.conf
+dist/agora-api.jar
