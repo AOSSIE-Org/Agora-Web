@@ -10,3 +10,4 @@ target
 /conf/applicationLocal.conf
 /conf/silhouetteLocal.conf
 dist/agora-api.jar
+/.bsp

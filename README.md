@@ -1,4 +1,4 @@
-# Agora-Web
+# Agora-API
 
 ## Readme
 
@@ -19,14 +19,14 @@ To run the development environment for this REST API, you need [Git](https://git
 ## Table of contents
 
 - [Agora-Web](#agora-web)
-  - [Readme](#readme)
-  - [Table of contents](#table-of-contents)
-    - [Installation](#installation)
-    - [Running the application](#running-the-application)
-    - [API documentation](#api-documentation)
-    - [Deployment](#deployment)
-    - [Troubleshooting your local environment](#troubleshooting-your-local-environment)
-  - [Further Reading / Useful Links](#further-reading--useful-links)
+    - [Readme](#readme)
+    - [Table of contents](#table-of-contents)
+        - [Installation](#installation)
+        - [Running the application](#running-the-application)
+        - [API documentation](#api-documentation)
+        - [Deployment](#deployment)
+        - [Troubleshooting your local environment](#troubleshooting-your-local-environment)
+    - [Further Reading / Useful Links](#further-reading--useful-links)
 
 
 ### Installation
@@ -35,7 +35,7 @@ To install the backend, please do the following:
 
 1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 2. Clone this repo with `https://gitlab.com/aossie/Agora-Web`
-  - **Note:** *If you just want to use the project, cloning is the best option. However, if you wish to contribute to the project, you will need to fork the project first, and then clone your `Agora-Web` fork and make your contributions via a branch on your fork.*
+- **Note:** *If you just want to use the project, cloning is the best option. However, if you wish to contribute to the project, you will need to fork the project first, and then clone your `Agora-Web` fork and make your contributions via a branch on your fork.*
 3. Install and run [MongoDB](https://www.mongodb.com/)
     1. The project currently only supports **MongoDB v3.6 or lower**
     2. Follow the installation instructions for your respective platform here:
@@ -43,15 +43,15 @@ To install the backend, please do the following:
             * Please make sure you have the Homebrew package manager installed. If not, you can [follow the instructions here](https://brew.sh/) to install it.
             * Make sure you install the older version of MongoDB with `brew install mongodb-community@3.6`
             * Make sure that the `mongod` command points to the 3.6 version of the binary. You confirm this by executing `which mongod`.
-            It should output something like:
-            > `/usr/local/opt/mongod-community@3.6/bin/mongod`
+              It should output something like:
+          > `/usr/local/opt/mongod-community@3.6/bin/mongod`
         * [Linux](https://docs.mongodb.com/v3.6/tutorial/install-mongodb-on-ubuntu/)
             * Instructions for popular Linux distributions are available at the above link.
-            * Unfortunately, older releases of MongoDB do not officially support newer releases of some distributions. The packages may work fine, but compatibility is not guaranteed.    
+            * Unfortunately, older releases of MongoDB do not officially support newer releases of some distributions. The packages may work fine, but compatibility is not guaranteed.
         * [Windows](https://docs.mongodb.com/v3.6/tutorial/install-mongodb-on-windows/)
             * Please make sure that you select v3.6 when the above link points you to the MongoDB Download Center. Any installation method (MSI/Zip) should be fine.
     3. Create a database named in MongoDB using the `mongo` command or using [MongoDB Compass](https://www.mongodb.com/products/compass)
-       
+
 4. Configure [Silhouette](https://www.silhouette.rocks/) to allow Agora's frontend to do Oauth2 authentication:
     1. Make a copy of `silhouette.conf` and rename it to `silhouetteLocal.conf`.
     2. Create new applications in [Facebook](https://developers.facebook.com/), [Twitter](https://dev.twitter.com/) and [Google](https://console.cloud.google.com/)
@@ -66,12 +66,12 @@ To install the backend, please do the following:
     4. Change the redirect URL in `silhouetteLocal.conf` to your localhost `localhost:9000`.
     5. Delete the line `include "silhouetteLocal.conf"` from `silhouetteLocal.conf`.
 
-5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`. 
-    1. Assign your MongoDB URI to the `mongodb.default.uri` field. 
+5. As above, make a copy of `application.conf` and rename it to `applicationLocal.conf`.
+    1. Assign your MongoDB URI to the `mongodb.default.uri` field.
         * For example, if you are using MongoDB locally, and you created a database named 'Agora' during the setup phase of MongoDB,
-        then you URL might look like "mongodb://localhost:27017/Agora"
-        Therefore, you must set the field like this:
-        > `mongodb.default.uri=mongodb://localhost:27017/Agora`
+          then your URL might look like "mongodb://localhost:27017/Agora"
+          Therefore, you must set the field like this:
+       > `mongodb.default.uri=mongodb://localhost:27017/Agora`
     2. Set your [SendGrid](https://sendgrid.com) username and password in `applicationLocal.conf`.
         ```
         user = ${?SENDGRID_USERNAME}
@@ -83,17 +83,25 @@ To install the backend, please do the following:
 
 To start the API, please do the following:
 
-- Make sure you have java 8 installed and not java 9. For some reasons the build fails with java 9
+- Make sure you have java 8 installed and not java 9. For some reason the build fails with java 9
 - Start the server by running `sbt run` in the root folder.
 - Go to [http://localhost:9000/](http://localhost:9000/) in a browser. Where you will see the API documentation hosted using swagger UI.
     - **Note:** *Changing any source code while the server is running will automatically recompile and reload the application on the next HTTP request.*
 
 ### API documentation
 
-REST API documentation is available under address: [REST API](http://localhost:9000/)
+REST API documentation is available under the address: [REST](http://localhost:9000/) API](http://localhost:9000/)
 
-### Deployment 
-The current development branch is deployed on heroku and is available at http://agora-rest-api.herokuapp.com/
+### Deployment
+Deployment on Google App Engine is supported but the app can be deployed to any cloud provider that supports java. Follow the steps bellow to deploy the application to Google App Engine
+
+- Prepare your production config settings and replace them accordingly in application.conf and silhouette.conf or just include the overriding configs in applicationLocal.conf and silhouetteLocal.conf
+- Run `sbt build` to generate a jar file in dist directory
+- Make sure you have [Google Clouud CLI](https://cloud.google.com/sdk/docs/install) installed and have logged in successfully from the comand line.
+- Navigate to the `dist` directory where you should find `agora-api.jar` file generated from the `build` task above
+- Run `gcloud app deploy`
+
+The current development branch is deployed on GAE and is available at https://agora-378510.uc.r.appspot.com/
 
 ### Troubleshooting your local environment
 

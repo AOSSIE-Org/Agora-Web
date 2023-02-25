@@ -37,15 +37,15 @@ libraryDependencies ++= Seq(
   guice
 )
 
-mainClass in assembly := Some("play.core.server.ProdServerStart")
+assembly / mainClass := Some("play.core.server.ProdServerStart")
 
-assemblyJarName in assembly := "agora-api.jar"
+assembly / assemblyJarName := "agora-api.jar"
 
-assemblyOutputPath in assembly := new File(s"dist/${(assembly/assemblyJarName).value}")
+assembly / assemblyOutputPath := new File(s"dist/${(assembly/assemblyJarName).value}")
 
-fullClasspath in assembly += Attributed.blank(PlayKeys.playPackageAssets.value)
+assembly / fullClasspath += Attributed.blank(PlayKeys.playPackageAssets.value)
 
-assemblyMergeStrategy in assembly := {
+assembly / assemblyMergeStrategy := {
   case referenceOverrides if referenceOverrides.contains("reference-overrides.conf") || referenceOverrides.contains("reference.conf") =>
     // Keep the content for all reference-overrides.conf files
     MergeStrategy.concat
@@ -57,10 +57,12 @@ assemblyMergeStrategy in assembly := {
   case _ => MergeStrategy.first
 }
 
-unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
+Test / unmanagedResourceDirectories += (baseDirectory.value / "target/web/public/test")
 
 resolvers += Resolver.jcenterRepo
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 resolvers += "iheartradio-maven" at "https://dl.bintray.com/iheartradio/maven"
 resolvers += "atlassian-maven" at "https://maven.atlassian.com/content/repositories/atlassian-public"
+
+addCommandAlias("build", ";clean; compile; test; assembly;")
