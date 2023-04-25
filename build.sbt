@@ -6,7 +6,7 @@ lazy val `Agora-REST-API` = (project in file(".")).enablePlugins(PlayScala)
 scalacOptions ++= Seq("-deprecation", "-language:_")
 
 scalaVersion := "2.12.17"
-val reactiveMongoVersion = "0.20.10-play27"
+val reactiveMongoVersion = "1.1.0-play27-RC9"
 val silhouetteVersion = "6.1.1"
 val playMailerVersion = "7.0.1"
 val playJsonVersion = "2.7.4"

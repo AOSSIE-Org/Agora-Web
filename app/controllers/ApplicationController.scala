@@ -22,8 +22,8 @@ class ApplicationController @Inject()(components: ControllerComponents,
   @ApiOperation(value = "", hidden = true)
   def index  = Action { implicit request =>
     Redirect(
-      url = "/assets/lib/swagger-ui/index.html",
-      queryString = Map("url" -> Seq("https://" + request.host + "/swagger.json"))
+      "/assets/lib/swagger-ui/index.html",
+       Map("url" -> Seq("https://" + request.host + "/swagger.json"))
     )
   }
 }

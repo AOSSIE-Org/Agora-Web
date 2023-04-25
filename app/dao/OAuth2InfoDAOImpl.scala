@@ -3,11 +3,13 @@ package dao
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
+
 import javax.inject.Inject
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
+import reactivemongo.api.bson.{BSON, BSONDocument, BSONDocumentHandler}
+import reactivemongo.api.bson.collection.BSONCollection
+import utils.BSONUtils.OFormatToBSONDocumentHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
@@ -17,23 +19,23 @@ class OAuth2InfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implic
   /**
     * The data store for the auth info.
     */
-  def oAuth2Data = reactiveMongoApi.database.map(_.collection[JSONCollection]("OAuth2Info"))
+  def oAuth2Data = reactiveMongoApi.database.map(_.collection[BSONCollection]("OAuth2Info"))
 
-  implicit lazy val format = Json.format[OAuth2Info]
+  private implicit val handler: BSONDocumentHandler[OAuth2Info] = OFormatToBSONDocumentHandler(Json.format[OAuth2Info])
 
   override def find(loginInfo: LoginInfo): Future[Option[OAuth2Info]] =
-    oAuth2Data.flatMap(_.find(Json.obj("loginInfoId" -> loginInfo.providerKey)).one[OAuth2Info])
+    oAuth2Data.flatMap(_.find(BSONDocument("loginInfoId" -> loginInfo.providerKey)).one[OAuth2Info])
 
   override def add(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] = {
-    val builder = Json.toJson(authInfo).as[JsObject] ++ Json.obj("loginInfoId" -> Some(loginInfo.providerKey))
-    oAuth2Data.flatMap(_.insert(builder)).flatMap {
+    val builder = BSON.writeDocument(authInfo).get ++ BSONDocument("loginInfoId" -> Some(loginInfo.providerKey))
+    oAuth2Data.flatMap(_.insert.one(builder)).flatMap {
       _ => Future.successful(authInfo)
     }
   }
 
   override def update(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] = {
-    val builder = Json.toJson(authInfo).as[JsObject] ++ Json.obj("loginInfoId" -> Some(loginInfo.providerKey))
-    oAuth2Data.flatMap(_.update(Json.obj("loginInfoId" -> loginInfo.providerKey), builder)).flatMap {
+    val builder = BSON.writeDocument(authInfo).get ++ BSONDocument("loginInfoId" -> Some(loginInfo.providerKey))
+    oAuth2Data.flatMap(_.update.one(BSONDocument("loginInfoId" -> loginInfo.providerKey), builder)).flatMap {
       _ => Future.successful(authInfo)
     }
   }
@@ -46,6 +48,6 @@ class OAuth2InfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implic
   }
 
   override def remove(loginInfo: LoginInfo): Future[Unit] = {
-    oAuth2Data.flatMap(_.remove(Json.obj("loginInfoId" -> loginInfo.providerKey))).flatMap(_ => Future.successful(()))
+    oAuth2Data.flatMap(_.delete.one(BSONDocument("loginInfoId" -> loginInfo.providerKey))).flatMap(_ => Future.successful(()))
   }
 }

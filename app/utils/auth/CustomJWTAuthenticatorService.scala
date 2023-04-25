@@ -283,7 +283,7 @@ class CustomJWTAuthenticatorService(
    */
   override def discardRefreshToken(authenticator: JWTAuthenticator)(implicit request: RequestHeader): Future[Unit] = {
 
-    refreshTokenRepository.fold(Future.successful(()))(_.remove(authenticator.id)).flatMap { _ => Future.successful()
+    refreshTokenRepository.fold(Future.successful(()))(_.remove(authenticator.id)).flatMap { _ => Future.successful(())
     }.recover {
       case e => throw new AuthenticatorDiscardingException(DiscardError.format(ID, authenticator), e)
     }

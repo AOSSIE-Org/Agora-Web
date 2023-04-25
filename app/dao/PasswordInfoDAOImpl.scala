@@ -6,8 +6,9 @@ import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
+import reactivemongo.api.bson.{BSON, BSONDocument, BSONDocumentHandler}
+import reactivemongo.api.bson.collection.BSONCollection
+import utils.BSONUtils.OFormatToBSONDocumentHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
@@ -20,9 +21,11 @@ class PasswordInfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(impl
   /**
     * The data store for the auth info.
     */
-  def passwords = reactiveMongoApi.database.map(_.collection[JSONCollection]("PasswordInfo"))
+  def passwords = reactiveMongoApi.database.map(_.collection[BSONCollection]("PasswordInfo"))
 
   implicit lazy val format = Json.format[PasswordInfo]
+
+  private implicit val handler: BSONDocumentHandler[PasswordInfo] = OFormatToBSONDocumentHandler(Json.format[PasswordInfo])
 
   /**
     * Finds the auth info which is linked with the specified login info.
@@ -31,7 +34,7 @@ class PasswordInfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(impl
     * @return The retrieved auth info or None if no auth info could be retrieved for the given login info.
     */
   override def find(loginInfo: LoginInfo): Future[Option[PasswordInfo]] =
-    passwords.flatMap(_.find(Json.obj("loginInfoId" -> loginInfo.providerKey)).one[PasswordInfo])
+    passwords.flatMap(_.find(BSONDocument("loginInfoId" -> loginInfo.providerKey)).one[PasswordInfo])
 
   /**
     * Adds new auth info for the given login info.
@@ -41,8 +44,8 @@ class PasswordInfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(impl
     * @return The added auth info.
     */
   override def add(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
-    val passwordBuilder = Json.toJson(authInfo).as[JsObject] ++ Json.obj("loginInfoId" -> Some(loginInfo.providerKey))
-    passwords.flatMap(_.insert(passwordBuilder)).flatMap {
+    val passwordBuilder = BSON.writeDocument(authInfo).get ++ BSONDocument("loginInfoId" -> Some(loginInfo.providerKey))
+    passwords.flatMap(_.insert.one(passwordBuilder)).flatMap {
       _ => Future.successful(authInfo)
     }
   }
@@ -55,8 +58,8 @@ class PasswordInfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(impl
     * @return The updated auth info.
     */
   override def update(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
-    val passwordBuilder = Json.toJson(authInfo).as[JsObject] ++ Json.obj("loginInfoId" -> Some(loginInfo.providerKey))
-    passwords.flatMap(_.update(Json.obj("loginInfoId" -> loginInfo.providerKey), passwordBuilder)).flatMap {
+    val passwordBuilder = BSON.writeDocument(authInfo).get ++ BSONDocument("loginInfoId" -> Some(loginInfo.providerKey))
+    passwords.flatMap(_.update.one(BSONDocument("loginInfoId" -> loginInfo.providerKey), passwordBuilder)).flatMap {
       _ => Future.successful(authInfo)
     }
   }
@@ -85,6 +88,6 @@ class PasswordInfoDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(impl
     * @return A future to wait for the process to be completed.
     */
   override def remove(loginInfo: LoginInfo): Future[Unit] = {
-    passwords.flatMap(_.remove(Json.obj("loginInfoId" -> loginInfo.providerKey))).flatMap(_ => Future.successful(()))
+    passwords.flatMap(_.delete.one(BSONDocument("loginInfoId" -> loginInfo.providerKey))).flatMap(_ => Future.successful(()))
   }
 }

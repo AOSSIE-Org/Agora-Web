@@ -2,8 +2,11 @@ package models.security
 
 import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 import formatters.json.UserData
+import models.security.User.UserWrites.UserReads
 import play.api.libs.json.{Json, _}
-import models.Question
+import models.{Election, Question}
+import reactivemongo.api.bson.BSONDocumentHandler
+import utils.BSONUtils.JsonToBSONDocumentHandler
 
 import scala.util.{Failure, Success, Try}
 
@@ -13,9 +16,6 @@ case class User(id: Option[String], loginInfo: LoginInfo, username: String, emai
 }
 
 object User {
-
-  implicit val reader = Json.reads[User]
-  implicit val writer = Json.writes[User]
 
   implicit val loginInfoReader = Json.reads[LoginInfo]
   implicit val loginInfoWriter = Json.writes[LoginInfo]
@@ -65,7 +65,7 @@ object User {
             val providerId = (user \ "loginInfo" \ "providerID").as[String]
             val providerKey = (user \ "loginInfo" \ "providerKey").as[String]
 
-            val username = (user \ "userName").as[String]
+            val username = (user \ "username").as[String]
             val email = (user \ "email").as[String]
             val firstName = (user \ "firstName").as[String]
             val lastName = (user \ "lastName").as[String]
@@ -97,5 +97,7 @@ object User {
     }
 
   }
+
+  implicit val handler: BSONDocumentHandler[User] = JsonToBSONDocumentHandler
 
 }

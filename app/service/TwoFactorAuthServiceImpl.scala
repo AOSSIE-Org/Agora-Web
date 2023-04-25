@@ -1,43 +1,27 @@
 package service
 
-import javax.crypto.Mac
-import javax.crypto.SecretKey
-import java.nio.ByteBuffer
-import java.security.InvalidKeyException
-import java.security.NoSuchAlgorithmException
-
-import javax.crypto.Cipher
 import com.mohiva.play.silhouette.api.LoginInfo
-import javax.crypto.KeyGenerator
-import javax.crypto.spec.SecretKeySpec
 import com.mohiva.play.silhouette.api.util.Clock
-
-import scala.math.pow
-import scala.math.BigInt
-import java.security.Key
-import java.security.SecureRandom
-
-import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
-import play.api.libs.json.Json
-import org.joda.time.DateTimeZone
-import org.joda.time.DateTime
-import models.{TotpToken, TrustedDevices}
-import java.util.UUID
-
 import models.security.User
-import javax.inject.Inject
+import models.{TotpToken, TrustedDevices}
+import org.joda.time.{DateTime, DateTimeZone}
+import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.Cursor
+import reactivemongo.api.bson.BSONDocument
+import reactivemongo.api.bson.collection.BSONCollection
 
+import java.util.UUID
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.math.pow
 
 class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi, clock: Clock) (implicit ex: ExecutionContext) extends TwoFactorAuthService {
+  import utils.BSONUtils.loginInfoHandler
+  private def totpTokenCollection = reactiveMongoApi.database.map(_.collection[BSONCollection]("totpTokens"))
 
-  private def totpTokenCollection = reactiveMongoApi.database.map(_.collection[JSONCollection]("totpTokens"))
-
-  private def trustedDevicesCollection = reactiveMongoApi.database.map(_.collection[JSONCollection]("trustedDevices"))
+  private def trustedDevicesCollection = reactiveMongoApi.database.map(_.collection[BSONCollection]("trustedDevices"))
 
   override def totp(time: Long, returnDigits: Int, crypto: String): Future[String] = {
         val msg: Array[Byte] = BigInt(time).toByteArray.reverse.padTo(8, 0.toByte).reverse
@@ -63,14 +47,14 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
   }
 
   override def save(token: TotpToken) = {
-    totpTokenCollection.flatMap(_.insert(token)).flatMap(_ => Future.successful(token))
+    totpTokenCollection.flatMap(_.insert.one(token)).flatMap(_ => Future.successful(token))
   }
 
-  override def find(crypto: String) = totpTokenCollection.flatMap(_.find(Json.obj("crypto" -> crypto))
+  override def find(crypto: String) = totpTokenCollection.flatMap(_.find(BSONDocument("crypto" -> crypto))
      .one[TotpToken])
 
   override def findUser(loginInfo: LoginInfo): Future[Option[TotpToken]] =
-    totpTokenCollection.flatMap(_.find(Json.obj("userLoginInfo" -> loginInfo)).one[TotpToken])
+    totpTokenCollection.flatMap(_.find(BSONDocument("userLoginInfo" -> loginInfo)).one[TotpToken])
 
   override def createTotpToken(loginInfo: LoginInfo): Future[TotpToken] = {
     findUser(loginInfo).flatMap {
@@ -92,11 +76,11 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
   }
 
   override def findExpired(dateTime: DateTime) =
-     totpTokenCollection.flatMap(_.find(Json.obj()).cursor[TotpToken]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[TotpToken]]()))
+     totpTokenCollection.flatMap(_.find(BSONDocument.empty).cursor[TotpToken]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[TotpToken]]()))
        .flatMap(tokens => Future.successful(tokens.filter(token => token.expiry.isBefore(dateTime))))
 
   override def remove(crypto: String) = {
-     totpTokenCollection.flatMap(_.remove(Json.obj("crypto" -> crypto))).flatMap(_ => Future.successful(()))
+     totpTokenCollection.flatMap(_.delete.one(BSONDocument("crypto" -> crypto))).flatMap(_ => Future.successful(()))
   }
 
   override def removeExpired() = {
@@ -118,8 +102,8 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
   override def wrongAttempt(crypto: String): Future[Boolean] = {
     find(crypto).flatMap { 
       case Some(token) =>
-        val query = Json.obj("crypto" -> crypto)
-        totpTokenCollection.flatMap(_.update(query, TotpToken(token.crypto, token.userLoginInfo, token.expiry, token.attempts + 1))).flatMap(_ => Future.successful(true))
+        val query = BSONDocument("crypto" -> crypto)
+        totpTokenCollection.flatMap(_.update.one(query, TotpToken(token.crypto, token.userLoginInfo, token.expiry, token.attempts + 1))).flatMap(_ => Future.successful(true))
     }
     
   }
@@ -157,15 +141,15 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
     else Future.successful(false)
   }
 
-  override def findTrustedDevice(trustedDevice: String) = trustedDevicesCollection.flatMap(_.find(Json.obj("trustedDevice" -> trustedDevice))
+  override def findTrustedDevice(trustedDevice: String) = trustedDevicesCollection.flatMap(_.find(BSONDocument("trustedDevice" -> trustedDevice))
      .one[TrustedDevices])
 
   override def removeTrustedDevice(trustedDevice: String) = {
-     trustedDevicesCollection.flatMap(_.remove(Json.obj("trustedDevice" -> trustedDevice))).flatMap(_ => Future.successful(()))
+     trustedDevicesCollection.flatMap(_.delete.one(BSONDocument("trustedDevice" -> trustedDevice))).flatMap(_ => Future.successful(()))
   }
 
    override def findTrustedDeviceExpired(dateTime: DateTime) =
-     trustedDevicesCollection.flatMap(_.find(Json.obj()).cursor[TrustedDevices]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[TrustedDevices]]()))
+     trustedDevicesCollection.flatMap(_.find(BSONDocument.empty).cursor[TrustedDevices]().collect[Seq](Int.MaxValue, Cursor.FailOnError[Seq[TrustedDevices]]()))
        .flatMap(trustedDevices => Future.successful(trustedDevices.filter(trustedDevice => trustedDevice.expiry.isBefore(dateTime))))
 
   override def removeExpiredTrustedDevice() = {
@@ -181,7 +165,7 @@ class TwoFactorAuthServiceImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi
     val expiry = 30
     var expiresOn = clock.now.withZone(DateTimeZone.UTC).plusDays(expiry)
     val trustedDevice = TrustedDevices(loginInfo, crypto, expiresOn)
-    trustedDevicesCollection.flatMap(_.insert(trustedDevice)).flatMap(_ => Future.successful(trustedDevice))
+    trustedDevicesCollection.flatMap(_.insert.one(trustedDevice)).flatMap(_ => Future.successful(trustedDevice))
   }
 
   override def validateTrustedDevice(loginInfo: LoginInfo, trust: Option[String]): Future[Boolean] = {

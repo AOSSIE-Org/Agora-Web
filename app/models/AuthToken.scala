@@ -3,6 +3,7 @@ package models
 import com.mohiva.play.silhouette.api.LoginInfo
 import org.joda.time.DateTime
 import play.api.libs.json._
+import reactivemongo.api.bson.BSONDocumentHandler
 
 /**
  * A token to authenticate a user against an endpoint for a short time period.
@@ -20,4 +21,6 @@ object AuthToken {
   implicit val jodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
 
   implicit val authTokenFormat = Json.format[AuthToken]
+
+  implicit val handler: BSONDocumentHandler[TrustedDevices] = utils.BSONUtils.OFormatToBSONDocumentHandler
 }

@@ -6,6 +6,8 @@ import org.joda.time.DateTime
 import play.api.libs.json.Reads._
 import play.api.libs.json.Writes._
 import play.api.libs.json._
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+import utils.BSONUtils
 
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.util.{Failure, Success, Try}
@@ -60,4 +62,5 @@ object JWTAuthenticatorFormat {
     }
   }
 
+  implicit val loginInfoHandler: BSONDocumentHandler[JWTAuthenticator] = BSONUtils.JsonToBSONDocumentHandler
 }

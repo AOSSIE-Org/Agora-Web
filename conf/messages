@@ -79,7 +79,7 @@ yahoo = Yahoo
 # Emails
 ##########
 
-email.from = Agora Vote <noreply@aossie.org>
+email.from = Agora Vote <icemc500@gmail.com>
 
 # Sign Up
 email.sign.up.subject = Welcome

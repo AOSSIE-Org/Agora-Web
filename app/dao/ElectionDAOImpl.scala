@@ -1,36 +1,40 @@
 package dao
 
 import com.mohiva.play.silhouette.api.LoginInfo
-import javax.inject.Inject
 import models.Election._
-import models.{Ballot, Election, Voter, Winner, md5HashString}
+import models._
 import org.joda.time.DateTime
-import play.api.libs.json._
 import play.modules.reactivemongo._
+import reactivemongo.api.bson.collection.BSONCollection
+import reactivemongo.api.bson.{BSONArray, BSONDocument}
 import reactivemongo.api.{Cursor, ReadPreference}
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection.{JSONCollection, JsCursor}
-import JsCursor._
 import service.ElectionService
 
+import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit ex: ExecutionContext) extends ElectionService {
+  /**
+   * The data store for the elections.
+   */
+  private def electionsCollection = reactiveMongoApi.database.map(_.collection[BSONCollection]("election"))
+
+
   /**
     * Saves an Election.
     *
     * @return The saved Election.
     */
   override def save(election: Election): Future[Election] = {
-    electionsCollection.flatMap(_.insert(election)).flatMap {
+    electionsCollection.flatMap(_.insert.one(election)).flatMap {
       _ => Future.successful(election)
     }
   }
 
   override def delete(id: String): Future[Unit] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
-    electionsCollection.flatMap(_.remove(query)).flatMap {
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
+    electionsCollection.flatMap(_.delete.one(query)).flatMap {
       _ => Future.successful(())
     }
   }
@@ -40,7 +44,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def userElectionList(loginInfo: LoginInfo): Future[List[Election]] = {
-    val query = Json.obj("loginInfo" -> loginInfo)
+    val query = BSONDocument("loginInfo" -> loginInfo)
     electionsCollection.flatMap(_.find(query).cursor[Election](ReadPreference.Primary).collect[List](Int.MaxValue,Cursor.FailOnError[List[Election]]()))
   }
 
@@ -52,14 +56,14 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def vote(id: String, ballot: Ballot): Future[Boolean] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
     var ballotList = ListBuffer[Ballot]()
     ballotList += ballot
     getBallots(id).flatMap {
       result =>
         val ballots = ballotList.toList.:::(result)
-        val modifier = Json.obj("$set" -> Json.obj("ballot" -> Json.toJson(ballots)))
-        electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+        val modifier = BSONDocument("$set" -> BSONDocument("ballot" -> BSONArray(ballots)))
+        electionsCollection.flatMap(_.update.one(query, modifier)).flatMap(_ => Future.successful(true))
     }
   }
 
@@ -71,7 +75,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def addVoter(id: String, voter: Voter): Future[Boolean] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
     retrieve(id).flatMap {
       case Some(election) =>
         val hashedVoter = Voter(voter.name, md5HashString.hashString(voter.hash.concat(election.inviteCode)))
@@ -83,8 +87,8 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
                 val voterList = ListBuffer[Voter]()
                 voterList += hashedVoter
                 val voters = voterList.toList.:::(result)
-                val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(voters)))
-                electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+                val modifier = BSONDocument("$set" -> BSONDocument("voterList" -> BSONArray(voters)))
+                electionsCollection.flatMap(_.update.one(query, modifier)).flatMap(_ => Future.successful(true))
               }
               else {
                 Future.successful(false)
@@ -97,7 +101,7 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def addVoters(id: String, voters: List[Voter]): Future[List[Voter]] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
     retrieve(id).flatMap{
       case Some(election) =>
         getBallots(id).flatMap{
@@ -106,8 +110,8 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
             val hashedVoters = voters.map{ voter => Voter(voter.name, md5HashString.hashString(voter.hash.concat(election.inviteCode))) }
             val hashedFilteredList = hashedVoters.filter(voter => !isVoterInList(voter, result) && !isVoterInBallot(voter, ballotResult))
             val allVoters = hashedFilteredList.:::(result)
-            val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(allVoters)))
-            electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(voters))
+            val modifier = BSONDocument("$set" -> BSONDocument("voterList" -> BSONArray(allVoters)))
+            electionsCollection.flatMap(_.update.one(query, modifier)).flatMap(_ => Future.successful(voters))
         }
     }
   }
@@ -127,12 +131,12 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def removeVoter(id: String, hashedEmail: String): Future[Boolean] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
     getVoterList(id).flatMap {
       result =>
         val voters = result.filter(v => v.hash!= hashedEmail)
-        val modifier = Json.obj("$set" -> Json.obj("voterList" -> Json.toJson(voters)))
-        electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+        val modifier = BSONDocument("$set" -> BSONDocument("voterList" -> BSONArray(voters)))
+        electionsCollection.flatMap(_.update.one(query, modifier)).flatMap(_ => Future.successful(true))
     }
   }
 
@@ -157,38 +161,38 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
 
   //get all the inactive elections
   override def getInactiveElections(): Future[List[Election]] = {
-    val query = Json.obj("isStarted" -> false)
+    val query = BSONDocument("isStarted" -> false)
     electionsCollection.flatMap(_.find(query).cursor[Election](readPreference = ReadPreference.primary).collect[List](Int.MaxValue, Cursor.FailOnError[List[Election]]()))
   }
 
   //get all the completed and uncount elections
   override def getCompletedElections(): Future[List[Election]] = {
-    val query = Json.obj("isCompleted" -> true, "isCounted" -> false)
+    val query = BSONDocument("isCompleted" -> true, "isCounted" -> false)
     electionsCollection.flatMap(_.find(query).cursor[Election](readPreference = ReadPreference.primary).collect[List](Int.MaxValue, Cursor.FailOnError[List[Election]]()))
   }
 
   //Update finished election
   override def updateCompleteElection(id: String) = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
-    val modifier = Json.obj("$set" -> Json.obj("isCompleted" -> Json.toJson(true)))
-    electionsCollection.flatMap(_.update(query, modifier))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
+    val modifier = BSONDocument("$set" -> BSONDocument("isCompleted" -> true))
+    electionsCollection.flatMap(_.update.one(query, modifier))
   }
 
   //Update active election
   override def updateActiveElection(id: String) = {
-    val query = Json.obj("_id" -> id)
-    val modifier = Json.obj("$set" -> Json.obj("isStarted" -> Json.toJson(true)))
-    electionsCollection.flatMap(_.update(query, modifier))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
+    val modifier = BSONDocument("$set" -> BSONDocument("isStarted" -> true))
+    electionsCollection.flatMap(_.update.one(query, modifier))
   }
 
   //get the all unfinished elections
   override def getActiveElection(): Future[List[Election]] = {
-    val query = Json.obj("isStarted" -> true, "isCompleted" -> false)
+    val query = BSONDocument("isStarted" -> true, "isCompleted" -> false)
     electionsCollection.flatMap(_.find(query).cursor[Election](readPreference = ReadPreference.primary).collect[List](Int.MaxValue, Cursor.FailOnError[List[Election]]()))
   }
 
   override def getActiveElectionWithRealTimeResult(): Future[List[Election]] = {
-    val query = Json.obj("isStarted" -> true, "isCompleted" -> false, "realtimeResult" -> true)
+    val query = BSONDocument("isStarted" -> true, "isCompleted" -> false, "realtimeResult" -> true)
     electionsCollection.flatMap(_.find(query).cursor[Election](readPreference = ReadPreference.primary).collect[List](Int.MaxValue, Cursor.FailOnError[List[Election]]()))
   }
 
@@ -200,9 +204,9 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def update(election: Election): Future[Boolean] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> election.id.get))
-    val modifier = Json.obj("$set" -> Json.toJson(election.copy(id = None)))
-    electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> election.id.get))
+    val modifier = BSONDocument("$set" -> election.copy(id = None))
+    electionsCollection.flatMap(_.update.one(query, modifier)).flatMap(_ => Future.successful(true))
   }
 
   override def getWinners(id: String): Future[List[Winner]] = {
@@ -213,13 +217,13 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def updateWinner(result: List[Winner], id: String) = {
-    electionsCollection.flatMap(_.update(Json.obj("_id" -> Json.obj("$oid" -> id)),
-      Json.obj("$set" -> Json.obj("winners" -> Json.toJson(result), "isCounted" -> Json.toJson(true)))))
+    electionsCollection.flatMap(_.update.one(BSONDocument("_id" -> BSONDocument("$oid" -> id)),
+      BSONDocument("$set" -> BSONDocument("winners" -> result, "isCounted" -> true))))
   }
 
   override def updateIsCounted(id: String) = {
-    electionsCollection.flatMap(_.update(Json.obj("_id" -> Json.obj("$oid" -> id)),
-      Json.obj("$set" -> Json.obj("isCounted" -> Json.toJson(true)))))
+    electionsCollection.flatMap(_.update.one(BSONDocument("_id" -> BSONDocument("$oid" -> id)),
+      BSONDocument("$set" -> BSONDocument("isCounted" -> true))))
   }
 
   override def getStatus(id: String): Future[String] = {
@@ -229,25 +233,20 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
   }
 
   override def savePollLink(id: String, voterLink: String): Future[Boolean] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
     retrieve(id).flatMap {
       case Some(election) => {
-         val modifier = Json.obj("$set" -> Json.obj("adminLink" -> Json.toJson(voterLink)))
-          electionsCollection.flatMap(_.update(query, modifier)).flatMap(_ => Future.successful(true))
+         val modifier = BSONDocument("$set" -> BSONDocument("adminLink" -> voterLink))
+          electionsCollection.flatMap(_.update.one(query, modifier)).flatMap(_ => Future.successful(true))
       }
       case _ => Future.successful(false)
     }
   }
 
   override def retrieve(id: String): Future[Option[Election]] = {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
+    val query = BSONDocument("_id" -> BSONDocument("$oid" -> id))
     electionsCollection.flatMap(_.find(query).one[Election])
   }
-
-  /**
-    * The data store for the elections.
-    */
-  private def electionsCollection = reactiveMongoApi.database.map(_.collection[JSONCollection]("election"))
 
   private def isVoterInList(voter: Voter, list: List[Voter]): Boolean = {
     for (voterD <- list) {
@@ -264,5 +263,4 @@ class ElectionDAOImpl @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit
     }
     return false
   }
-
 }

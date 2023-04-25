@@ -2,12 +2,13 @@ package models
 
 import java.text.SimpleDateFormat
 import java.util.Date
-
 import play.api.libs.json._
 import com.mohiva.play.silhouette.api.LoginInfo
 import formatters.json.ElectionData
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import org.joda.time.DateTime
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+import utils.BSONUtils.JsonToBSONDocumentHandler
 
 import scala.util.{Failure, Success, Try}
 
@@ -279,4 +280,6 @@ object Election {
     }
   }
 
+  implicit val loginInfoHandler: BSONDocumentHandler[LoginInfo] = Macros.handler[LoginInfo]
+  implicit val handler: BSONDocumentHandler[Election] = JsonToBSONDocumentHandler(Election.ElectionWrites, Election.ElectionReads)
 }

@@ -4,6 +4,7 @@ import agora.model.Candidate
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import play.api.libs.json.{Format, JsPath, Json, OFormat}
 import play.api.libs.functional.syntax._
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 @ApiModel(description = "Winner object")
 case class Winner(
@@ -22,4 +23,7 @@ object Winner {
     (JsPath \ "candidate").format[Candidate] and
       (JsPath \ "score").format[Score]
     )(Winner.apply, unlift(Winner.unapply))
+
+  implicit val candidateHandler: BSONDocumentHandler[Candidate] = Macros.handler[Candidate]
+  implicit val handler: BSONDocumentHandler[Winner] = Macros.handler[Winner]
 }

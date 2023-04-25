@@ -93,15 +93,22 @@ To start the API, please do the following:
 REST API documentation is available under the address: [REST](http://localhost:9000/) API](http://localhost:9000/)
 
 ### Deployment
-Deployment on Google App Engine is supported but the app can be deployed to any cloud provider that supports java. Follow the steps bellow to deploy the application to Google App Engine
+#### Deploy on Google App Engine
+Deployment on Google App Engine is supported but the app can be deployed to any cloud provider that supports Java. Follow the steps below to deploy the application to Google App Engine
 
 - Prepare your production config settings and replace them accordingly in application.conf and silhouette.conf or just include the overriding configs in applicationLocal.conf and silhouetteLocal.conf
 - Run `sbt build` to generate a jar file in dist directory
-- Make sure you have [Google Clouud CLI](https://cloud.google.com/sdk/docs/install) installed and have logged in successfully from the comand line.
+- Make sure you have [Google Clouud CLI](https://cloud.google.com/sdk/docs/install) installed and have logged in successfully from the command line.
 - Navigate to the `dist` directory where you should find `agora-api.jar` file generated from the `build` task above
 - Run `gcloud app deploy`
 
 The current development branch is deployed on GAE and is available at https://agora-378510.uc.r.appspot.com/
+
+#### Deploy on [Fly(Preferred)](https://fly.io/app/sign-in)
+- Signup on Fly and download [Flyctl(Command line tool)](https://fly.io/docs/hands-on/install-flyctl/)
+- In the projects root directory run `flyctl auth login` to login
+- Run `fly launch` to generate the fly.toml file. See [https://fly.io/docs/languages-and-frameworks/dockerfile/](https://fly.io/docs/languages-and-frameworks/dockerfile/)
+- Run `fly deploy` to deploy the project. Wait for the deployment to complete this will take a while
 
 ### Troubleshooting your local environment
 

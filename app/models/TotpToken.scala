@@ -3,6 +3,7 @@ package models
 import com.mohiva.play.silhouette.api.LoginInfo
 import org.joda.time.DateTime
 import play.api.libs.json._
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 /**
  * A token for two factor authentication
@@ -20,4 +21,6 @@ object TotpToken {
   implicit val jodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
 
   implicit val totpTokenFormat = Json.format[TotpToken]
+
+  implicit val handler: BSONDocumentHandler[TotpToken] = utils.BSONUtils.OFormatToBSONDocumentHandler
 }

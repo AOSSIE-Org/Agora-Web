@@ -1,28 +1,26 @@
 package repository
 
-import javax.inject.Inject
-
-import com.mohiva.play.silhouette.api.repositories.AuthenticatorRepository
 import com.mohiva.play.silhouette.impl.authenticators.JWTAuthenticator
 import formatters.json.JWTAuthenticatorFormat._
-import play.api.libs.json.Writes._
-import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
-import scala.language.postfixOps
+import reactivemongo.api.bson.BSONDocument
+import reactivemongo.api.bson.collection.BSONCollection
 
+import javax.inject.Inject
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.postfixOps
 
 class RefreshTokenAuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: ReactiveMongoApi)(implicit ec: ExecutionContext) extends RefreshTokenAuthenticatorRepository[JWTAuthenticator] {
+  import utils.BSONUtils.FiniteDurationBsonFormat
 
   final val maxDuration = 720 hours
 
   /**
    * The data store for the password info.
    */
-  def refreshTokenAuthRepository = reactiveMongoApi.database.map(_.collection[JSONCollection]("refreshTokenAuthRepository"))
+  def refreshTokenAuthRepository = reactiveMongoApi.database.map(_.collection[BSONCollection]("refreshTokenAuthRepository"))
+
 
   /**
    * Finds the authenticator for the given ID.
@@ -31,7 +29,7 @@ class RefreshTokenAuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: Reacti
    * @return The found authenticator or None if no authenticator could be found for the given ID.
    */
   override def find(id: String): Future[Option[JWTAuthenticator]] = {
-    refreshTokenAuthRepository.flatMap(_.find(Json.obj("_id" -> id)).one[JWTAuthenticator])
+    refreshTokenAuthRepository.flatMap(_.find(BSONDocument("id" -> id)).one[JWTAuthenticator])
   }
 
   /**
@@ -41,8 +39,8 @@ class RefreshTokenAuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: Reacti
    * @return The added authenticator.
    */
   override def add(authenticator: JWTAuthenticator): Future[JWTAuthenticator] = {
-    val passInfo = Json.obj("_id" -> authenticator.id, "authenticator" -> authenticator, "duration" -> maxDuration)
-    refreshTokenAuthRepository.flatMap(_.insert(passInfo)).flatMap(_ => Future(authenticator))
+    val passInfo = BSONDocument("id" -> authenticator.id, "authenticator" -> authenticator, "duration" -> maxDuration)
+    refreshTokenAuthRepository.flatMap(_.insert.one(passInfo)).flatMap(_ => Future(authenticator))
   }
 
   /**
@@ -52,8 +50,8 @@ class RefreshTokenAuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: Reacti
    * @return The updated authenticator.
    */
   override def update(authenticator: JWTAuthenticator) = {
-    val passInfo = Json.obj("_id" -> authenticator.id, "authenticator" -> authenticator, "duration" -> maxDuration)
-    refreshTokenAuthRepository.flatMap(_.update(Json.obj("_id" -> authenticator.id), passInfo)).flatMap(_ => Future(authenticator))
+    val passInfo = BSONDocument("id" -> authenticator.id, "authenticator" -> authenticator, "duration" -> maxDuration)
+    refreshTokenAuthRepository.flatMap(_.update.one(BSONDocument("id" ->  authenticator.id), BSONDocument("$set" -> passInfo))).flatMap(_ => Future(authenticator))
   }
 
   /**
@@ -63,5 +61,5 @@ class RefreshTokenAuthenticatorRepositoryImpl @Inject()(reactiveMongoApi: Reacti
    * @return An empty future.
    */
   override def remove(id: String): Future[Unit] =
-    refreshTokenAuthRepository.flatMap(_.remove(Json.obj("_id" -> id))).flatMap(_ => Future.successful(()))
+    refreshTokenAuthRepository.flatMap(_.delete.one(BSONDocument("id" -> id))).flatMap(_ => Future.successful(()))
 }

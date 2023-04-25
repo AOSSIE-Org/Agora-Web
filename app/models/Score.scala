@@ -2,6 +2,7 @@ package models
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Format, JsPath, Json, OFormat}
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 @ApiModel(description = "Score object")
 case class Score(
@@ -14,4 +15,6 @@ object Score {
     (JsPath \ "numerator").format[Int] and
       (JsPath \ "denominator").format[Int]
     )(Score.apply, unlift(Score.unapply))
+
+  implicit val handler: BSONDocumentHandler[Score] = Macros.handler[Score]
 }
