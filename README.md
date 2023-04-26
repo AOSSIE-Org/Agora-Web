@@ -93,6 +93,15 @@ To start the API, please do the following:
 REST API documentation is available under the address: [REST](http://localhost:9000/) API](http://localhost:9000/)
 
 ### Deployment
+
+#### Deploy on [Fly(Preferred)](https://fly.io/app/sign-in)
+- Signup on Fly and download [Flyctl(Command line tool)](https://fly.io/docs/hands-on/install-flyctl/)
+- In the projects root directory run `flyctl auth login` to login
+- Run `fly launch` to generate the fly.toml file. See [https://fly.io/docs/languages-and-frameworks/dockerfile/](https://fly.io/docs/languages-and-frameworks/dockerfile/)
+- Run `fly deploy` to deploy the project. Wait for the deployment to complete this will take a while
+
+The current development branch is deployed on Fly and is available at https://bitter-feather-9060.fly.dev/
+
 #### Deploy on Google App Engine
 Deployment on Google App Engine is supported but the app can be deployed to any cloud provider that supports Java. Follow the steps below to deploy the application to Google App Engine
 
@@ -103,12 +112,6 @@ Deployment on Google App Engine is supported but the app can be deployed to any 
 - Run `gcloud app deploy`
 
 The current development branch is deployed on GAE and is available at https://agora-378510.uc.r.appspot.com/
-
-#### Deploy on [Fly(Preferred)](https://fly.io/app/sign-in)
-- Signup on Fly and download [Flyctl(Command line tool)](https://fly.io/docs/hands-on/install-flyctl/)
-- In the projects root directory run `flyctl auth login` to login
-- Run `fly launch` to generate the fly.toml file. See [https://fly.io/docs/languages-and-frameworks/dockerfile/](https://fly.io/docs/languages-and-frameworks/dockerfile/)
-- Run `fly deploy` to deploy the project. Wait for the deployment to complete this will take a while
 
 ### Troubleshooting your local environment
 
