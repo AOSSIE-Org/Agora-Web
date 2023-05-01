@@ -1,7 +1,6 @@
 package controllers
 
 import java.net.URLDecoder
-import java.util.UUID
 
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
@@ -61,22 +60,20 @@ class ActivateAccountController @Inject()(
       case Some(authToken) => userService.retrieve(authToken.userLoginInfo).flatMap {
         case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
           for {
-            isActivated <- userService.update(user.copy(activated = true), authToken.userLoginInfo)
-            authenticator <- silhouette.env.authenticatorService.create(authToken.userLoginInfo)
-            token <- silhouette.env.authenticatorService.init(authenticator)
-            result <- silhouette.env.authenticatorService.embed(token,
-              Ok(
-                Json.toJson(
-                  user.extractUserData.copy(authToken = Some(Token(
-                    token,
-                    expiresOn = authenticator.expirationDateTime))
-                  )
+            _ <- userService.update(user.copy(activated = true), authToken.userLoginInfo)
+            jwtAuthenticator <- silhouette.env.authenticatorService.create(user.loginInfo)
+            refreshTokenAuthenticator <- silhouette.env.authenticatorService.createRefreshToken(user.loginInfo)
+            authToken <- silhouette.env.authenticatorService.init(jwtAuthenticator)
+            refreshToken <- silhouette.env.authenticatorService.initRefreshToken(refreshTokenAuthenticator)
+          } yield {
+            Ok(
+              Json.toJson(
+                user.extractUserData.copy(
+                  authToken = Some(Token(authToken, expiresOn = jwtAuthenticator.expirationDateTime)),
+                  refreshToken = Some(Token(refreshToken, expiresOn = refreshTokenAuthenticator.expirationDateTime))
                 )
               )
             )
-          } yield {
-            silhouette.env.eventBus.publish(LoginEvent(user, request))
-            result
           }
         case _ => Future.successful(BadRequest(Json.toJson("message" -> Messages("invalid.activation.link"))))
       }
