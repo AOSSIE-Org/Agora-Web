@@ -15,12 +15,12 @@ import reactivemongo.api.bson.BSONDocumentHandler
 case class AuthToken(tokenId: String, userLoginInfo: LoginInfo, expiry: DateTime)
 
 object AuthToken {
-  implicit val loginInfoFormat = Json.format[LoginInfo]
+  implicit val loginInfoFormat: OFormat[LoginInfo] = Json.format[LoginInfo]
 
-  implicit val jodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
-  implicit val jodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
+  implicit val jodaDateReads: Reads[DateTime] = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
+  implicit val jodaDateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
 
-  implicit val authTokenFormat = Json.format[AuthToken]
+  implicit val authTokenFormat: OFormat[AuthToken] = Json.format[AuthToken]
 
-  implicit val handler: BSONDocumentHandler[TrustedDevices] = utils.BSONUtils.OFormatToBSONDocumentHandler
+  implicit val handler: BSONDocumentHandler[AuthToken] = utils.BSONUtils.OFormatToBSONDocumentHandler(authTokenFormat)
 }

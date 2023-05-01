@@ -85,11 +85,11 @@ case class Election(
 
 object Election {
 
-  implicit val jodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss'Z'")
-  implicit val jodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss'Z'")
+  implicit val jodaDateReads: Reads[DateTime] = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss'Z'")
+  implicit val jodaDateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
-  implicit val loginInfoReader = Json.reads[LoginInfo]
-  implicit val loginInfoWriter = Json.writes[LoginInfo]
+  implicit val loginInfoReader: Reads[LoginInfo] = Json.reads[LoginInfo]
+  implicit val loginInfoWriter: OWrites[LoginInfo] = Json.writes[LoginInfo]
 
   implicit object ElectionWrites extends OWrites[Election] {
     def writes(election: Election): JsObject = {

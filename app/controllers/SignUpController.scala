@@ -18,6 +18,7 @@ import service.{AuthTokenService, UserService}
 import utils.auth.{CustomSilhouette, DefaultEnv}
 import utils.responses.rest.Bad
 
+import java.util.UUID
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -59,7 +60,7 @@ class SignUpController @Inject()(components: ControllerComponents,
         case None => /* User not already exists */
           userService.retrieve(loginInfo).flatMap {
             case None => /* UserName not already exists */ 
-            val user = User(None, loginInfo, loginInfo.providerKey, signUp.email, signUp.firstName, signUp.lastName, None, false, signUp.securityQuestion, false)
+            val user = User(Some(UUID.randomUUID().toString.replace("-", "")), loginInfo, loginInfo.providerKey, signUp.email, signUp.firstName, signUp.lastName, None, false, signUp.securityQuestion, false)
             val authInfo = passwordHasherRegistry.current.hash(signUp.password)
             for {
               avatar <- avatarService.retrieveURL(signUp.email)

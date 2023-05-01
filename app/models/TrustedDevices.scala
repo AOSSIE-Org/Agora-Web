@@ -8,12 +8,12 @@ import reactivemongo.api.bson.BSONDocumentHandler
 case class TrustedDevices(userLoginInfo: LoginInfo, trustedDevice: String, expiry: DateTime)
 
 object TrustedDevices {
-  implicit val loginInfoFormat = Json.format[LoginInfo]
+  implicit val loginInfoFormat: OFormat[LoginInfo] = Json.format[LoginInfo]
 
-  implicit val jodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
-  implicit val jodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
+  implicit val jodaDateReads: Reads[DateTime] = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
+  implicit val jodaDateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSZZ")
 
-  implicit val trustedDevicesFormat = Json.format[TrustedDevices]
+  implicit val trustedDevicesFormat: OFormat[TrustedDevices] = Json.format[TrustedDevices]
 
   implicit val handler: BSONDocumentHandler[TrustedDevices] = utils.BSONUtils.OFormatToBSONDocumentHandler
 }

@@ -10,10 +10,7 @@ case class Ballot(
 )
 
 object Ballot {
-  implicit val ballotFormat : Format[Ballot] = (
-    (JsPath \ "voteBallot").format[String] and
-      (JsPath \ "hash").format[String]
-    )(Ballot.apply, unlift(Ballot.unapply))
+  implicit val ballotFormat : OFormat[Ballot] = Json.format[Ballot]
 
   implicit val handler: BSONDocumentHandler[Ballot] = Macros.handler[Ballot]
 }
